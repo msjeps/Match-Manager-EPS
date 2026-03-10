@@ -1,0 +1,22 @@
+{
+  "name": "TEN EPS - Tennis de Table",
+  "short_name": "TEN EPS",
+  "description": "Gestion de tournois de Tennis de Table pour l'EPS",
+  "start_url": "./TEN_EPS.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#213364",
+  "theme_color": "#213364",
+  "icons": [
+    {
+      "src": "icon_192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
