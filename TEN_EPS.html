@@ -1,0 +1,2355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#213364">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon_192.png">
+<link rel="apple-touch-icon" href="icon_192.png">
+<title>TEN EPS - Tennis de Table</title>
+<style>
+:root{--pri:#F3C146;--pri-lt:#F5D080;--pri-dk:#D4A020;--accent:#4DB0FA;--ok:#4CAF50;--err:#E64D4C;--info:#4DB0FA;--warn:#F3C146;--bg:#213364;--surf:#3e5db3;--surf2:#4A6BC5;--txt:#FFFFFF;--txt2:#BDD3FF;--brd:#5572C8;--sh:0 2px 12px rgba(0,0,0,.4);--rad:12px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+.screen{display:none;min-height:100vh;padding-bottom:20px}
+.screen.active{display:block}
+.top-bar{background:linear-gradient(135deg,var(--surf2),var(--surf));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.4);border-bottom:2px solid var(--pri)}
+.top-bar h1{font-size:1.1em;flex:1}
+.top-bar .logo{font-size:1.3em;font-weight:700;flex:1}
+.btn-back{background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 14px;border-radius:8px;font-size:.9em;cursor:pointer}
+.btn-icon{background:none;border:none;color:#fff;font-size:1.4em;cursor:pointer;padding:4px 8px}
+.content{padding:16px;max-width:800px;margin:0 auto}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-weight:600;margin-bottom:6px;color:var(--txt2);font-size:.9em}
+input[type=text],input[type=number],select,textarea{width:100%;padding:12px;border:2px solid var(--brd);border-radius:var(--rad);font-size:1em;background:var(--surf2);color:var(--txt);transition:border .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pri)}
+textarea{resize:vertical;min-height:80px}
+.btn-primary{background:linear-gradient(135deg,var(--pri),var(--pri-dk));color:#000;border:none;padding:14px 24px;border-radius:var(--rad);font-size:1em;font-weight:700;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(243,193,70,.3);transition:transform .1s}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{background:transparent;color:var(--pri);border:2px solid var(--pri);padding:10px 18px;border-radius:var(--rad);font-size:.9em;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-secondary:active{background:var(--pri);color:#000}
+.btn-success{background:var(--ok);color:#fff;border:none;padding:10px 18px;border-radius:var(--rad);font-size:.9em;font-weight:600;cursor:pointer}
+.btn-danger{background:var(--err);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:.85em;cursor:pointer}
+.btn-sm{padding:8px 14px;font-size:.85em}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.stepper{display:flex;align-items:center;gap:0}
+.stepper button{width:44px;height:44px;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-size:1.3em;cursor:pointer;border-radius:var(--rad) 0 0 var(--rad)}
+.stepper button:last-child{border-radius:0 var(--rad) var(--rad) 0}
+.stepper input{width:60px;height:44px;text-align:center;border:2px solid var(--brd);border-left:none;border-right:none;font-size:1.1em;font-weight:700}
+.card{background:var(--surf);border-radius:var(--rad);padding:16px;margin-bottom:12px;box-shadow:var(--sh);border:1px solid var(--brd)}
+.card-header{padding:12px 16px;border-radius:var(--rad) var(--rad) 0 0;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:space-between;margin:-16px -16px 12px -16px}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:.75em;font-weight:600}
+.badge-orange{background:rgba(243,193,70,.2);color:#F3C146}
+.badge-green{background:rgba(76,175,80,.2);color:#66BB6A}
+.badge-blue{background:rgba(33,150,243,.2);color:#42A5F5}
+.badge-red{background:rgba(244,67,54,.2);color:#EF5350}
+.mode-cards{display:grid;gap:12px}
+.mode-card{border:2px solid var(--brd);border-radius:var(--rad);padding:16px;cursor:pointer;transition:all .2s;background:var(--surf)}
+.mode-card.selected{border-color:var(--pri);background:rgba(243,193,70,.08)}
+.mode-card h3{color:var(--pri);margin-bottom:4px}
+.mode-card p{font-weight:600;margin-bottom:4px}
+.mode-card small{color:var(--txt2)}
+.player-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;margin-bottom:6px}
+.player-item .num{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--pri-dk));color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85em;flex-shrink:0}
+.player-item .name{flex:1;font-weight:600;letter-spacing:.02em}
+.player-item .level{font-size:.8em;color:var(--txt2)}
+.player-item .del{background:none;border:none;color:var(--err);font-size:1.2em;cursor:pointer;padding:4px 8px}
+.pool-card{border-radius:var(--rad);overflow:hidden;margin-bottom:16px;box-shadow:var(--sh);background:var(--surf);border:1px solid var(--brd)}
+.pool-header{padding:12px 16px;color:#fff;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.pool-body{padding:12px}
+.pool-player{padding:8px 12px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
+.pool-player:last-child{border-bottom:none}
+.pool-player .seed{width:26px;height:26px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8em;font-weight:700}
+.match-card{background:var(--surf);border-radius:var(--rad);padding:14px;margin-bottom:10px;box-shadow:var(--sh);border:1px solid var(--brd);border-left:4px solid var(--brd)}
+.match-card.done{border-left-color:var(--ok);background:rgba(76,175,80,.06)}
+.match-card.pending{border-left-color:var(--warn)}
+.match-card.playing{border-left-color:var(--accent);background:rgba(77,176,250,.1);box-shadow:0 0 0 2px var(--accent),var(--sh)}
+.match-status.playing{color:var(--accent)}
+.match-table-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(243,193,70,.15);color:var(--pri-lt);border:1px solid var(--pri);border-radius:6px;padding:2px 8px;font-size:.78em;font-weight:700;cursor:pointer}
+.match-table-badge:empty{display:none}
+.match-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.match-num{font-weight:700;color:var(--pri)}
+.match-status{font-size:.8em;font-weight:600}
+.match-status.pending{color:var(--warn)}
+.match-status.done{color:var(--ok)}
+.match-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.match-row .pname{flex:1;font-weight:500;font-size:.95em}
+.match-row input[type=number]{width:60px;height:40px;text-align:center;border:2px solid var(--brd);border-radius:8px;font-size:1.1em;font-weight:800;padding:0;color:var(--txt);background:var(--surf2)}
+.match-row input.winner{border-color:var(--ok);background:rgba(76,175,80,.1);color:#66BB6A}
+.match-row input.loser{border-color:var(--brd);background:var(--surf);color:var(--txt2)}
+.match-actions{display:flex;align-items:center;gap:8px;margin-top:8px}
+.match-actions .ref-input{flex:1;padding:8px;border:1px solid var(--brd);border-radius:8px;font-size:.85em;background:var(--surf2);color:var(--txt)}
+.match-actions .ref-input::placeholder{color:var(--txt2)}
+.match-validate{background:var(--ok);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:.9em}
+.match-validate:disabled{opacity:.4;cursor:not-allowed}
+.progress-bar{height:8px;background:var(--brd);border-radius:4px;overflow:hidden;margin:12px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--ok),var(--accent));transition:width .3s;border-radius:4px}
+.tab-bar{display:flex;gap:0;background:var(--surf);border-radius:var(--rad);overflow:hidden;border:2px solid var(--brd);margin-bottom:16px}
+.tab-btn{flex:1;padding:10px 8px;border:none;background:none;font-weight:600;font-size:.85em;cursor:pointer;transition:all .2s;color:var(--txt2)}
+.tab-btn.active{background:var(--pri);color:#000}
+.ranking-table{width:100%;border-collapse:collapse;font-size:.9em}
+.ranking-table th{background:linear-gradient(135deg,var(--pri-dk),var(--pri));color:#fff;padding:10px 8px;text-align:center;font-size:.8em}
+.ranking-table td{padding:8px;text-align:center;border-bottom:1px solid var(--brd);color:var(--txt)}
+.ranking-table tr:nth-child(even){background:rgba(255,255,255,.03)}
+.ranking-table .rank{font-weight:700;color:var(--pri)}
+.ranking-table .pname{text-align:left;font-weight:500}
+.timer-bar{background:linear-gradient(135deg,var(--surf),var(--surf2));color:#fff;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:1.1em;border-bottom:2px solid var(--pri)}
+.timer-bar .time{font-family:monospace;font-size:1.3em;color:var(--pri)}
+.timer-bar button{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:.9em;cursor:pointer}
+.pool-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px}
+.pool-nav button{width:40px;height:40px;border-radius:50%;border:2px solid var(--brd);background:var(--surf);color:var(--txt);font-size:1.2em;cursor:pointer}
+.pool-nav .pool-name{font-size:1.1em;font-weight:700;color:var(--pri)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--txt2)}
+.empty-state .icon{font-size:3em;margin-bottom:12px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2A3F6F;color:#fff;padding:12px 24px;border-radius:var(--rad);font-weight:500;z-index:1000;animation:toastIn .3s ease;border:1px solid var(--brd)}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.bracket-round{margin-bottom:20px}
+.bracket-round h3{color:var(--pri);margin-bottom:10px;font-size:1em}
+.qr-container{text-align:center;padding:20px}
+.qr-container canvas{border:4px solid var(--txt);border-radius:8px;margin:16px auto;display:block}
+.import-zone{border:2px dashed var(--brd);border-radius:var(--rad);padding:30px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;color:var(--txt2)}
+.import-zone:hover{border-color:var(--pri);background:rgba(243,193,70,.05)}
+.import-zone input{display:none}
+.chip{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.8em;font-weight:600;margin:2px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--surf);border-radius:var(--rad);padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.7);border:1px solid var(--brd)}
+.modal h2{margin-bottom:16px;color:var(--pri)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.section-title{font-size:1.1em;font-weight:700;color:var(--pri-lt);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.info-box{background:rgba(77,176,250,.1);border-left:4px solid var(--info);padding:12px;border-radius:0 8px 8px 0;margin-bottom:16px;font-size:.9em;color:#BDD3FF}
+.stat-row{display:flex;justify-content:space-around;padding:12px;background:var(--surf2);border-radius:8px;margin-bottom:12px;border:1px solid var(--brd)}
+.stat-item{text-align:center}
+.stat-item .val{font-size:1.4em;font-weight:700;color:var(--pri)}
+.stat-item .lbl{font-size:.75em;color:var(--txt2)}
+#inp-pname::placeholder,#inp-plist::placeholder{color:#f4eac5}
+.level-select{display:flex;gap:4px}
+.level-select button{width:32px;height:32px;border-radius:50%;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-weight:700;font-size:.8em;cursor:pointer}
+.level-select button.active{background:var(--pri);color:#000;border-color:var(--pri)}
+.toggle{position:relative;width:50px;height:28px;background:var(--brd);border-radius:14px;cursor:pointer;transition:background .2s}
+.toggle.on{background:var(--ok)}
+.toggle::after{content:'';position:absolute;width:24px;height:24px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{left:24px}
+.player-item{cursor:pointer;transition:background .15s}
+.player-item:active{background:rgba(243,193,70,.08)}
+.level-editor{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:8px;margin:-2px 0 6px 0;animation:slideDown .2s ease}
+.level-editor-inner{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.lvl-btn{padding:6px 12px;border:2px solid var(--brd);border-radius:8px;background:var(--surf);color:var(--txt);cursor:pointer;font-size:.85em;transition:all .15s}
+.lvl-btn.active{background:var(--pri);color:#000;border-color:var(--pri)}
+.trophy-display{color:var(--pri-lt);font-size:.9em}
+.no-level{color:var(--txt2);font-size:.8em;font-style:italic}
+@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:100px}}
+.pool-player.selected{background:rgba(243,193,70,.1);border:2px solid var(--pri);border-radius:8px;margin:-1px}
+.pool-header.drop-target{box-shadow:inset 0 0 0 3px rgba(255,255,255,.6)}
+.set-scores{margin-bottom:8px}
+.set-header,.set-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.set-header{font-size:.75em;font-weight:700;color:var(--txt2);text-transform:uppercase}
+.pname-col{flex:1;font-weight:500;font-size:.95em}
+.set-col{width:54px;text-align:center;flex-shrink:0}
+.set-col input[type=number]{width:50px;height:38px;text-align:center;border:2px solid var(--brd);border-radius:8px;font-size:1em;font-weight:700;padding:0;color:var(--txt);background:var(--surf2)}
+.set-col input.winner{border-color:var(--ok);background:rgba(76,175,80,.1);color:#66BB6A}
+.set-col input.loser{border-color:var(--err);background:rgba(244,67,54,.08);color:#EF9A9A}
+.ref-bonus-label{display:flex;align-items:center;gap:4px;font-size:.8em;white-space:nowrap;cursor:pointer;color:var(--txt)}
+.ref-bonus-label input[type=checkbox]{width:18px;height:18px;accent-color:var(--pri)}
+.bv-slot{padding:3px 6px;border:1px solid var(--brd);font-size:.72em;background:var(--surf2);color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:24px;line-height:18px}
+.bv-w{background:rgba(76,175,80,.2);font-weight:700;color:#66BB6A}
+.bv-bye{background:rgba(255,255,255,.03);color:var(--txt2);font-style:italic}
+.bv-champ{padding:6px 8px;border:2px solid var(--ok);border-radius:8px;background:rgba(76,175,80,.1);text-align:center;font-weight:700;font-size:.85em;color:#66BB6A}
+@media(max-width:600px){.content{padding:12px}.match-row .pname{font-size:.85em}.set-col{width:46px}.set-col input[type=number]{width:42px;font-size:.9em}}
+</style>
+</head>
+<body>
+
+<!-- ==================== HOME ==================== -->
+<section id="scr-home" class="screen active">
+<div class="top-bar">
+<div class="logo">&#127955; TEN EPS</div>
+<button class="btn-icon" onclick="showScreen('scr-admin')" style="font-size:1.8em;color:#f3c146">&#9881;</button>
+</div>
+<div class="content">
+<h2 style="margin-bottom:16px">Mes Tournois</h2>
+<div id="tournament-list"></div>
+<button class="btn-primary" onclick="showScreen('scr-create')" style="margin-top:16px">+ Nouveau tournoi</button>
+<div style="margin-top:40px;text-align:center;color:var(--txt2);font-size:.8em">Nathalie Prenois</div>
+</div>
+</section>
+
+<!-- ==================== CREATE ==================== -->
+<section id="scr-create" class="screen">
+<div class="top-bar">
+<button class="btn-back" onclick="showScreen('scr-home')">&larr; Retour</button>
+<h1>Nouveau tournoi</h1>
+</div>
+<div class="content">
+<div class="form-group"><label>Nom du tournoi</label><input type="text" id="inp-tname" placeholder="ex: Tournoi 6B"></div>
+<div class="form-group"><label>Classe</label><input type="text" id="inp-tclass" placeholder="ex: 6B"></div>
+<div class="form-group"><label>Mode de jeu</label>
+<div class="mode-cards">
+<div class="mode-card selected" data-mode="1" onclick="selMode(1)">
+<h3>&#127942; Mode 1 &mdash; Poules de niveau</h3>
+<p>Poules ind&eacute;pendantes par niveau</p>
+<small>Chaque poule a son classement. Id&eacute;al pour diff&eacute;rencier les niveaux.</small>
+</div>
+<div class="mode-card" data-mode="2" onclick="selMode(2)">
+<h3>&#127942; Mode 2 &mdash; Poules + Tableau final</h3>
+<p>Phase de poules puis finales crois&eacute;es</p>
+<small>Les 1ers se rencontrent, les 2e aussi, etc. Classement g&eacute;n&eacute;ral.</small>
+</div>
+<div class="mode-card" data-mode="3" onclick="selMode(3)">
+<h3>&#127942; Mode 3 &mdash; Tableau &agrave; &eacute;limination</h3>
+<p>Bracket + tableaux consolante</p>
+<small>T&ecirc;tes de s&eacute;rie + tableau des perdants pour classer tout le monde.</small>
+</div>
+</div></div>
+<div class="form-group"><label>Nombre de tables disponibles</label>
+<div class="stepper"><button onclick="stepV('inp-tables',-1)">&minus;</button><input type="number" id="inp-tables" value="10" min="1" max="20"><button onclick="stepV('inp-tables',1)">+</button></div></div>
+<div class="form-group"><label>Format de match</label>
+<select id="inp-format"><option value="set11">1 set &agrave; 11 pts</option><option value="set21">1 set &agrave; 21 pts</option><option value="bo3">2 sets gagnants &agrave; 11</option></select></div>
+<div class="form-group"><label>Dur&eacute;e de la phase (min, 0 = illimit&eacute;)</label>
+<input type="number" id="inp-duration" value="0" min="0" max="180"></div>
+<button class="btn-primary" onclick="createTournament()">Cr&eacute;er le tournoi &rarr;</button>
+</div>
+</section>
+
+<!-- ==================== PLAYERS ==================== -->
+<section id="scr-players" class="screen">
+<div class="top-bar">
+<button class="btn-back" onclick="backFromPlayers()">&larr; Retour</button>
+<h1 id="players-title">Inscription des joueurs</h1>
+</div>
+<div class="content">
+<div class="btn-group">
+<button class="btn-secondary btn-sm" onclick="showSaveListModal()">&#128190; Sauvegarder</button>
+<button class="btn-secondary btn-sm" onclick="showLoadListModal()">&#128194; Charger liste</button>
+<button class="btn-danger btn-sm" onclick="clearAllPlayers()">&#128465; Tout supprimer</button>
+</div>
+<div class="tab-bar" style="margin-bottom:12px">
+<button class="tab-btn active" onclick="setPlayerTab(0,this)">+ Un par un</button>
+<button class="tab-btn" onclick="setPlayerTab(1,this)">&#9776; Liste</button>
+<button class="tab-btn" onclick="setPlayerTab(2,this)">&#8613; Import CSV</button>
+</div>
+<div id="player-tab-0">
+<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start">
+<input type="text" id="inp-pname" placeholder="Nom du joueur" style="flex:1" onkeydown="if(event.key==='Enter')addPlayer()">
+<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="level-select" id="level-btns"></div><span style="font-size:.65em;color:var(--txt2)">Choix du niveau</span></div>
+<button class="btn-success" onclick="addPlayer()">+ Ajouter</button>
+</div>
+</div>
+<div id="player-tab-1" style="display:none">
+<textarea id="inp-plist" placeholder="Un joueur par ligne :&#10;NOM Pr&eacute;nom&#10;NOM Pr&eacute;nom&#10;..." rows="8"></textarea>
+<button class="btn-secondary" onclick="addFromList()" style="margin-top:8px;width:100%">Ajouter la liste</button>
+</div>
+<div id="player-tab-2" style="display:none">
+<div class="import-zone" onclick="document.getElementById('csv-file').click()">
+<div style="font-size:2em;margin-bottom:8px">&#128196;</div>
+<p>Cliquer pour importer un fichier CSV</p>
+<small>Format : Nom;Niveau (niveau optionnel, 1-5)</small>
+<input type="file" id="csv-file" accept=".csv,.txt,.xls,.xlsx" onchange="importCSV(this)">
+</div>
+</div>
+<h3 style="margin:16px 0 8px" id="player-count">Joueurs inscrits (0)</h3>
+<div id="player-list"></div>
+<div id="player-empty" class="empty-state"><div class="icon">&#128101;</div><p>Aucun joueur inscrit pour le moment</p></div>
+<button class="btn-primary" onclick="goToConfig()" style="margin-top:20px">Continuer &rarr;</button>
+</div>
+</section>
+
+<!-- ==================== POOL CONFIG ==================== -->
+<section id="scr-pool-config" class="screen">
+<div class="top-bar">
+<button class="btn-back" onclick="showScreen('scr-players')">&larr; Retour</button>
+<h1>Configuration des poules</h1>
+</div>
+<div class="content">
+<div class="card">
+<div class="form-group"><label>Nombre de poules</label>
+<div class="stepper"><button onclick="stepPools(-1)">&minus;</button><input type="number" id="inp-nbpools" value="2" min="1" max="12" onchange="updatePoolConfig()"><button onclick="stepPools(1)">+</button></div></div>
+<div class="stat-row" id="pool-stats"></div>
+</div>
+<div id="pool-quali-section"></div>
+<div id="pool-config-info" class="info-box"></div>
+<button class="btn-primary" onclick="createPools()">Cr&eacute;er les poules &rarr;</button>
+</div>
+</section>
+
+<!-- ==================== DISTRIBUTION ==================== -->
+<section id="scr-distribution" class="screen">
+<div class="top-bar">
+<button class="btn-back" onclick="showScreen('scr-pool-config')">&larr; Modifier les poules</button>
+<h1>R&eacute;partition</h1>
+</div>
+<div class="content">
+<div class="btn-group">
+<button class="btn-secondary btn-sm" onclick="distByLevel()">&#11088; Niveau</button>
+<button class="btn-secondary btn-sm" onclick="distRandom()">&#128256; M&eacute;langer</button>
+<button class="btn-secondary btn-sm" onclick="distManual()">&#9998; Manuel</button>
+</div>
+<div id="dist-pools"></div>
+<button class="btn-primary" onclick="validateDistribution()">Valider et g&eacute;n&eacute;rer les matchs &rarr;</button>
+</div>
+</section>
+
+<!-- ==================== MATCHES ==================== -->
+<section id="scr-matches" class="screen">
+<div id="timer-container"></div>
+<div class="top-bar">
+<button class="btn-back" onclick="backFromMatches()">&larr; Retour</button>
+<h1 id="matches-title">Matchs</h1>
+<button class="btn-icon" onclick="showScreen('scr-export')">&#128228;</button>
+</div>
+<div class="content">
+<div id="matches-tabs" class="tab-bar"></div>
+<div id="matches-progress"></div>
+<div id="matches-list"></div>
+<div class="btn-group" style="margin-top:20px">
+<button class="btn-secondary" onclick="showScreen('scr-rankings')">&#127942; Classements</button>
+<button class="btn-primary" id="btn-next-phase" style="display:none" onclick="goNextPhase()"></button>
+</div>
+</div>
+</section>
+
+<!-- ==================== RANKINGS ==================== -->
+<section id="scr-rankings" class="screen">
+<div class="top-bar">
+<button class="btn-back" onclick="showScreen('scr-matches')">&larr; Retour</button>
+<h1>Classements</h1>
+<button class="btn-icon" onclick="showScreen('scr-export')">&#128228;</button>
+</div>
+<div class="content">
+<div id="rankings-tabs" class="tab-bar"></div>
+<div id="rankings-content"></div>
+</div>
+</section>
+
+<!-- ==================== FINALS (Mode 2) ==================== -->
+<section id="scr-finals" class="screen">
+<div id="finals-timer"></div>
+<div class="top-bar">
+<button class="btn-back" onclick="showScreen('scr-rankings')">&larr; Retour</button>
+<h1>Tableaux finaux</h1>
+<button class="btn-icon" onclick="showScreen('scr-export')">&#128228;</button>
+</div>
+<div class="content">
+<div id="finals-tabs" class="tab-bar"></div>
+<div id="finals-list"></div>
+<button class="btn-secondary" onclick="showFinalRankings()" style="margin-top:16px;width:100%">&#127942; Classement g&eacute;n&eacute;ral</button>
+</div>
+</section>
+
+<!-- ==================== BRACKET (Mode 3) ==================== -->
+<section id="scr-bracket" class="screen">
+<div id="bracket-timer"></div>
+<div class="top-bar">
+<button class="btn-back" onclick="backFromBracket()">&larr; Retour</button>
+<h1>Tableau principal</h1>
+<button class="btn-icon" onclick="showScreen('scr-export')">&#128228;</button>
+</div>
+<div class="content">
+<div id="bracket-tabs" class="tab-bar"></div>
+<div id="bracket-content"></div>
+<div style="display:flex;gap:8px;margin-top:16px">
+<button class="btn-secondary" onclick="showBracketRanking()" style="flex:1">&#127942; Classement complet</button>
+<button class="btn-primary" onclick="showBracketVisual()" style="flex:1">&#128204; Tableau</button>
+</div>
+</div>
+</section>
+
+<!-- ==================== EXPORT ==================== -->
+<section id="scr-export" class="screen">
+<div class="top-bar">
+<button class="btn-back" onclick="goBackFromExport()">&larr; Retour</button>
+<h1>Export des r&eacute;sultats</h1>
+</div>
+<div class="content">
+<div class="card">
+<h3 style="margin-bottom:12px">&#128203; R&eacute;sum&eacute; du tournoi</h3>
+<div id="export-summary"></div>
+</div>
+<div class="card">
+<h3 style="margin-bottom:12px">QR Code des r&eacute;sultats</h3>
+<div class="qr-container" id="qr-container"></div>
+</div>
+<button class="btn-secondary" onclick="downloadCSV()" style="width:100%;margin-top:12px">&#128196; T&eacute;l&eacute;charger XLSX</button>
+</div>
+</section>
+
+<!-- ==================== ADMIN ==================== -->
+<section id="scr-admin" class="screen">
+<div class="top-bar">
+<button class="btn-back" onclick="showScreen('scr-home')">&larr; Retour</button>
+<h1>Param&egrave;tres</h1>
+</div>
+<div class="content">
+<div class="card">
+<h3>Format de match par d&eacute;faut</h3>
+<select id="adm-format" onchange="saveSettings()" style="margin-top:8px"><option value="set11">1 set &agrave; 11 pts</option><option value="set21">1 set &agrave; 21 pts</option><option value="bo3">2 sets gagnants &agrave; 11</option></select>
+</div>
+<div class="card">
+<h3>Syst&egrave;me de points (poules)</h3>
+<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+<div class="form-group" style="flex:1;min-width:80px"><label>Victoire</label><input type="number" id="adm-winpts" value="3" min="0" max="10" onchange="saveSettings()"></div>
+<div class="form-group" style="flex:1;min-width:80px"><label>D&eacute;faite 3 sets</label><input type="number" id="adm-lose3pts" value="2" min="0" max="10" onchange="saveSettings()"></div>
+<div class="form-group" style="flex:1;min-width:80px"><label>D&eacute;faite</label><input type="number" id="adm-losepts" value="1" min="0" max="10" onchange="saveSettings()"></div>
+</div>
+<p style="font-size:.8em;color:var(--txt2);margin-top:6px">&#9432; D&eacute;faite 3 sets = match nul en bo3 (1-1)</p>
+</div>
+<div class="card">
+<h3>&#9989; Bonus arbitre</h3>
+<div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+<div class="toggle" id="adm-refbonus" onclick="toggleRefBonus()"></div>
+<span>Attribuer un bonus &agrave; l'arbitre</span></div>
+<div style="margin-top:8px"><div class="form-group"><label>Points bonus arbitre</label>
+<input type="number" id="adm-refbonuspts" value="1" min="0" max="5" onchange="saveSettings()"></div></div>
+</div>
+<div class="card">
+<h3>&#128465; Donn&eacute;es</h3>
+<button class="btn-danger" onclick="resetAll()" style="margin-top:8px">Supprimer toutes les donn&eacute;es</button>
+</div>
+<div class="card">
+<h3>&#10067; Aide</h3>
+<p style="font-size:.85em;color:var(--txt2);margin:8px 0">Guide d'utilisation de l'application</p>
+<button class="btn-secondary" onclick="showHelp()" style="width:100%">Ouvrir l'aide</button>
+</div>
+<div class="card" style="margin-top:20px;text-align:center;color:var(--txt2)">
+<p style="font-size:.85em">TEN EPS v1.0 &mdash; Tennis de Table EPS</p>
+<p style="font-size:.8em">Application PWA hors-ligne</p>
+<p style="font-size:.75em;margin-top:4px">Nathalie Prenois</p>
+</div>
+</div>
+</section>
+
+<!-- ==================== MODALS ==================== -->
+<div id="modal-container"></div>
+
+<script>
+/* ===== QR CODE (qrcode-generator v1.4.4, MIT — Kazuhiko Arase) ===== */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,(function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1}))},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}((function(){return qrcode}));
+qrcode.stringToBytes=qrcode.stringToBytesFuncs['UTF-8'];
+const QRGen={toCanvas:function(canvas,text,cellSize){cellSize=cellSize||6;try{var qr=qrcode(0,'L');qr.addData(text,'Byte');qr.make();var sz=qr.getModuleCount(),quiet=4,total=(sz+quiet*2)*cellSize;canvas.width=total;canvas.height=total;var ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,total,total);ctx.fillStyle='#000';for(var r=0;r<sz;r++)for(var c=0;c<sz;c++)if(qr.isDark(r,c))ctx.fillRect((c+quiet)*cellSize,(r+quiet)*cellSize,cellSize,cellSize);}catch(e){canvas.width=200;canvas.height=50;var ctx2=canvas.getContext('2d');ctx2.fillStyle='red';ctx2.font='14px sans-serif';ctx2.fillText('Donn\u00e9es trop longues pour QR',10,30);}}};
+
+/* ===== APP STATE ===== */
+let state={tournaments:[],savedLists:[],settings:{format:'set11',winPts:3,loseSets3Pts:2,losePts:1,refBonusEnabled:false,refBonusPts:1,tables:10}};
+let T=null; // current tournament
+let curPoolIdx=0;
+let curFinalIdx=0;
+let curBracketTab=0;
+let timerInterval=null;
+let timerSeconds=0;
+let selectedPlayerForMove=null;
+
+const LS_KEY='teneps_data';
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
+function save(){localStorage.setItem(LS_KEY,JSON.stringify(state))}
+function load(){try{const d=JSON.parse(localStorage.getItem(LS_KEY));if(d)state=d;}catch(e){}}
+
+/* ===== NAVIGATION ===== */
+function showScreen(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+window.scrollTo(0,0);
+if(id==='scr-home')renderHome();
+if(id==='scr-players')renderPlayers();
+if(id==='scr-pool-config')updatePoolConfig();
+if(id==='scr-distribution')renderDistribution();
+if(id==='scr-matches')renderMatches();
+if(id==='scr-rankings')renderRankings();
+if(id==='scr-finals')renderFinals();
+if(id==='scr-bracket')renderBracket();
+if(id==='scr-export')renderExport();
+if(id==='scr-admin')renderAdmin();
+}
+
+function toast(msg){const d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),2500)}
+
+/* ===== HOME ===== */
+function renderHome(){
+const el=document.getElementById('tournament-list');
+if(!state.tournaments.length){el.innerHTML='<div class="empty-state"><div class="icon">&#127955;</div><p>Aucun tournoi. Cr\u00e9ez-en un !</p></div>';return;}
+el.innerHTML=state.tournaments.map(t=>{
+const modeNames={1:'Poules de niveau',2:'Poules + Finales',3:'Tableau \u00e9limination'};
+const phaseNames={players:'Inscription',pools:'Configuration',matches:'Matchs en cours',finals:'Finales',bracket:'Bracket',done:'Termin\u00e9'};
+return`<div class="card" style="cursor:pointer" onclick="openTournament('${t.id}')">
+<div style="display:flex;justify-content:space-between;align-items:start">
+<div><h3 style="color:var(--pri)">&#127942; ${t.name}</h3>
+<p style="font-size:.85em;color:var(--txt2)">&#128197; ${t.date} &mdash; ${t.classe||''}</p>
+<p style="font-size:.85em">${t.players.length} joueurs &bull; Mode ${t.mode}</p>
+<span class="badge badge-orange">${modeNames[t.mode]}</span>
+<span class="badge badge-blue">${phaseNames[t.phase]||t.phase}</span></div>
+<button class="btn-danger btn-sm" onclick="event.stopPropagation();delTournament('${t.id}')">&#128465;</button>
+</div></div>`}).join('');
+}
+
+function openTournament(id){
+T=state.tournaments.find(t=>t.id===id);
+if(!T)return;
+if(T.phase==='players')showScreen('scr-players');
+else if(T.phase==='pools')showScreen('scr-pool-config');
+else if(T.phase==='matches')showScreen('scr-matches');
+else if(T.phase==='finals')showScreen('scr-finals');
+else if(T.phase==='bracket')showScreen('scr-bracket');
+else showScreen('scr-matches');
+}
+
+function delTournament(id){if(confirm('Supprimer ce tournoi ?')){state.tournaments=state.tournaments.filter(t=>t.id!==id);save();renderHome()}}
+
+/* ===== CREATE ===== */
+let selModeVal=1;
+function selMode(m){selModeVal=m;document.querySelectorAll('.mode-card').forEach(c=>c.classList.toggle('selected',+c.dataset.mode===m))}
+
+function createTournament(){
+const name=document.getElementById('inp-tname').value.trim();
+if(!name){toast('Entrez un nom de tournoi');return;}
+T={id:uid(),name,classe:document.getElementById('inp-tclass').value.trim(),
+date:new Date().toLocaleDateString('fr-FR'),mode:selModeVal,
+settings:{tables:+document.getElementById('inp-tables').value||10,format:document.getElementById('inp-format').value,
+winPts:state.settings.winPts!==undefined?state.settings.winPts:3,
+loseSets3Pts:state.settings.loseSets3Pts!==undefined?state.settings.loseSets3Pts:2,
+losePts:state.settings.losePts!==undefined?state.settings.losePts:1,
+refBonusEnabled:!!state.settings.refBonusEnabled,
+refBonusPts:state.settings.refBonusPts||1,
+duration:+document.getElementById('inp-duration').value||0},
+players:[],pools:[],matches:[],phase:'players',finals:[],bracket:null};
+state.tournaments.push(T);save();
+showScreen('scr-players');
+}
+
+/* ===== PLAYERS ===== */
+function renderPlayers(){
+if(!T)return;
+document.getElementById('players-title').textContent=T.name+' - Joueurs';
+renderLevelBtns();
+renderPlayerList();
+}
+
+function renderLevelBtns(){
+const el=document.getElementById('level-btns');
+el.innerHTML='';
+for(let i=0;i<=5;i++){
+const b=document.createElement('button');
+b.textContent=i===0?'-':i;
+b.title=i===0?'Sans niveau':'Niveau '+i;
+b.className=i===0?'active':'';
+b.onclick=()=>{el.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active')};
+el.appendChild(b);
+}}
+
+function getSelectedLevel(){
+const btns=document.getElementById('level-btns').querySelectorAll('button');
+for(let i=0;i<btns.length;i++)if(btns[i].classList.contains('active'))return i;
+return 0;
+}
+
+function addPlayer(){
+const inp=document.getElementById('inp-pname');
+const name=inp.value.trim().toUpperCase();
+if(!name){toast('Entrez un nom');return;}
+const level=getSelectedLevel();
+T.players.push({id:uid(),name,level});
+save();inp.value='';renderPlayerList();
+if(navigator.vibrate)navigator.vibrate(30);
+}
+
+function addFromList(){
+const txt=document.getElementById('inp-plist').value.trim();
+if(!txt)return;
+const lines=txt.split('\n').map(l=>l.trim()).filter(l=>l);
+for(const line of lines){
+const parts=line.split(';');
+const name=parts[0].trim().toUpperCase();
+const level=parts[1]?Math.min(5,Math.max(0,+parts[1])):0;
+if(name)T.players.push({id:uid(),name,level});
+}
+save();document.getElementById('inp-plist').value='';renderPlayerList();
+toast(lines.length+' joueur(s) ajout\u00e9(s)');
+}
+
+function importCSV(input){
+const file=input.files[0];if(!file)return;
+const reader=new FileReader();
+reader.onload=e=>{
+const txt=e.target.result;
+const lines=txt.split('\n').map(l=>l.trim()).filter(l=>l);
+let added=0;
+for(let i=0;i<lines.length;i++){
+const line=lines[i];
+if(line.toLowerCase().startsWith('nom'))continue;
+const parts=line.split(/[;,\t]/);
+const name=parts[0].trim().toUpperCase();
+const level=parts[1]?Math.min(5,Math.max(0,+parts[1])):0;
+if(name){T.players.push({id:uid(),name,level});added++;}
+}
+save();renderPlayerList();toast(added+' joueur(s) import\u00e9(s)');
+};
+reader.readAsText(file);input.value='';
+}
+
+function removePlayer(id){T.players=T.players.filter(p=>p.id!==id);save();renderPlayerList()}
+function clearAllPlayers(){if(confirm('Supprimer tous les joueurs ?')){T.players=[];save();renderPlayerList()}}
+
+function trophyHtml(level){
+if(!level)return '<span class="no-level">Non class\u00e9</span>';
+return '<span class="trophy-display">'+'\u{1F3C6}'.repeat(level)+'</span>';
+}
+function lvlBtnsHtml(pid,curLvl){
+var h='';for(var l=0;l<=5;l++){
+h+='<button class="lvl-btn'+(curLvl===l?' active':'')+'" onclick="setPlayerLevel(\''+pid+'\','+l+')">'+(l===0?'Aucun':'\u{1F3C6}'.repeat(l))+'</button>';
+}return h;
+}
+
+function renderPlayerList(){
+const el=document.getElementById('player-list');
+const empty=document.getElementById('player-empty');
+document.getElementById('player-count').textContent='Joueurs inscrits ('+T.players.length+')';
+if(!T.players.length){el.innerHTML='';empty.style.display='';return;}
+empty.style.display='none';
+el.innerHTML=T.players.map((p,i)=>`<div class="player-item" onclick="toggleLevelEditor('${p.id}',event)">
+<div class="num">${i+1}</div><div class="name">${p.name}</div>
+<div class="level-trophies">${trophyHtml(p.level)}</div>
+<button class="del" onclick="event.stopPropagation();removePlayer('${p.id}')">&times;</button></div>
+<div class="level-editor" id="lved-${p.id}" style="display:none"><div class="level-editor-inner">
+${lvlBtnsHtml(p.id,p.level)}
+</div></div>`).join('');
+}
+
+function toggleLevelEditor(pid,ev){
+if(ev&&ev.target.classList.contains('del'))return;
+const ed=document.getElementById('lved-'+pid);if(!ed)return;
+document.querySelectorAll('.level-editor').forEach(e=>{if(e.id!=='lved-'+pid)e.style.display='none';});
+ed.style.display=ed.style.display==='none'?'':'none';
+}
+
+function setPlayerLevel(pid,level){
+const p=T.players.find(x=>x.id===pid);if(!p)return;
+p.level=level;save();renderPlayerList();
+toast('Niveau '+(level||'aucun')+' attribu\u00e9');
+}
+
+function setPlayerTab(idx,btn){
+[0,1,2].forEach(i=>{document.getElementById('player-tab-'+i).style.display=i===idx?'':'none'});
+btn.parentElement.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+}
+
+function backFromPlayers(){
+if(T.phase==='players'){showScreen('scr-home');}
+else{showScreen('scr-home');}
+}
+
+function goToConfig(){
+if(T.players.length<2){toast('Ajoutez au moins 2 joueurs');return;}
+if(T.mode===3){
+T.phase='bracket';save();
+generateBracket();
+showScreen('scr-bracket');
+}else{
+T.phase='pools';save();
+showScreen('scr-pool-config');
+}
+}
+
+/* ===== SAVED LISTS ===== */
+function showSaveListModal(){
+if(!T||!T.players.length){toast('Aucun joueur \u00e0 sauvegarder');return;}
+let html='<div class="form-group"><label>Nom de la liste</label><input type="text" id="save-list-name" placeholder="ex: 6B - Groupe 1"></div>';
+if(state.savedLists.length){
+html+='<div class="section-title" style="font-size:.9em">Listes existantes</div>';
+html+=state.savedLists.map((l,i)=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid var(--brd)" onclick="document.getElementById(\'save-list-name\').value=\''+l.name.replace(/'/g,"\\'")+'\'"><span style="font-weight:500">'+l.name+'</span><span style="color:var(--txt2);font-size:.85em">'+l.players.length+' joueurs</span></div>').join('');
+html+='<p style="font-size:.8em;color:var(--txt2);margin-top:6px">Cliquez sur un nom pour le remplacer</p>';
+}
+html+='<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" style="width:auto" onclick="doSaveList()">Sauvegarder ('+T.players.length+' joueurs)</button></div>';
+showModal('Sauvegarder la liste',html);
+}
+
+function doSaveList(){
+const name=document.getElementById('save-list-name').value.trim();
+if(!name){toast('Entrez un nom pour la liste');return;}
+const existing=state.savedLists.findIndex(l=>l.name===name);
+const players=T.players.map(p=>({name:p.name,level:p.level}));
+if(existing>=0){
+state.savedLists[existing].players=players;
+toast('Liste "'+name+'" mise \u00e0 jour');
+}else{
+state.savedLists.push({name,players});
+toast('Liste "'+name+'" sauvegard\u00e9e');
+}
+save();closeModal();
+}
+
+function showLoadListModal(){
+if(!state.savedLists.length){toast('Aucune liste sauvegard\u00e9e');return;}
+let html=state.savedLists.map((l,i)=>'<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between"><div><strong>'+l.name+'</strong><br><span style="font-size:.85em;color:var(--txt2)">'+l.players.length+' joueur(s)</span></div><button class="btn-danger btn-sm" onclick="deleteSavedList('+i+')" title="Supprimer">&times;</button></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-primary" style="flex:1;padding:10px" onclick="loadSavedList('+i+',true)">Charger (remplacer)</button><button class="btn-secondary" style="flex:1;padding:10px" onclick="loadSavedList('+i+',false)">Ajouter aux joueurs</button></div></div>').join('');
+html+='<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Fermer</button></div>';
+showModal('Charger une liste',html);
+}
+
+function loadSavedList(idx,replace){
+const list=state.savedLists[idx];
+if(!list)return;
+if(replace)T.players=[];
+for(const p of list.players)T.players.push({id:uid(),name:p.name,level:p.level||0});
+save();renderPlayerList();closeModal();
+toast(list.players.length+' joueur(s) '+(replace?'charg\u00e9(s)':'ajout\u00e9(s)'));
+}
+
+function deleteSavedList(idx){
+const name=state.savedLists[idx]?.name||'';
+if(!confirm('Supprimer la liste "'+name+'" ?'))return;
+state.savedLists.splice(idx,1);
+save();closeModal();
+if(state.savedLists.length)showLoadListModal();
+else toast('Liste supprim\u00e9e');
+}
+
+/* ===== POOL CONFIG ===== */
+function stepV(id,d){const inp=document.getElementById(id);inp.value=Math.max(+inp.min||1,Math.min(+inp.max||99,+inp.value+d))}
+function stepPools(d){const inp=document.getElementById('inp-nbpools');inp.value=Math.max(1,Math.min(12,+inp.value+d));updatePoolConfig()}
+
+function updatePoolConfig(){
+if(!T)return;
+const nb=+document.getElementById('inp-nbpools').value;
+const total=T.players.length;
+if(!T.poolSizes||T.poolSizes.length!==nb){
+T.poolSizes=[];
+const base=Math.floor(total/nb);const extra=total%nb;
+for(let i=0;i<nb;i++)T.poolSizes.push(base+(i<extra?1:0));
+save();
+}
+const assigned=T.poolSizes.reduce((a,b)=>a+b,0);
+document.getElementById('pool-stats').innerHTML=`
+<div class="stat-item"><div class="val">${total}</div><div class="lbl">Total joueurs</div></div>
+<div class="stat-item"><div class="val">${nb}</div><div class="lbl">Poules</div></div>
+<div class="stat-item"><div class="val" ${assigned!==total?'style="color:var(--err)"':''}>${assigned}/${total}</div><div class="lbl">R\u00e9partis</div></div>`;
+let html='<div class="section-title">&#128101; Joueurs par poule</div>';
+for(let i=0;i<nb;i++){
+html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+<span style="font-weight:600;min-width:80px">Poule ${i+1}</span>
+<div class="stepper"><button onclick="adjPoolSize(${i},-1)">&minus;</button>
+<input type="number" id="psize-${i}" value="${T.poolSizes[i]}" min="2" max="${total}" onchange="setPoolSize(${i},+this.value)">
+<button onclick="adjPoolSize(${i},1)">+</button></div>
+<span style="color:var(--txt2);font-size:.85em">joueurs</span></div>`;
+}
+// Tables par poule
+const nbTables=T.settings.tables||10;
+if(!T.poolTables||T.poolTables.length!==nb){
+T.poolTables=[];
+const tPerPool=Math.floor(nbTables/nb);
+let tIdx=1;
+for(let i=0;i<nb;i++){
+const cnt=tPerPool+(i<nbTables%nb?1:0);
+const arr=[];for(let j=0;j<cnt;j++)arr.push(tIdx++);
+T.poolTables.push(arr);
+}
+save();
+}
+html+='<div class="section-title">&#127993; Tables par poule <span style="font-size:.78em;color:var(--txt2)">('+nbTables+' tables)</span></div>';
+for(let i=0;i<nb;i++){
+html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+<span style="font-weight:600;min-width:80px">Poule ${i+1}</span>
+<input type="text" id="ptables-${i}" value="${(T.poolTables[i]||[]).join(',')}" placeholder="ex: 1,2,3" style="flex:1;padding:6px 10px;border-radius:8px;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-size:.9em" onchange="setPoolTables(${i},this.value)">
+</div>`;
+}
+if(T.mode===2){
+html+='<div class="section-title">&#9989; Qualifi\u00e9s par poule</div>';
+for(let i=0;i<nb;i++){
+html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+<span style="font-weight:600;min-width:80px">Poule ${i+1}</span>
+<div class="stepper"><button onclick="stepV('quali-${i}',-1)">&minus;</button>
+<input type="number" id="quali-${i}" value="2" min="1" max="${T.poolSizes[i]}">
+<button onclick="stepV('quali-${i}',1)">+</button></div>
+<span style="color:var(--txt2);font-size:.85em">/ ${T.poolSizes[i]}</span></div>`;
+}}
+document.getElementById('pool-quali-section').innerHTML=html;
+document.getElementById('pool-config-info').innerHTML=T.mode===1?
+'Mode 1 : chaque poule est un mini-championnat ind\u00e9pendant. R\u00e9partissez par niveau.':
+'Mode 2 : les qualifi\u00e9s de chaque poule se retrouveront en tableau final.';
+}
+
+function setPoolTables(idx,val){
+if(!T)return;
+if(!T.poolTables)T.poolTables=[];
+T.poolTables[idx]=val.split(',').map(s=>+s.trim()).filter(n=>n>0);
+save();
+}
+
+function assignPoolTablesToMatches(){
+if(!T||!T.poolTables)return;
+for(let pi=0;pi<T.pools.length;pi++){
+const pool=T.pools[pi];
+const tables=T.poolTables[pi]||[];
+if(!tables.length)continue;
+const matches=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool');
+for(let mi=0;mi<matches.length;mi++){
+if(!matches[mi].table)matches[mi].table=tables[mi%tables.length];
+}
+}
+save();
+}
+
+function adjPoolSize(idx,d){
+if(!T||!T.poolSizes)return;
+const nv=T.poolSizes[idx]+d;if(nv<2)return;
+T.poolSizes[idx]=nv;save();updatePoolConfig();
+}
+
+function setPoolSize(idx,val){
+if(!T||!T.poolSizes)return;
+T.poolSizes[idx]=Math.max(2,val);save();updatePoolConfig();
+}
+
+function createPools(){
+const nb=+document.getElementById('inp-nbpools').value;
+T.pools=[];
+for(let i=0;i<nb;i++){
+const quali=T.mode===2?(+document.getElementById('quali-'+i)?.value||2):0;
+T.pools.push({id:uid(),name:'Poule '+(i+1),playerIds:[],quali});
+}
+distributePlayers('level');
+save();
+showScreen('scr-distribution');
+}
+
+/* ===== DISTRIBUTION ===== */
+function distributePlayers(method){
+const nb=T.pools.length;
+T.pools.forEach(p=>p.playerIds=[]);
+let players=[...T.players];
+if(method==='level'){
+players.sort((a,b)=>(b.level||0)-(a.level||0));
+}else if(method==='random'){
+for(let i=players.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[players[i],players[j]]=[players[j],players[i]];}
+}
+if(T.poolSizes&&T.poolSizes.length===nb){
+let idx=0;
+for(let i=0;i<nb;i++){
+const count=T.poolSizes[i]||0;
+for(let j=0;j<count&&idx<players.length;j++){
+T.pools[i].playerIds.push(players[idx].id);idx++;
+}}
+}else{
+for(let i=0;i<players.length;i++)T.pools[i%nb].playerIds.push(players[i].id);
+}
+save();
+}
+
+function distByLevel(){distributePlayers('level');renderDistribution();toast('R\u00e9parti par niveau')}
+function distRandom(){distributePlayers('random');renderDistribution();toast('M\u00e9lang\u00e9 al\u00e9atoirement')}
+function distManual(){selectedPlayerForMove=null;renderDistribution();toast('Touchez un joueur puis la poule de destination')}
+
+const POOL_COLORS=[['#1565C0','#42A5F5'],['#00897B','#4DB6AC'],['#F57C00','#FFB74D'],['#7B1FA2','#BA68C8'],['#C62828','#EF5350'],['#2E7D32','#66BB6A'],['#4527A0','#7E57C2'],['#FF6F00','#FFCA28'],['#00838F','#4DD0E1'],['#AD1457','#F06292'],['#33691E','#AED581'],['#4E342E','#A1887F']];
+
+function renderDistribution(){
+const el=document.getElementById('dist-pools');
+el.innerHTML=T.pools.map((pool,pi)=>{
+const col=POOL_COLORS[pi%POOL_COLORS.length];
+const players=pool.playerIds.map(id=>T.players.find(p=>p.id===id)).filter(Boolean);
+return`<div class="pool-card">
+<div class="pool-header" style="background:linear-gradient(135deg,${col[0]},${col[1]});cursor:pointer" onclick="moveToPool('${pool.id}')">
+<span>&#127942; ${pool.name}</span><span class="badge" style="background:rgba(255,255,255,.3);color:#fff">${players.length} joueurs</span>
+${selectedPlayerForMove?'<span style="font-size:.8em;opacity:.8">&#128071; D\u00e9poser ici</span>':''}
+</div><div class="pool-body">${players.map((p,i)=>`<div class="pool-player${selectedPlayerForMove===p.id?' selected':''}" onclick="selectPlayerForMove('${p.id}',event)" style="cursor:pointer"><div class="seed">${i+1}</div><span>${p.name}</span>${p.level?'<span class="chip" style="background:rgba(77,176,250,.2);color:#4DB0FA">Niv.'+p.level+'</span>':''}</div>`).join('')}
+${!players.length?'<p style="padding:12px;color:var(--txt2);text-align:center">Touchez un joueur puis cette poule</p>':''}
+</div></div>`;
+}).join('');
+}
+
+function selectPlayerForMove(pid,ev){
+ev.stopPropagation();
+selectedPlayerForMove=selectedPlayerForMove===pid?null:pid;
+renderDistribution();
+}
+
+function moveToPool(poolId){
+if(!selectedPlayerForMove)return;
+for(const pool of T.pools){
+const idx=pool.playerIds.indexOf(selectedPlayerForMove);
+if(idx>=0){pool.playerIds.splice(idx,1);break;}
+}
+const target=T.pools.find(p=>p.id===poolId);
+if(target)target.playerIds.push(selectedPlayerForMove);
+selectedPlayerForMove=null;
+save();renderDistribution();toast('Joueur d\u00e9plac\u00e9');
+}
+
+function validateDistribution(){
+const empty=T.pools.filter(p=>p.playerIds.length<2);
+if(empty.length){toast('Chaque poule doit avoir au moins 2 joueurs');return;}
+generateAllPoolMatches();
+T.phase='matches';save();
+showScreen('scr-matches');
+}
+
+/* ===== ROUND ROBIN ===== */
+function generateRoundRobin(playerIds){
+const n=playerIds.length;
+const list=[...playerIds];
+if(n%2!==0)list.push(null);
+const rounds=list.length-1;
+const half=list.length/2;
+const matches=[];
+for(let r=0;r<rounds;r++){
+for(let i=0;i<half;i++){
+const a=list[i],b=list[list.length-1-i];
+if(a!==null&&b!==null)matches.push({p1:a,p2:b,round:r+1});
+}
+const last=list.pop();list.splice(1,0,last);
+}
+return matches;
+}
+
+function generateAllPoolMatches(){
+T.matches=[];
+for(const pool of T.pools){
+const rrMatches=generateRoundRobin(pool.playerIds);
+for(let i=0;i<rrMatches.length;i++){
+T.matches.push({id:uid(),poolId:pool.id,phase:'pool',
+p1:rrMatches[i].p1,p2:rrMatches[i].p2,
+score1:null,score2:null,referee:'',table:null,
+status:'pending',round:rrMatches[i].round,matchNum:i+1});
+}
+}
+assignPoolTablesToMatches();
+save();
+}
+
+/* ===== MATCHES ===== */
+function renderMatches(){
+if(!T)return;
+document.getElementById('matches-title').textContent=T.name+' - Matchs';
+// Pool tabs
+const tabs=document.getElementById('matches-tabs');
+tabs.innerHTML=T.pools.map((p,i)=>`<button class="tab-btn${i===curPoolIdx?' active':''}" onclick="curPoolIdx=${i};renderMatches()">${p.name}</button>`).join('');
+const pool=T.pools[curPoolIdx];
+if(!pool)return;
+const matches=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool');
+const done=matches.filter(m=>m.status==='done').length;
+const playing=matches.filter(m=>m.status==='playing').length;
+const total=matches.length;
+document.getElementById('matches-progress').innerHTML=`
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+<span style="font-weight:600">${done}/${total} termin\u00e9s${playing?' \u2014 <span style="color:var(--accent)">'+playing+' en cours</span>':''}</span>
+<span style="color:var(--txt2);font-size:.85em">${total?Math.round(100*done/total):0}%</span></div>
+<div class="progress-bar"><div class="progress-fill" style="width:${total?100*done/total:0}%"></div></div>`;
+
+renderTimerBar('timer-container',T.settings.duration);
+
+document.getElementById('matches-list').innerHTML=matches.map(m=>renderMatchCard(m)).join('');
+
+// Next phase button
+const btn=document.getElementById('btn-next-phase');
+const allDone=T.matches.filter(m=>m.phase==='pool').every(m=>m.status==='done');
+if(allDone&&T.mode===2&&T.phase!=='finals'){
+btn.style.display='';btn.textContent='Passer aux finales \u2192';btn.className='btn-primary';
+}else{btn.style.display='none';}
+}
+
+function saveReferee(mid,val){
+const m=T.matches.find(x=>x.id===mid);if(!m)return;
+m.refereeId=val||'';
+const rp=T.players.find(p=>p.id===val);
+m.referee=rp?rp.name:'';
+save();
+// Re-render pour mettre à jour les listes d'arbitres des autres matchs
+if(m.phase==='pool')renderMatches();
+else if(m.phase==='final')renderFinals();
+else if(m.phase==='bracket')renderBracket();
+}
+
+function getRefereeCandidates(m){
+// Exclure : les 2 joueurs du match, les joueurs en cours de jeu, les arbitres déjà assignés
+const excluded=new Set([m.p1,m.p2]);
+// Joueurs actuellement en train de jouer (status playing)
+T.matches.forEach(x=>{if(x.id!==m.id&&x.status==='playing'){excluded.add(x.p1);excluded.add(x.p2);}});
+// Arbitres déjà assignés à d'autres matchs non terminés
+T.matches.forEach(x=>{if(x.id!==m.id&&x.status!=='done'&&x.refereeId)excluded.add(x.refereeId);});
+return T.players.filter(p=>!excluded.has(p.id));
+}
+
+function toggleMatchPlaying(mid,ev){
+if(ev.target.closest('input,select,button,label'))return;
+const m=T.matches.find(x=>x.id===mid);if(!m||m.status==='done')return;
+m.status=m.status==='playing'?'pending':'playing';save();
+if(m.phase==='pool')renderMatches();
+else if(m.phase==='final')renderFinals();
+else if(m.phase==='bracket')renderBracket();
+}
+
+function editMatchTable(mid,ev){
+ev.stopPropagation();
+const m=T.matches.find(x=>x.id===mid);if(!m)return;
+const v=prompt('N\u00b0 de table :',m.table||'');
+if(v===null)return;
+m.table=v?+v:null;save();
+if(m.phase==='pool')renderMatches();
+else if(m.phase==='final')renderFinals();
+else if(m.phase==='bracket')renderBracket();
+}
+
+function renderMatchCard(m){
+const p1=T.players.find(p=>p.id===m.p1);
+const p2=T.players.find(p=>p.id===m.p2);
+if(!p1||!p2)return'';
+const isDone=m.status==='done';
+const isPlaying=m.status==='playing';
+const statusLabel=isDone?'\u2705 Termin\u00e9':isPlaying?'\u{1F3D3} En cours':'\u23f3 En attente';
+const tableBadge=m.table?`<span class="match-table-badge" onclick="editMatchTable('${m.id}',event)" title="Modifier la table">T${m.table}</span>`:`<span class="match-table-badge" onclick="editMatchTable('${m.id}',event)" title="Attribuer une table" style="opacity:.5;border-style:dashed">T?</span>`;
+const fmt=T.settings.format||'set11';
+const isBo3=fmt==='bo3';
+const candidates=getRefereeCandidates(m);
+const refVal=m.refereeId||'';
+const refSelectHtml='<select class="ref-input" id="ref-'+m.id+'" '+(isDone?'disabled':'')+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.85em"><option value="">&#9999; Arbitre</option>'+candidates.map(p=>'<option value="'+p.id+'"'+(refVal===p.id?' selected':'')+'>'+p.name+'</option>').join('')+'</select>';
+const actionsHtml=`<div class="match-actions">
+${refSelectHtml}
+<label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${m.refBonus?'checked':''} ${isDone?'disabled':''}>+1 pt arb.</label>
+${isDone?'<button class="btn-secondary btn-sm" onclick="unlockMatch(\''+m.id+'\')">&#9998; Modifier</button>':
+'<button class="match-validate" onclick="validateMatch(\''+m.id+'\')">&#10003; Valider</button>'}
+</div>`;
+if(!isBo3){
+const s1=m.score1!==null?m.score1:'';
+const s2=m.score2!==null?m.score2:'';
+const w1=isDone&&m.score1>m.score2;
+const w2=isDone&&m.score2>m.score1;
+return`<div class="match-card ${m.status}" onclick="toggleMatchPlaying('${m.id}',event)">
+<div class="match-header"><span class="match-num">Match ${m.matchNum||''}</span>${tableBadge}
+<span class="match-status ${m.status}">${statusLabel}</span></div>
+<div class="match-row"><span class="pname"${w1?' style="color:var(--ok);font-weight:700"':''}>${p1.name}</span>
+<input type="number" id="s1-${m.id}" value="${s1}" min="0" max="99" class="${w1?'winner':w2?'loser':''}" ${isDone?'disabled':''}></div>
+<div class="match-row"><span class="pname"${w2?' style="color:var(--ok);font-weight:700"':''}>${p2.name}</span>
+<input type="number" id="s2-${m.id}" value="${s2}" min="0" max="99" class="${w2?'winner':w1?'loser':''}" ${isDone?'disabled':''}></div>
+${actionsHtml}</div>`;
+}
+const sets=m.sets||[{s1:'',s2:''},{s1:'',s2:''},{s1:'',s2:''}];
+let sw1=0,sw2=0;
+if(sets[0].s1!==''&&sets[0].s2!==''){if(+sets[0].s1>+sets[0].s2)sw1++;else if(+sets[0].s2>+sets[0].s1)sw2++;}
+if(sets[1].s1!==''&&sets[1].s2!==''){if(+sets[1].s1>+sets[1].s2)sw1++;else if(+sets[1].s2>+sets[1].s1)sw2++;}
+const showS3=isDone?(sets[2]&&sets[2].s1!==''):(sw1===1&&sw2===1);
+const s3d=showS3?'':'display:none';
+const isW1=isDone&&(m.score1||0)>(m.score2||0);
+const isW2=isDone&&(m.score2||0)>(m.score1||0);
+return`<div class="match-card ${m.status}" onclick="toggleMatchPlaying('${m.id}',event)">
+<div class="match-header"><span class="match-num">Match ${m.matchNum||''}</span>${tableBadge}
+<span class="match-status ${m.status}">${statusLabel}</span></div>
+<div class="set-scores">
+<div class="set-header"><div class="pname-col"></div><div class="set-col">S1</div><div class="set-col">S2</div><div class="set-col set3-${m.id}" style="${s3d}">S3</div></div>
+<div class="set-row"><div class="pname-col"${isW1?' style="color:var(--ok);font-weight:700"':''}>${p1.name}</div>
+<div class="set-col"><input type="number" id="s1a-${m.id}" value="${sets[0].s1}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col"><input type="number" id="s2a-${m.id}" value="${sets[1].s1}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3a-${m.id}" value="${sets[2]?sets[2].s1:''}" min="0" max="99" ${isDone?'disabled':''}></div></div>
+<div class="set-row"><div class="pname-col"${isW2?' style="color:var(--ok);font-weight:700"':''}>${p2.name}</div>
+<div class="set-col"><input type="number" id="s1b-${m.id}" value="${sets[0].s2}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col"><input type="number" id="s2b-${m.id}" value="${sets[1].s2}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3b-${m.id}" value="${sets[2]?sets[2].s2:''}" min="0" max="99" ${isDone?'disabled':''}></div></div>
+</div>${actionsHtml}</div>`;
+}
+
+function checkBo3(mid){
+const g=id=>document.getElementById(id);
+const s1a=g('s1a-'+mid),s1b=g('s1b-'+mid),s2a=g('s2a-'+mid),s2b=g('s2b-'+mid);
+if(!s1a||!s1b||!s2a||!s2b)return;
+let w1=0,w2=0;
+if(s1a.value!==''&&s1b.value!==''){if(+s1a.value>+s1b.value)w1++;else if(+s1b.value>+s1a.value)w2++;}
+if(s2a.value!==''&&s2b.value!==''){if(+s2a.value>+s2b.value)w1++;else if(+s2b.value>+s2a.value)w2++;}
+const show=w1===1&&w2===1;
+document.querySelectorAll('.set3-'+mid).forEach(el=>{el.style.display=show?'':'none';});
+}
+
+function validateMatch(mid){
+const m=T.matches.find(x=>x.id===mid);if(!m)return;
+const ref=document.getElementById('ref-'+mid).value.trim();
+const fmt=T.settings.format||'set11';
+const refBonusEl=document.getElementById('refbonus-'+mid);
+if(fmt==='bo3'){
+const g=id=>{const el=document.getElementById(id);return el?+el.value:NaN;};
+const s1a=g('s1a-'+mid),s1b=g('s1b-'+mid),s2a=g('s2a-'+mid),s2b=g('s2b-'+mid);
+if(isNaN(s1a)||isNaN(s1b)){toast('Entrez les scores du Set 1');return;}
+if(s1a===s1b){toast('Set 1 : pas de score \u00e9gal');return;}
+if(isNaN(s2a)||isNaN(s2b)){toast('Entrez les scores du Set 2');return;}
+if(s2a===s2b){toast('Set 2 : pas de score \u00e9gal');return;}
+let w1=0,w2=0;
+if(s1a>s1b)w1++;else w2++;
+if(s2a>s2b)w1++;else w2++;
+const sets=[{s1:s1a,s2:s1b},{s1:s2a,s2:s2b}];
+let tp1=s1a+s2a,tp2=s1b+s2b;
+if(w1===1&&w2===1){
+const s3a=g('s3a-'+mid),s3b=g('s3b-'+mid);
+if(isNaN(s3a)||isNaN(s3b)){toast('Entrez les scores du Set 3');return;}
+if(s3a===s3b){toast('Set 3 : pas de score \u00e9gal');return;}
+sets.push({s1:s3a,s2:s3b});tp1+=s3a;tp2+=s3b;
+if(s3a>s3b)w1++;else w2++;
+}
+m.sets=sets;m.score1=w1;m.score2=w2;m.totalPts1=tp1;m.totalPts2=tp2;
+}else{
+const s1=+document.getElementById('s1-'+mid).value;
+const s2=+document.getElementById('s2-'+mid).value;
+if(isNaN(s1)||isNaN(s2)){toast('Entrez les scores');return;}
+if(s1===s2){toast('Pas de match nul au tennis de table');return;}
+m.score1=s1;m.score2=s2;m.totalPts1=s1;m.totalPts2=s2;
+}
+m.refereeId=ref||'';
+const refPlayer=T.players.find(p=>p.id===ref);
+m.referee=refPlayer?refPlayer.name:'';
+m.status='done';
+m.refBonus=refBonusEl?refBonusEl.checked:false;
+save();
+if(navigator.vibrate)navigator.vibrate(50);
+// Lib\u00e9rer la table et r\u00e9attribuer en mode bracket
+if(m.phase==='bracket'){const freedTable=m.table;m.table=null;assignBracketTables();save();}
+if(m.phase==='pool')renderMatches();
+else if(m.phase==='final')renderFinals();
+else if(m.phase==='bracket')renderBracket();
+}
+
+function unlockMatch(mid){
+const m=T.matches.find(x=>x.id===mid);if(!m)return;
+m.status='pending';save();
+if(m.phase==='pool')renderMatches();
+else if(m.phase==='final')renderFinals();
+else if(m.phase==='bracket')renderBracket();
+}
+
+/* ===== TIMER ===== */
+function renderTimerBar(containerId,minutes){
+const el=document.getElementById(containerId);
+if(!minutes){el.innerHTML='';return;}
+if(timerInterval){
+const m=Math.floor(timerSeconds/60);
+const s=timerSeconds%60;
+el.innerHTML=`<div class="timer-bar"><span>&#9200; Chrono</span><span class="time">${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</span>
+<div><button onclick="stopTimer()">&#9209; Stop</button></div></div>`;
+}else{
+el.innerHTML=`<div class="timer-bar"><span>&#9200; ${minutes} min</span><span class="time">--:--</span>
+<button onclick="startTimer(${minutes})">&#9654; D\u00e9marrer</button></div>`;
+}
+}
+
+function startTimer(minutes){
+timerSeconds=minutes*60;
+timerInterval=setInterval(()=>{
+timerSeconds--;
+if(timerSeconds<=0){clearInterval(timerInterval);timerInterval=null;toast('Temps \u00e9coul\u00e9 !');if(navigator.vibrate)navigator.vibrate([200,100,200]);}
+renderTimerBar('timer-container',T.settings.duration);
+renderTimerBar('finals-timer',T.settings.duration);
+renderTimerBar('bracket-timer',T.settings.duration);
+},1000);
+renderTimerBar('timer-container',T.settings.duration);
+}
+
+function stopTimer(){clearInterval(timerInterval);timerInterval=null;timerSeconds=0;
+renderTimerBar('timer-container',T?.settings?.duration);
+renderTimerBar('finals-timer',T?.settings?.duration);
+renderTimerBar('bracket-timer',T?.settings?.duration);
+}
+
+function backFromMatches(){
+if(T.mode===3)showScreen('scr-bracket');
+else showScreen('scr-distribution');
+}
+
+/* ===== RANKINGS ===== */
+function calcPoolRanking(poolId){
+const pool=T.pools.find(p=>p.id===poolId);if(!pool)return[];
+const matches=T.matches.filter(m=>m.poolId===poolId&&m.phase==='pool'&&m.status==='done');
+const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
+const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
+const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
+const refBP=T.settings.refBonusPts!==undefined?T.settings.refBonusPts:(state.settings.refBonusPts||1);
+const stats={};
+for(const pid of pool.playerIds){
+stats[pid]={id:pid,w:0,l:0,l3:0,pts:0,pf:0,pa:0,played:0,refBonus:0};
+}
+for(const m of matches){
+if(!stats[m.p1]||!stats[m.p2])continue;
+stats[m.p1].played++;stats[m.p2].played++;
+// PF/PC : total des points réels (bo3 = somme des sets, sinon score direct)
+const pf1=m.totalPts1!==undefined?m.totalPts1:m.score1;
+const pf2=m.totalPts2!==undefined?m.totalPts2:m.score2;
+stats[m.p1].pf+=pf1;stats[m.p1].pa+=pf2;
+stats[m.p2].pf+=pf2;stats[m.p2].pa+=pf1;
+// Détection match en 3 sets (bo3 terminé 1-1 avant le set décisif → sets.length===3)
+const went3Sets=m.sets&&m.sets.length>=3;
+if(m.score1>m.score2){
+stats[m.p1].w++;stats[m.p1].pts+=wPts;
+stats[m.p2].l++;
+if(went3Sets){stats[m.p2].l3++;stats[m.p2].pts+=l3Pts;}
+else{stats[m.p2].pts+=lPts;}
+}else{
+stats[m.p2].w++;stats[m.p2].pts+=wPts;
+stats[m.p1].l++;
+if(went3Sets){stats[m.p1].l3++;stats[m.p1].pts+=l3Pts;}
+else{stats[m.p1].pts+=lPts;}
+}
+}
+// Bonus arbitre : on parcourt TOUS les matchs de poule du tournoi
+// pour créditer les joueurs de cette poule même s'ils arbitrent ailleurs
+if(T.settings.refBonusEnabled||state.settings.refBonusEnabled){
+const allDonePoolMatches=T.matches.filter(m=>m.phase==='pool'&&m.status==='done'&&m.refBonus);
+for(const m of allDonePoolMatches){
+const refId=m.refereeId||(m.referee?((T.players.find(p=>p.name.toLowerCase()===m.referee.trim().toLowerCase()))||{}).id:null);
+if(refId&&stats[refId]){stats[refId].refBonus+=refBP;stats[refId].pts+=refBP;}
+}
+}
+return Object.values(stats).sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+}
+
+function renderRankings(){
+if(!T)return;
+const tabs=document.getElementById('rankings-tabs');
+const content=document.getElementById('rankings-content');
+if(T.mode===3){
+renderBracketRankingContent(content);
+return;
+}
+tabs.innerHTML=T.pools.map((p,i)=>`<button class="tab-btn${i===0?' active':''}" onclick="showRankTab(${i},this)">${p.name}</button>`).join('');
+if(T.mode===2||(T.mode===1&&T.pools.length>1)){
+tabs.innerHTML+=`<button class="tab-btn" onclick="showRankTab(-1,this)">G\u00e9n\u00e9ral \u2605</button>`;
+}
+showRankTab(0);
+}
+
+function showRankTab(idx,btn){
+if(btn)btn.parentElement.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',b===btn));
+const content=document.getElementById('rankings-content');
+if(idx===-1){
+renderOverallRanking(content);return;
+}
+const pool=T.pools[idx];
+const ranking=calcPoolRanking(pool.id);
+content.innerHTML=renderRankingTable(ranking,pool.name,T.mode===2?pool.quali:0);
+}
+
+function renderRankingTable(ranking,title,qualiCount){
+const hasAnyBonus=ranking.some(r=>r.refBonus>0);
+const hasAnyL3=ranking.some(r=>r.l3>0);
+let html=`<h3 style="margin-bottom:10px;color:var(--pri)">${title}</h3>`;
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Pts</th><th>V</th><th>D</th>${hasAnyL3?'<th title="D\u00e9faites en 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence de points (PF\u2212PC)">Diff</th>${hasAnyBonus?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
+ranking.forEach((r,i)=>{
+const p=T.players.find(x=>x.id===r.id);
+const quali=qualiCount&&i<qualiCount;
+html+=`<tr${quali?' style="background:rgba(76,175,80,.08)"':''}>
+<td class="rank">${i+1}${quali?' \u2705':''}</td><td class="pname">${p?p.name:'?'}</td>
+<td><strong>${r.pts}</strong></td><td>${r.w}</td><td>${r.l}</td>${hasAnyL3?`<td>${r.l3||0}</td>`:''}
+<td>${r.pf}</td><td>${r.pa}</td><td>${r.pf-r.pa>=0?'+':''}${r.pf-r.pa}</td>${hasAnyBonus?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+});
+html+='</tbody></table>';
+return html;
+}
+
+/* ===== FINALS (Mode 2) ===== */
+function goNextPhase(){
+if(T.mode===2){
+generateFinals();
+T.phase='finals';save();
+showScreen('scr-finals');
+}
+}
+
+function generateFinals(){
+// Guard : ne pas régénérer si des matchs de finale existent déjà (évite d'effacer les résultats)
+// On teste T.matches (pas T.finals) pour éviter un état incohérent
+if(T.matches.some(m=>m.phase==='final'))return;
+T.finals=[];T.matches=T.matches.filter(m=>m.phase==='pool');
+const rankings=T.pools.map(p=>calcPoolRanking(p.id));
+const maxQuali=Math.max(...T.pools.map(p=>p.quali||2));
+for(let rank=0;rank<maxQuali;rank++){
+const groupPlayers=[];
+for(let pi=0;pi<T.pools.length;pi++){
+if(rankings[pi][rank])groupPlayers.push(rankings[pi][rank].id);
+}
+if(groupPlayers.length<2)continue;
+const groupId=uid();
+const groupName=rank===0?'Finale des 1ers':rank===1?'Finale des 2\u00e8mes':'Finale des '+(rank+1)+'\u00e8mes';
+T.finals.push({id:groupId,name:groupName,rank:rank+1,playerIds:groupPlayers});
+const rrMatches=generateRoundRobin(groupPlayers);
+for(let i=0;i<rrMatches.length;i++){
+T.matches.push({id:uid(),poolId:groupId,phase:'final',
+p1:rrMatches[i].p1,p2:rrMatches[i].p2,
+score1:null,score2:null,referee:'',table:null,
+status:'pending',round:rrMatches[i].round,matchNum:i+1});
+}
+}
+save();
+}
+
+function renderFinals(){
+if(!T)return;
+renderTimerBar('finals-timer',T.settings.duration);
+const tabs=document.getElementById('finals-tabs');
+tabs.innerHTML=T.finals.map((f,i)=>`<button class="tab-btn${i===curFinalIdx?' active':''}" onclick="curFinalIdx=${i};renderFinals()">${f.name}</button>`).join('');
+const group=T.finals[curFinalIdx];
+if(!group){document.getElementById('finals-list').innerHTML='<p class="empty-state">Aucune finale</p>';return;}
+const matches=T.matches.filter(m=>m.poolId===group.id&&m.phase==='final');
+const done=matches.filter(m=>m.status==='done').length;
+document.getElementById('finals-list').innerHTML=`
+<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">${done}/${matches.length} matchs</span></div>
+<div class="progress-bar"><div class="progress-fill" style="width:${matches.length?100*done/matches.length:0}%"></div></div>
+${matches.map(m=>renderMatchCard(m)).join('')}`;
+}
+
+function showFinalRankings(){
+showScreen('scr-rankings');
+setTimeout(()=>showRankTab(-1,document.querySelector('#rankings-tabs .tab-btn:last-child')),100);
+}
+
+function renderOverallRanking(el){
+const refEnabled=T.settings.refBonusEnabled||state.settings.refBonusEnabled;
+const refBP=T.settings.refBonusPts!==undefined?T.settings.refBonusPts:(state.settings.refBonusPts||1);
+const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
+const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
+const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
+
+// ---- MODE 1 : classement croisé toutes poules ----
+if(T.mode===1){
+const all=[];
+for(const pool of T.pools){
+const rk=calcPoolRanking(pool.id);
+for(const r of rk)all.push({...r,poolName:pool.name});
+}
+all.sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+const hasD3=all.some(r=>r.l3>0);
+const hasArb=all.some(r=>r.refBonus>0);
+let html=`<h3 style="color:var(--pri);margin-bottom:6px">Classement g\u00e9n\u00e9ral</h3>`;
+html+=`<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Tous les joueurs — tri par points totaux${refEnabled?' (V + D + bonus arb)':' (V + D)'}</p>`;
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.75em">Poule</th><th title="Points totaux">Pts</th><th>V</th><th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence">Diff</th>${hasArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
+all.forEach((r,i)=>{
+const p=T.players.find(x=>x.id===r.id);
+const diff=r.pf-r.pa;
+html+=`<tr><td class="rank">${i+1}</td><td class="pname">${p?p.name:'?'}</td><td style="font-size:.78em;color:var(--txt2)">${r.poolName}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td><td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+});
+html+='</tbody></table>';
+el.innerHTML=html;
+return;
+}
+
+// ---- MODE 2 : classement par groupe de finale + cumulatif ----
+if(!T.finals||!T.finals.length){el.innerHTML='<p style="color:var(--txt2)">Pas encore de finales</p>';return;}
+
+// Stats de poule (inclut bonus arb poule via calcPoolRanking)
+const poolStats={};
+for(const pool of T.pools){
+const rk=calcPoolRanking(pool.id);
+for(const r of rk){poolStats[r.id]={w:r.w,l:r.l,l3:r.l3||0,pts:r.pts,pf:r.pf,pa:r.pa,refBonus:r.refBonus||0};}
+}
+// Bonus arb finales
+const finalRefBonus={};
+if(refEnabled){
+const doneFinalsRef=T.matches.filter(m=>m.phase==='final'&&m.status==='done'&&m.refBonus);
+for(const m of doneFinalsRef){
+const refId=m.refereeId||(m.referee?((T.players.find(p=>p.name.toLowerCase()===m.referee.trim().toLowerCase()))||{}).id:null);
+if(refId)finalRefBonus[refId]=(finalRefBonus[refId]||0)+refBP;
+}
+}
+const anyArb=Object.values(poolStats).some(s=>s.refBonus>0)||Object.keys(finalRefBonus).length>0;
+
+let html=`<h3 style="color:var(--pri);margin-bottom:6px">Classement g\u00e9n\u00e9ral</h3>`;
+html+=`<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Pts = poule + finale${refEnabled?' + bonus arbitre':''} &mdash; rang d\u00e9termin\u00e9 par les victoires en finale</p>`;
+let globalRank=1;
+
+for(const group of T.finals){
+const matches=T.matches.filter(m=>m.poolId===group.id&&m.phase==='final');
+const fStats={};
+for(const pid of group.playerIds)fStats[pid]={id:pid,w:0,l:0,l3:0,pts:0,pf:0,pa:0};
+for(const m of matches){
+if(m.status!=='done'||!fStats[m.p1]||!fStats[m.p2])continue;
+const pf1=m.totalPts1!==undefined?m.totalPts1:m.score1;
+const pf2=m.totalPts2!==undefined?m.totalPts2:m.score2;
+fStats[m.p1].pf+=pf1;fStats[m.p1].pa+=pf2;fStats[m.p2].pf+=pf2;fStats[m.p2].pa+=pf1;
+const w3s=m.sets&&m.sets.length>=3;
+if(m.score1>m.score2){fStats[m.p1].w++;fStats[m.p1].pts+=wPts;fStats[m.p2].l++;fStats[m.p2].pts+=(w3s?l3Pts:lPts);if(w3s)fStats[m.p2].l3++;}
+else{fStats[m.p2].w++;fStats[m.p2].pts+=wPts;fStats[m.p1].l++;fStats[m.p1].pts+=(w3s?l3Pts:lPts);if(w3s)fStats[m.p1].l3++;}
+}
+const combined=Object.values(fStats).map(fs=>{
+const ps=poolStats[fs.id]||{w:0,l:0,l3:0,pts:0,pf:0,pa:0,refBonus:0};
+const frb=finalRefBonus[fs.id]||0;
+const totalArb=(ps.refBonus||0)+frb;
+return{id:fs.id,finalW:fs.w,
+totalW:ps.w+fs.w,totalL:ps.l+fs.l,totalL3:(ps.l3||0)+fs.l3,
+totalPF:ps.pf+fs.pf,totalPA:ps.pa+fs.pa,
+refBonus:totalArb,
+totalPts:ps.pts+fs.pts+frb};
+});
+const ranked=combined.sort((a,b)=>b.finalW-a.finalW||b.totalPts-a.totalPts||(b.totalPF-b.totalPA)-(a.totalPF-a.totalPA)||b.totalPF-a.totalPF);
+const hasD3=ranked.some(r=>r.totalL3>0);
+html+=`<h4 style="margin:16px 0 8px;color:var(--txt)">${group.name}</h4>`;
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th title="Pts poule + finale${refEnabled?' + arb':''}">Pts</th><th>V</th><th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s (toutes phases)">PF</th><th title="Points encaiss\u00e9s (toutes phases)">PC</th><th title="Diff\u00e9rence">Diff</th>${anyArb?'<th title="Bonus arbitre toutes phases">Arb</th>':''}</tr></thead><tbody>`;
+for(const r of ranked){
+const p=T.players.find(x=>x.id===r.id);
+const diff=r.totalPF-r.totalPA;
+html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${p?p.name:'?'}</td><td><strong>${r.totalPts}</strong></td><td>${r.totalW}</td><td>${r.totalL}</td>${hasD3?`<td>${r.totalL3||0}</td>`:''}<td>${r.totalPF}</td><td>${r.totalPA}</td><td>${diff>=0?'+':''}${diff}</td>${anyArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+globalRank++;
+}
+html+='</tbody></table>';
+}
+el.innerHTML=html;
+}
+
+/* ===== BRACKET (Mode 3) ===== */
+/*
+ T\u00eates de s\u00e9rie (seeding) :
+ - D = prochaine puissance de 2 >= N (8,16,32,64,128)
+ - E = D - N = nombre d'exemptions (byes)
+ - Les E meilleurs joueurs sont t\u00eates de s\u00e9rie, exempt\u00e9s du 1er tour
+ - Le placement standard garantit que les TS ne se rencontrent qu'en fin de tournoi :
+   Seed 1 vs Seed D (finale si tous gagnent)
+   Seeds 1-4 dans 4 quarts diff\u00e9rents
+*/
+function bracketSeedOrder(n){
+// Retourne l'ordre des t\u00eates de s\u00e9rie par slot du tableau
+// Index = slot (0-based), valeur = num\u00e9ro de seed (1-based)
+// Ex pour n=8: [1,8,4,5,2,7,3,6]
+// => Match 1: Seed1 vs Seed8, Match 2: Seed4 vs Seed5, etc.
+if(n<=1)return[1];
+if(n===2)return[1,2];
+const half=bracketSeedOrder(n/2);
+const result=[];
+for(const s of half){result.push(s);result.push(n+1-s);}
+return result;
+}
+
+function generateBracket(){
+let players=[...T.players];
+// Tri par niveau d\u00e9croissant (meilleurs en premier = meilleures t\u00eates de s\u00e9rie)
+players.sort((a,b)=>(b.level||0)-(a.level||0)||(a.name<b.name?-1:1));
+let size=1;while(size<players.length)size*=2;
+const byes=size-players.length;
+
+// Placement standard des seeds dans le tableau
+const seedOrder=bracketSeedOrder(size);
+// seedOrder[slot] = num\u00e9ro de seed (1-based) pour ce slot
+// Les seeds > players.length sont des byes (null)
+const bracket=new Array(size).fill(null);
+for(let slot=0;slot<size;slot++){
+const seedNum=seedOrder[slot]; // 1-based
+if(seedNum<=players.length) bracket[slot]=players[seedNum-1].id;
+// sinon: reste null = bye
+}
+
+// Sauvegarder les infos de seeding pour affichage
+const seedNames=[];
+for(let i=0;i<Math.min(byes,players.length);i++){
+seedNames.push({rank:i+1,id:players[i].id,name:players[i].name,level:players[i].level});
+}
+
+T.bracket={size,slots:bracket,rounds:[],consolation:[],
+nbSeeds:byes,seedInfo:seedNames,nbPlayers:players.length};
+T.matches=T.matches.filter(m=>m.phase!=='bracket');
+
+// G\u00e9n\u00e9rer le 1er tour
+const round1=[];
+let matchNum=1;
+for(let i=0;i<size;i+=2){
+const p1=bracket[i];
+const p2=bracket[i+1];
+if(p1&&p2){
+const m={id:uid(),phase:'bracket',bracketRound:1,bracketPos:i/2,
+p1,p2,score1:null,score2:null,referee:'',status:'pending',table:null,matchNum:matchNum++};
+T.matches.push(m);
+round1.push(m.id);
+}else if(p1){
+round1.push({bye:p1});
+}else if(p2){
+round1.push({bye:p2});
+}else{
+round1.push(null);
+}
+}
+T.bracket.rounds=[round1];
+assignBracketTables();
+save();
+}
+
+function assignBracketTables(){
+if(!T||!T.bracket)return;
+const nbTables=T.settings.tables||10;
+const usedTables=new Set();
+// Tables d\u00e9j\u00e0 utilis\u00e9es par matchs en cours/non termin\u00e9s
+T.matches.filter(m=>m.phase==='bracket'&&m.status==='playing'&&m.table).forEach(m=>usedTables.add(m.table));
+// Attribuer les tables aux matchs pending sans table
+const pending=T.matches.filter(m=>m.phase==='bracket'&&m.status==='pending'&&!m.table);
+for(const m of pending){
+for(let t=1;t<=nbTables;t++){
+if(!usedTables.has(t)){m.table=t;usedTables.add(t);break;}
+}
+}
+}
+
+function advanceBracket(){
+if(!T||!T.bracket)return;
+const rounds=T.bracket.rounds;
+const lastRound=rounds[rounds.length-1];
+const nextEntries=[];
+const losers=[];
+let allResolved=true;
+for(let i=0;i<lastRound.length;i+=2){
+const e1=lastRound[i];
+const e2=lastRound[i+1];
+const w1=resolveEntry(e1);
+const w2=resolveEntry(e2);
+if(w1===null||w2===null){
+if(e1===undefined&&e2===undefined){nextEntries.push(null);}
+else{allResolved=false;nextEntries.push(null);}
+}else{
+if(w1&&w2){
+const m={id:uid(),phase:'bracket',bracketRound:rounds.length+1,bracketPos:Math.floor(i/2),
+p1:w1,p2:w2,score1:null,score2:null,referee:'',status:'pending',table:null,
+matchNum:T.matches.filter(x=>x.phase==='bracket').length+1};
+T.matches.push(m);
+nextEntries.push(m.id);
+}else{
+nextEntries.push(w1?{bye:w1}:{bye:w2});
+}
+// Collect losers
+const l1=resolveLoser(e1);
+const l2=resolveLoser(e2);
+if(l1)losers.push(l1);
+if(l2)losers.push(l2);
+}
+}
+// Check if this is the semi-final → final transition (petite finale case)
+const isPetiteFinaleCase=nextEntries.length===1&&losers.length===2;
+
+// Store losers for consolation (skip if petite finale handles them)
+if(losers.length>0&&!isPetiteFinaleCase){
+T.bracket.consolation.push({round:rounds.length,losers});
+}
+if(nextEntries.length>1||nextEntries.some(e=>e!==null)){
+rounds.push(nextEntries);
+}
+// Petite finale : les perdants des demi-finales s'affrontent pour la 3e place
+if(isPetiteFinaleCase){
+const m={id:uid(),phase:'bracket',bracketRound:rounds.length+1,bracketPos:-1,
+p1:losers[0],p2:losers[1],score1:null,score2:null,
+referee:'',status:'pending',table:null,matchNum:T.matches.filter(x=>x.phase==='bracket').length+1,
+isPetiteFinale:true};
+T.matches.push(m);
+T.bracket.petiteFinale=m.id;
+}
+assignBracketTables();
+save();
+}
+
+function resolveEntry(entry){
+if(!entry)return null;
+if(entry===null||entry===undefined)return null;
+if(typeof entry==='object'&&entry.bye)return entry.bye;
+const m=T.matches.find(x=>x.id===entry);
+if(!m)return null;
+if(m.status!=='done')return null;
+return m.score1>m.score2?m.p1:m.p2;
+}
+
+function resolveLoser(entry){
+if(!entry)return null;
+if(typeof entry==='object'&&entry.bye)return null;
+const m=T.matches.find(x=>x.id===entry);
+if(!m||m.status!=='done')return null;
+return m.score1>m.score2?m.p2:m.p1;
+}
+
+function renderBracket(){
+if(!T||!T.bracket)return;
+renderTimerBar('bracket-timer',T.settings.duration);
+// Check if we need to advance
+checkBracketAdvance();
+const tabs=document.getElementById('bracket-tabs');
+const roundNames=getBracketRoundNames();
+const allTabs=[...roundNames.map((n,i)=>({name:n,type:'main',idx:i}))];
+if(T.bracket.petiteFinale)allTabs.push({name:'Petite finale',type:'petite'});
+// Add consolation tabs (skip if redundant with petite finale)
+T.bracket.consolation.forEach((c,i)=>{
+if(c.losers.length<2)return;
+if(T.bracket.petiteFinale&&c.losers.length===2){
+const pf=T.matches.find(m=>m.id===T.bracket.petiteFinale);
+if(pf&&c.losers.includes(pf.p1)&&c.losers.includes(pf.p2))return;
+}
+allTabs.push({name:'Consolante R'+(c.round),type:'consolation',idx:i});
+});
+tabs.innerHTML=allTabs.map((t,i)=>`<button class="tab-btn${i===curBracketTab?' active':''}" onclick="curBracketTab=${i};renderBracket()">${t.name}</button>`).join('');
+const tab=allTabs[curBracketTab]||allTabs[0];
+const content=document.getElementById('bracket-content');
+if(!tab){content.innerHTML='';return;}
+if(tab.type==='main'){
+const roundMatches=T.matches.filter(m=>m.phase==='bracket'&&m.bracketRound===(tab.idx+1)&&!m.isPetiteFinale);
+const done=roundMatches.filter(m=>m.status==='done').length;
+let seedHtml='';
+if(tab.idx===0&&T.bracket.nbSeeds>0){
+const si=T.bracket.seedInfo||[];
+const byeEntries=(T.bracket.rounds[0]||[]).filter(e=>e&&typeof e==='object'&&e.bye);
+seedHtml=`<div class="info-box" style="margin-bottom:12px">
+<strong>\u{1F3C6} Tableau de ${T.bracket.size} \u2014 ${T.bracket.nbPlayers||T.players.length} joueurs \u2014 ${T.bracket.nbSeeds} exemption(s)</strong><br>
+<span style="font-size:.85em;color:#4DB0FA"><strong>T\u00eates de s\u00e9rie</strong> (exempt\u00e9es du 1er tour) :</span>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${si.map(s=>
+'<span class="chip" style="background:rgba(243,193,70,.15);color:var(--pri-lt);border:1px solid var(--pri)">'+
+'<strong>TS'+s.rank+'</strong> '+s.name+(s.level?' '+'\u{1F3C6}'.repeat(s.level):'')+'</span>').join('')}
+</div></div>
+<div style="margin-bottom:12px">${byeEntries.map(e=>{
+const p=T.players.find(x=>x.id===e.bye);
+return p?'<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(76,175,80,.1);border-radius:8px;margin-bottom:4px;border-left:4px solid var(--ok)"><span style="color:var(--ok);font-weight:700">\u2705</span><span style="font-weight:500">'+p.name+'</span><span style="color:var(--txt2);font-size:.85em">\u2192 qualifi\u00e9(e) directement (t\u00eate de s\u00e9rie)</span></div>':'';
+}).join('')}</div>`;
+}
+content.innerHTML=seedHtml+`<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">${done}/${roundMatches.length} matchs</span></div>
+<div class="progress-bar"><div class="progress-fill" style="width:${roundMatches.length?100*done/roundMatches.length:0}%"></div></div>
+${roundMatches.map(m=>renderMatchCard(m)).join('')}
+${!roundMatches.length?'<p class="empty-state">Aucun match dans ce tour</p>':''}`;
+}else if(tab.type==='petite'){
+const m=T.matches.find(x=>x.id===T.bracket.petiteFinale);
+content.innerHTML=m?renderMatchCard(m):'<p class="empty-state">Petite finale pas encore g\u00e9n\u00e9r\u00e9e</p>';
+}else if(tab.type==='consolation'){
+const cons=T.bracket.consolation[tab.idx];
+if(!cons||cons.losers.length<2){content.innerHTML='<p>Pas assez de joueurs</p>';return;}
+const consMatches=T.matches.filter(m=>m.phase==='bracket'&&m.consolationRound===tab.idx);
+if(!consMatches.length){
+generateConsolationMatches(tab.idx);
+renderBracket();return;
+}
+content.innerHTML=consMatches.map(m=>renderMatchCard(m)).join('');
+}
+}
+
+function generateConsolationMatches(consIdx){
+const cons=T.bracket.consolation[consIdx];
+if(!cons||cons.losers.length<2)return;
+const losers=cons.losers;
+const rrMatches=generateRoundRobin(losers);
+for(let i=0;i<rrMatches.length;i++){
+T.matches.push({id:uid(),phase:'bracket',consolationRound:consIdx,
+p1:rrMatches[i].p1,p2:rrMatches[i].p2,
+score1:null,score2:null,referee:'',status:'pending',table:null,
+matchNum:T.matches.filter(x=>x.phase==='bracket').length+1,
+bracketRound:0});
+}
+save();
+}
+
+function checkBracketAdvance(){
+if(!T||!T.bracket)return;
+const rounds=T.bracket.rounds;
+const lastRound=rounds[rounds.length-1];
+if(!lastRound||lastRound.length<=1)return;
+let allDone=true;
+for(const entry of lastRound){
+if(!entry)continue;
+if(typeof entry==='object'&&entry.bye)continue;
+const m=T.matches.find(x=>x.id===entry);
+if(!m||m.status!=='done'){allDone=false;break;}
+}
+if(allDone)advanceBracket();
+}
+
+function getBracketRoundNames(){
+if(!T||!T.bracket)return[];
+const totalRounds=Math.log2(T.bracket.size);
+const names=[];
+for(let i=0;i<T.bracket.rounds.length;i++){
+const remaining=totalRounds-i;
+if(remaining===1)names.push('Finale');
+else if(remaining===2)names.push('Demi-finales');
+else if(remaining===3)names.push('Quarts de finale');
+else if(remaining===4)names.push('8\u00e8mes de finale');
+else names.push('Tour '+(i+1));
+}
+return names;
+}
+
+function backFromBracket(){showScreen('scr-players')}
+
+function showBracketRanking(){
+showScreen('scr-rankings');
+}
+
+function renderBracketRankingContent(el){
+if(!T||!T.bracket){el.innerHTML='<p>Pas de bracket</p>';return;}
+let html='<h3 style="color:var(--pri);margin-bottom:12px">Classement du tableau</h3>';
+const ranking=[];
+// Final winner & loser
+const finalMatches=T.matches.filter(m=>m.phase==='bracket'&&!m.isPetiteFinale);
+const finale=finalMatches.filter(m=>{
+const names=getBracketRoundNames();
+return m.bracketRound===T.bracket.rounds.length;
+});
+if(finale.length&&finale[0].status==='done'){
+const w=finale[0].score1>finale[0].score2?finale[0].p1:finale[0].p2;
+const l=finale[0].score1>finale[0].score2?finale[0].p2:finale[0].p1;
+ranking.push({id:w,rank:1,note:'Vainqueur'});
+ranking.push({id:l,rank:2,note:'Finaliste'});
+}
+// Petite finale
+if(T.bracket.petiteFinale){
+const pf=T.matches.find(m=>m.id===T.bracket.petiteFinale);
+if(pf&&pf.status==='done'){
+const w=pf.score1>pf.score2?pf.p1:pf.p2;
+const l=pf.score1>pf.score2?pf.p2:pf.p1;
+ranking.push({id:w,rank:3,note:'3\u00e8me'});
+ranking.push({id:l,rank:4,note:'4\u00e8me'});
+}
+}
+// Consolation rankings
+T.bracket.consolation.forEach((cons,ci)=>{
+const consMatches=T.matches.filter(m=>m.phase==='bracket'&&m.consolationRound===ci&&m.status==='done');
+const stats={};
+for(const pid of cons.losers)stats[pid]={id:pid,w:0,pf:0,pa:0,pts:0};
+for(const m of consMatches){
+if(!stats[m.p1]||!stats[m.p2])continue;
+stats[m.p1].pf+=m.score1;stats[m.p1].pa+=m.score2;
+stats[m.p2].pf+=m.score2;stats[m.p2].pa+=m.score1;
+if(m.score1>m.score2){stats[m.p1].w++;stats[m.p1].pts+=2;stats[m.p2].pts+=1;}
+else{stats[m.p2].w++;stats[m.p2].pts+=2;stats[m.p1].pts+=1;}
+}
+const sorted=Object.values(stats).sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa));
+sorted.forEach(s=>{if(!ranking.find(r=>r.id===s.id))ranking.push({id:s.id,rank:ranking.length+1,note:'Consolante R'+(ci+1)});});
+});
+// Add remaining unranked players
+for(const p of T.players){
+if(!ranking.find(r=>r.id===p.id))ranking.push({id:p.id,rank:ranking.length+1,note:''});
+}
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Note</th></tr></thead><tbody>`;
+for(const r of ranking){
+const p=T.players.find(x=>x.id===r.id);
+html+=`<tr><td class="rank">${r.rank}</td><td class="pname">${p?p.name:'?'}</td><td style="font-size:.8em">${r.note}</td></tr>`;
+}
+html+='</tbody></table>';
+el.innerHTML=html;
+}
+
+/* ===== EXPORT ===== */
+function goBackFromExport(){
+if(!T)showScreen('scr-home');
+else if(T.mode===3)showScreen('scr-bracket');
+else if(T.phase==='finals')showScreen('scr-finals');
+else showScreen('scr-matches');
+}
+
+function renderExport(){
+if(!T)return;
+const summary=document.getElementById('export-summary');
+const doneMatches=T.matches.filter(m=>m.status==='done').length;
+const totalMatches=T.matches.length;
+const modeNames={1:'Poules de niveau',2:'Poules + Finales',3:'Tableau \u00e9limination'};
+summary.innerHTML=`<p><strong>${T.name}</strong> &mdash; ${T.classe} &mdash; ${T.date}</p>
+<p>${T.players.length} joueurs &bull; ${doneMatches}/${totalMatches} matchs jou\u00e9s</p>
+<p>${modeNames[T.mode]||'Mode '+T.mode} &bull; ${T.pools.length} poule${T.pools.length>1?'s':''}</p>`;
+
+const qrData=buildQRData();
+const container=document.getElementById('qr-container');
+container.innerHTML='';
+const canvas=document.createElement('canvas');
+container.appendChild(canvas);
+QRGen.toCanvas(canvas,qrData,5);
+const today=new Date().toLocaleDateString('fr-FR');
+const _p1=document.createElement('p');
+_p1.style.cssText='font-size:.8em;color:var(--txt2);margin-top:8px';
+_p1.textContent='Scannez pour r\u00e9cup\u00e9rer les r\u00e9sultats';
+container.appendChild(_p1);
+// Info XLS
+const _p2=document.createElement('p');
+_p2.style.cssText='font-size:.75em;color:var(--txt2);margin-top:4px';
+_p2.textContent='XLSX : Onglet 1 = Matchs de poule | Onglet 2 = Classement final';
+container.appendChild(_p2);
+const _p3=document.createElement('p');
+_p3.style.cssText='font-size:.75em;color:var(--txt2)';
+_p3.textContent='Fichier : tournoi_'+T.classe+'_'+today.replace(/\//g,'-')+'.xlsx';
+container.appendChild(_p3);
+}
+
+function buildQRData(){
+const hasRefBonus=T.settings.refBonusEnabled||state.settings.refBonusEnabled;
+let data='TENEPS|'+T.name+'|'+T.classe+'|'+T.date+'|M'+T.mode+'\n';
+if(T.mode===3){
+const bracketRanking=getBracketFullRanking();
+if(bracketRanking.length){
+data+=bracketRanking.map((r,i)=>(i+1)+';'+r.name).join('\n');
+}else{
+data+=T.players.map((p,i)=>(i+1)+';'+p.name).join('\n');
+}
+}else{
+for(const pool of T.pools){
+const rk=calcPoolRanking(pool.id);
+data+=pool.name+':\n';
+data+=rk.map((r,i)=>{
+const p=T.players.find(x=>x.id===r.id);
+return(i+1)+';'+(p?p.name:'?')+';'+r.pts+';'+r.w+';'+r.l+(hasRefBonus?';'+(r.refBonus||0):'');
+}).join('\n')+'\n';
+}
+}
+return data.substring(0,2000);
+}
+
+// Retourne le classement complet du bracket sous la forme [{id, name}]
+function getBracketFullRanking(){
+if(!T||!T.bracket)return[];
+const ranking=[];
+const finalMatches=T.matches.filter(m=>m.phase==='bracket'&&!m.isPetiteFinale);
+const finale=finalMatches.filter(m=>m.bracketRound===T.bracket.rounds.length);
+if(finale.length&&finale[0].status==='done'){
+const w=finale[0].score1>finale[0].score2?finale[0].p1:finale[0].p2;
+const l=finale[0].score1>finale[0].score2?finale[0].p2:finale[0].p1;
+const addP=(id)=>{const p=T.players.find(x=>x.id===id);if(p&&!ranking.find(r=>r.id===id))ranking.push({id,name:p.name});};
+addP(w);addP(l);
+}
+if(T.bracket.petiteFinale){
+const pf=T.matches.find(m=>m.id===T.bracket.petiteFinale);
+if(pf&&pf.status==='done'){
+const w=pf.score1>pf.score2?pf.p1:pf.p2;
+const l=pf.score1>pf.score2?pf.p2:pf.p1;
+const addP=(id)=>{const p=T.players.find(x=>x.id===id);if(p&&!ranking.find(r=>r.id===id))ranking.push({id,name:p.name});};
+addP(w);addP(l);
+}
+}
+T.bracket.consolation.forEach((cons,ci)=>{
+const consMatches=T.matches.filter(m=>m.phase==='bracket'&&m.consolationRound===ci&&m.status==='done');
+const stats={};
+for(const pid of cons.losers)stats[pid]={id:pid,w:0,pf:0,pa:0,pts:0};
+for(const m of consMatches){
+if(!stats[m.p1]||!stats[m.p2])continue;
+stats[m.p1].pf+=m.score1;stats[m.p1].pa+=m.score2;stats[m.p2].pf+=m.score2;stats[m.p2].pa+=m.score1;
+if(m.score1>m.score2){stats[m.p1].w++;stats[m.p1].pts+=2;stats[m.p2].pts+=1;}
+else{stats[m.p2].w++;stats[m.p2].pts+=2;stats[m.p1].pts+=1;}
+}
+const sorted=Object.values(stats).sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa));
+sorted.forEach(s=>{if(!ranking.find(r=>r.id===s.id)){const p=T.players.find(x=>x.id===s.id);if(p)ranking.push({id:s.id,name:p.name});}});
+});
+for(const p of T.players){if(!ranking.find(r=>r.id===p.id))ranking.push({id:p.id,name:p.name});}
+return ranking;
+}
+
+function downloadCSV(){
+if(!T)return;
+const today=new Date().toLocaleDateString('fr-FR').replace(/\//g,'-');
+const hasRefBonus=T.settings.refBonusEnabled||state.settings.refBonusEnabled;
+const refBP=T.settings.refBonusPts!==undefined?T.settings.refBonusPts:(state.settings.refBonusPts||1);
+const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
+const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
+const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
+
+// ======= GÉNÉRATEUR XLSX OOXML (ZIP stocké) =======
+function escX(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function colRef(n){let s='';while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26);}return s;}
+// sh(val,bold) = cellule texte ; nm(val,bold) = cellule numérique
+function sh(v,b){return{v,b:!!b};}
+function nm(v,b){return{v,n:true,b:!!b};}
+function makeSheetXml(rows){
+let x='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>';
+let rn=0;
+for(const row of rows){
+rn++;
+if(!row||row.length===0){x+=`<row r="${rn}"/>`;continue;}
+x+=`<row r="${rn}">`;
+row.forEach((cell,ci)=>{
+if(cell==null)return;
+const ref=colRef(ci+1)+rn;
+const s=cell.b?' s="1"':'';
+if(cell.n){const v=isNaN(Number(cell.v))?0:Number(cell.v);x+=`<c r="${ref}"${s}><v>${v}</v></c>`;}
+else{x+=`<c r="${ref}" t="inlineStr"${s}><is><t>${escX(String(cell.v))}</t></is></c>`;}
+});
+x+='</row>';
+}
+x+='</sheetData></worksheet>';
+return x;
+}
+// CRC32
+const CRCT=new Uint32Array(256);
+for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);CRCT[i]=c;}
+function crc32(d){let c=0xFFFFFFFF;for(const b of d)c=CRCT[(c^b)&0xFF]^(c>>>8);return(c^0xFFFFFFFF)>>>0;}
+// ZIP mode stocké
+function makeZip(files){
+const enc2=new TextEncoder();
+const parts=[],cds=[];let off=0;
+for(const f of files){
+const nm2=enc2.encode(f.name);
+const dat=typeof f.data==='string'?enc2.encode(f.data):f.data;
+const cr=crc32(dat);
+const lh=new Uint8Array(30+nm2.length);const lv=new DataView(lh.buffer);
+lv.setUint32(0,0x04034b50,true);lv.setUint16(4,20,true);lv.setUint16(6,0,true);lv.setUint16(8,0,true);
+lv.setUint16(10,0,true);lv.setUint16(12,0,true);lv.setUint32(14,cr,true);
+lv.setUint32(18,dat.length,true);lv.setUint32(22,dat.length,true);
+lv.setUint16(26,nm2.length,true);lv.setUint16(28,0,true);lh.set(nm2,30);
+const cd=new Uint8Array(46+nm2.length);const cv=new DataView(cd.buffer);
+cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);
+cv.setUint16(8,0,true);cv.setUint16(10,0,true);cv.setUint16(12,0,true);cv.setUint16(14,0,true);
+cv.setUint32(16,cr,true);cv.setUint32(20,dat.length,true);cv.setUint32(24,dat.length,true);
+cv.setUint16(28,nm2.length,true);cv.setUint16(30,0,true);cv.setUint16(32,0,true);
+cv.setUint16(34,0,true);cv.setUint16(36,0,true);cv.setUint32(38,0,true);cv.setUint32(42,off,true);
+cd.set(nm2,46);
+parts.push(lh,dat);cds.push(cd);off+=lh.length+dat.length;
+}
+const cdOff=off;let cdSz=0;for(const cd of cds){parts.push(cd);cdSz+=cd.length;}
+const eocd=new Uint8Array(22);const ev=new DataView(eocd.buffer);
+ev.setUint32(0,0x06054b50,true);ev.setUint16(4,0,true);ev.setUint16(6,0,true);
+ev.setUint16(8,files.length,true);ev.setUint16(10,files.length,true);
+ev.setUint32(12,cdSz,true);ev.setUint32(16,cdOff,true);ev.setUint16(20,0,true);
+parts.push(eocd);
+const tot=parts.reduce((s,p)=>s+p.length,0);const res=new Uint8Array(tot);let pos=0;
+for(const p of parts){res.set(p,pos);pos+=p.length;}return res;
+}
+
+// ======= ONGLET 1 : Matchs de poule =======
+const s1rows=[];
+const h1=[sh('Poule',true),sh('Match',true),sh('Joueur 1',true),sh('Score J1',true),sh('Score J2',true),sh('Joueur 2',true),sh('Arbitre',true)];
+if(hasRefBonus)h1.push(sh('Bonus Arb',true));
+s1rows.push(h1);
+const poolMatches=T.matches.filter(m=>m.phase==='pool');
+for(const pool of T.pools){
+const pMatches=poolMatches.filter(m=>m.poolId===pool.id).sort((a,b)=>(a.matchNum||0)-(b.matchNum||0));
+for(const m of pMatches){
+const pl1=T.players.find(x=>x.id===m.p1);
+const pl2=T.players.find(x=>x.id===m.p2);
+let refName='';
+if(m.refereeId){const rp=T.players.find(x=>x.id===m.refereeId);refName=rp?rp.name:(m.referee||'');}
+else refName=m.referee||'';
+const done=m.status==='done';
+const row=[sh(pool.name),nm(m.matchNum||0),sh(pl1?pl1.name:'?'),done?nm(m.score1):sh('-'),done?nm(m.score2):sh('-'),sh(pl2?pl2.name:'?'),sh(refName)];
+if(hasRefBonus)row.push(nm(m.refBonus&&done?refBP:0));
+s1rows.push(row);
+}
+}
+
+// ======= ONGLET 2 : Classement final (UNIQUEMENT le classement global) =======
+const s2rows=[];
+if(T.mode===3){
+// Bracket : classement final
+s2rows.push([sh('Rang',true),sh('Joueur',true)]);
+const br=getBracketFullRanking();
+if(br.length){br.forEach((e,i)=>s2rows.push([nm(i+1),sh(e.name)]));}
+else{T.players.forEach((p,i)=>s2rows.push([nm(i+1),sh(p.name)]));}
+}else if(T.mode===1){
+// Mode 1 : classement croisé toutes poules
+s2rows.push([sh('Classement g\u00e9n\u00e9ral — toutes poules'+(hasRefBonus?' (victoires + d\u00e9faites + bonus arb)':' (victoires + d\u00e9faites)'),true)]);
+s2rows.push([]);
+const hdr1=[sh('Rang',true),sh('Joueur',true),sh('Poule',true),sh('Points',true),sh('Victoires',true),sh('D\u00e9faites',true),sh('Def.3sets',true),sh('PF',true),sh('PC',true),sh('Diff\u00e9rence',true)];
+if(hasRefBonus)hdr1.push(sh('Bonus.Arb',true));
+s2rows.push(hdr1);
+const all=[];
+for(const pool of T.pools){const rk=calcPoolRanking(pool.id);for(const r of rk)all.push({...r,poolName:pool.name});}
+all.sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+all.forEach((r,i)=>{
+const p=T.players.find(x=>x.id===r.id);
+const row=[nm(i+1),sh(p?p.name:'?'),sh(r.poolName),nm(r.pts),nm(r.w),nm(r.l),nm(r.l3||0),nm(r.pf),nm(r.pa),nm(r.pf-r.pa)];
+if(hasRefBonus)row.push(nm(r.refBonus||0));
+s2rows.push(row);
+});
+}else{
+// Mode 2 : classement cumulatif poule + finale + bonus arb
+const poolSt={};
+for(const pool of T.pools){const rk=calcPoolRanking(pool.id);for(const r of rk){poolSt[r.id]={w:r.w,l:r.l,l3:r.l3||0,pts:r.pts,pf:r.pf,pa:r.pa,refBonus:r.refBonus||0};}}
+const finalArb={};
+if(hasRefBonus){
+const df=T.matches.filter(m=>m.phase==='final'&&m.status==='done'&&m.refBonus);
+for(const m of df){const refId=m.refereeId||(m.referee?((T.players.find(p=>p.name.toLowerCase()===m.referee.trim().toLowerCase()))||{}).id:null);if(refId)finalArb[refId]=(finalArb[refId]||0)+refBP;}
+}
+if(!T.finals||!T.finals.length){
+s2rows.push([sh('Pas encore de finales — export apr\u00e8s la phase finale')]);
+}else{
+s2rows.push([sh('Classement g\u00e9n\u00e9ral — poule + finale'+(hasRefBonus?' + bonus arb':''),true)]);
+s2rows.push([]);
+let globalRank=1;
+for(const group of T.finals){
+s2rows.push([sh(group.name,true)]);
+const hdr2=[sh('Rang',true),sh('Joueur',true),sh('Points',true),sh('Victoires',true),sh('D\u00e9faites',true),sh('Def.3sets',true),sh('PF',true),sh('PC',true),sh('Diff\u00e9rence',true)];
+if(hasRefBonus)hdr2.push(sh('Bonus.Arb',true));
+s2rows.push(hdr2);
+const matches=T.matches.filter(m=>m.poolId===group.id&&m.phase==='final');
+const fSt={};
+for(const pid of group.playerIds)fSt[pid]={id:pid,w:0,l:0,l3:0,pts:0,pf:0,pa:0};
+for(const m of matches){
+if(m.status!=='done'||!fSt[m.p1]||!fSt[m.p2])continue;
+const pf1=m.totalPts1!==undefined?m.totalPts1:m.score1,pf2=m.totalPts2!==undefined?m.totalPts2:m.score2;
+fSt[m.p1].pf+=pf1;fSt[m.p1].pa+=pf2;fSt[m.p2].pf+=pf2;fSt[m.p2].pa+=pf1;
+const w3s=m.sets&&m.sets.length>=3;
+if(m.score1>m.score2){fSt[m.p1].w++;fSt[m.p1].pts+=wPts;fSt[m.p2].l++;fSt[m.p2].pts+=(w3s?l3Pts:lPts);if(w3s)fSt[m.p2].l3++;}
+else{fSt[m.p2].w++;fSt[m.p2].pts+=wPts;fSt[m.p1].l++;fSt[m.p1].pts+=(w3s?l3Pts:lPts);if(w3s)fSt[m.p1].l3++;}
+}
+const combined=Object.values(fSt).map(fs=>{
+const ps=poolSt[fs.id]||{w:0,l:0,l3:0,pts:0,pf:0,pa:0,refBonus:0};
+const frb=finalArb[fs.id]||0;
+return{id:fs.id,finalW:fs.w,totalW:ps.w+fs.w,totalL:ps.l+fs.l,totalL3:(ps.l3||0)+fs.l3,totalPF:ps.pf+fs.pf,totalPA:ps.pa+fs.pa,refBonus:(ps.refBonus||0)+frb,totalPts:ps.pts+fs.pts+frb};
+});
+const ranked=combined.sort((a,b)=>b.finalW-a.finalW||b.totalPts-a.totalPts||(b.totalPF-b.totalPA)-(a.totalPF-a.totalPA));
+for(const r of ranked){
+const p=T.players.find(x=>x.id===r.id);
+const row=[nm(globalRank),sh(p?p.name:'?'),nm(r.totalPts),nm(r.totalW),nm(r.totalL),nm(r.totalL3||0),nm(r.totalPF),nm(r.totalPA),nm(r.totalPF-r.totalPA)];
+if(hasRefBonus)row.push(nm(r.refBonus||0));
+s2rows.push(row);globalRank++;
+}
+s2rows.push([]);
+}
+}
+}
+
+// ======= Assemblage XLSX =======
+const CT='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>';
+const RELS='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+const WB='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Matchs de poule" sheetId="1" r:id="rId1"/><sheet name="Classement final" sheetId="2" r:id="rId2"/></sheets></workbook>';
+const WB_RELS='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+const STY='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0"/></cellXfs></styleSheet>';
+const zipData=makeZip([
+{name:'[Content_Types].xml',data:CT},
+{name:'_rels/.rels',data:RELS},
+{name:'xl/workbook.xml',data:WB},
+{name:'xl/_rels/workbook.xml.rels',data:WB_RELS},
+{name:'xl/styles.xml',data:STY},
+{name:'xl/worksheets/sheet1.xml',data:makeSheetXml(s1rows)},
+{name:'xl/worksheets/sheet2.xml',data:makeSheetXml(s2rows)},
+]);
+const blob=new Blob([zipData],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='tournoi_'+T.classe+'_'+today+'.xlsx';
+document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+toast('XLSX t\u00e9l\u00e9charg\u00e9 ✓');
+}
+
+/* ===== ADMIN ===== */
+function renderAdmin(){
+document.getElementById('adm-format').value=state.settings.format||'set11';
+document.getElementById('adm-winpts').value=state.settings.winPts!==undefined?state.settings.winPts:3;
+document.getElementById('adm-lose3pts').value=state.settings.loseSets3Pts!==undefined?state.settings.loseSets3Pts:2;
+document.getElementById('adm-losepts').value=state.settings.losePts!==undefined?state.settings.losePts:1;
+document.getElementById('adm-refbonuspts').value=state.settings.refBonusPts||1;
+const tog=document.getElementById('adm-refbonus');
+if(tog)tog.classList.toggle('on',!!state.settings.refBonusEnabled);
+}
+
+function saveSettings(){
+state.settings.format=document.getElementById('adm-format').value;
+state.settings.winPts=+document.getElementById('adm-winpts').value;
+state.settings.loseSets3Pts=+document.getElementById('adm-lose3pts').value;
+state.settings.losePts=+document.getElementById('adm-losepts').value;
+state.settings.refBonusPts=+document.getElementById('adm-refbonuspts').value;
+save();toast('Param\u00e8tres enregistr\u00e9s');
+}
+
+function toggleRefBonus(){
+state.settings.refBonusEnabled=!state.settings.refBonusEnabled;
+const tog=document.getElementById('adm-refbonus');
+if(tog)tog.classList.toggle('on',state.settings.refBonusEnabled);
+save();
+}
+
+function showHelp(){
+const c=document.getElementById('modal-container');
+c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:12px" onclick="if(event.target===this)this.remove()">
+<div style="background:var(--surf);border-radius:var(--rad);max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:20px;color:var(--txt);box-shadow:var(--sh)">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<h2 style="color:var(--pri)">Aide - TEN EPS</h2>
+<button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;color:var(--txt);font-size:1.5em;cursor:pointer">&times;</button>
+</div>
+<div style="font-size:.9em;line-height:1.6">
+<h3 style="color:var(--pri);margin:12px 0 6px">1. Cr\u00e9er un tournoi</h3>
+<p>Depuis l'\u00e9cran d'accueil, appuyez sur <b>+ Nouveau tournoi</b>. Renseignez le nom, la classe, le nombre de tables disponibles, le format de match et la dur\u00e9e optionnelle du chronometre.</p>
+<p>Choisissez le mode de tournoi :</p>
+<ul style="margin:4px 0 4px 20px">
+<li><b>Mode 1 - Poules de niveau</b> : poules ind\u00e9pendantes, chaque poule a son propre classement.</li>
+<li><b>Mode 2 - Poules + Finales</b> : phase de poules puis finales crois\u00e9es (les 1ers s'affrontent, les 2\u00e8mes, etc.).</li>
+<li><b>Mode 3 - Tableau \u00e0 \u00e9limination</b> : bracket avec t\u00eates de s\u00e9rie, petite finale et tableaux consolante.</li>
+</ul>
+
+<h3 style="color:var(--pri);margin:12px 0 6px">2. Inscrire les joueurs</h3>
+<p>Trois m\u00e9thodes d'inscription :</p>
+<ul style="margin:4px 0 4px 20px">
+<li><b>Un par un</b> : saisissez le nom et s\u00e9lectionnez le niveau (0 \u00e0 5 troph\u00e9es).</li>
+<li><b>Liste</b> : collez une liste (un joueur par ligne). Format : <code>NOM Pr\u00e9nom</code> ou <code>NOM;Niveau</code>.</li>
+<li><b>Import CSV</b> : importez un fichier .csv ou .txt (s\u00e9parateur ; ou ,).</li>
+</ul>
+<p>Les listes peuvent \u00eatre <b>sauvegard\u00e9es</b> et recharg\u00e9es pour d'autres tournois.</p>
+
+<h3 style="color:var(--pri);margin:12px 0 6px">3. Configurer les poules</h3>
+<p>D\u00e9finissez le nombre de poules et la taille de chaque poule. En mode 2, indiquez aussi le nombre de qualifi\u00e9s par poule pour les finales.</p>
+
+<h3 style="color:var(--pri);margin:12px 0 6px">4. R\u00e9partir les joueurs</h3>
+<p>Trois options de r\u00e9partition :</p>
+<ul style="margin:4px 0 4px 20px">
+<li><b>Par niveau</b> : distribution serpentine \u00e9quilibr\u00e9e selon les niveaux.</li>
+<li><b>Al\u00e9atoire</b> : m\u00e9lange al\u00e9atoire.</li>
+<li><b>Manuel</b> : touchez un joueur puis la poule de destination.</li>
+</ul>
+
+<h3 style="color:var(--pri);margin:12px 0 6px">5. G\u00e9rer les matchs</h3>
+<p>Les matchs sont g\u00e9n\u00e9r\u00e9s automatiquement (round-robin). Pour chaque match :</p>
+<ul style="margin:4px 0 4px 20px">
+<li>Saisissez les scores des deux joueurs.</li>
+<li>Attribuez un <b>arbitre</b> via le menu d\u00e9roulant (les joueurs occup\u00e9s sont automatiquement exclus).</li>
+<li>Cochez <b>+1 pt arb.</b> si l'arbitrage \u00e9tait de qualit\u00e9 (bonus configurable).</li>
+<li>Cliquez sur <b>Valider</b> pour enregistrer le r\u00e9sultat.</li>
+</ul>
+<p>Le <b>chronometre</b> (si configur\u00e9) s'affiche en haut de l'\u00e9cran avec vibration en fin de temps.</p>
+
+<h3 style="color:var(--pri);margin:12px 0 6px">6. Formats de match</h3>
+<ul style="margin:4px 0 4px 20px">
+<li><b>1 set \u00e0 11 pts</b> : un seul set, le premier \u00e0 11 gagne.</li>
+<li><b>1 set \u00e0 21 pts</b> : un seul set, le premier \u00e0 21 gagne.</li>
+<li><b>2 sets gagnants \u00e0 11</b> (Bo3) : le 3\u00e8me set appara\u00eet uniquement en cas d'\u00e9galit\u00e9 1-1.</li>
+</ul>
+<p><em>Pas de match nul au tennis de table : les scores \u00e9gaux sont refus\u00e9s.</em></p>
+
+<h3 style="color:var(--pri);margin:12px 0 6px">7. Classements et export</h3>
+<p>Les classements sont calcul\u00e9s automatiquement (points, diff\u00e9rence, points marqu\u00e9s). Vous pouvez :</p>
+<ul style="margin:4px 0 4px 20px">
+<li>Exporter en <b>CSV</b> (compatible Excel).</li>
+<li>G\u00e9n\u00e9rer un <b>QR code</b> avec les r\u00e9sultats.</li>
+</ul>
+
+<h3 style="color:var(--pri);margin:12px 0 6px">8. Param\u00e8tres</h3>
+<p>Configurez les points de victoire/d\u00e9faite, le bonus arbitre, et le format par d\u00e9faut. Ces r\u00e9glages s'appliquent aux nouveaux tournois.</p>
+<p>Le bouton <b>"Supprimer toutes les donn\u00e9es"</b> r\u00e9initialise l'application \u00e0 son \u00e9tat d'origine : tous les param\u00e8tres personnalis\u00e9s (format, points, bonus) sont remis aux valeurs par d\u00e9faut et tous les tournois cr\u00e9\u00e9s sont supprim\u00e9s.</p>
+
+<h3 style="color:var(--pri);margin:12px 0 6px">9. Installation sur tablette (PWA)</h3>
+<p>L'application peut s'installer comme une application native :</p>
+<ul style="margin:4px 0 4px 20px">
+<li><b>Android (Chrome)</b> : ouvrir l'application dans Chrome, appuyer sur le menu (\u22ee) en haut \u00e0 droite, puis s\u00e9lectionner <b>"Ajouter \u00e0 l'\u00e9cran d'accueil"</b>.</li>
+<li><b>iPad / iPhone (Safari)</b> : ouvrir l'application dans Safari, appuyer sur le bouton <b>Partager</b> (carr\u00e9 avec fl\u00e8che vers le haut), puis s\u00e9lectionner <b>"Sur l'\u00e9cran d'accueil"</b>.</li>
+<li><b>Android (APK)</b> : si vous disposez du fichier APK sign\u00e9, transf\u00e9rez-le sur la tablette (cl\u00e9 USB, e-mail, partage r\u00e9seau). Ouvrez le fichier APK, autorisez l'installation depuis des <b>"Sources inconnues"</b> si demand\u00e9 (Param\u00e8tres &gt; S\u00e9curit\u00e9), puis suivez les \u00e9tapes d'installation. L'application appara\u00eet ensuite directement dans le menu des applications.</li>
+</ul>
+
+<h3 style="color:var(--pri);margin:12px 0 6px">10. Mode hors-ligne et confidentialit\u00e9</h3>
+<p>L'application fonctionne <b>100% sans connexion internet</b> (gymnase, stade). Les donn\u00e9es sont sauvegard\u00e9es automatiquement sur la tablette uniquement.</p>
+<p style="margin-top:8px"><b>Conforme RGPD</b> : aucune donn\u00e9e n'est stock\u00e9e en ligne ni transmise \u00e0 un serveur. Toutes les informations (noms des joueurs, scores, classements) restent exclusivement sur l'appareil de l'utilisateur.</p>
+</div>
+</div>
+</div>`;
+}
+
+function resetAll(){
+if(confirm('Supprimer TOUTES les donn\u00e9es ? Cette action est irr\u00e9versible.')){
+localStorage.removeItem(LS_KEY);
+location.reload();
+}
+}
+
+/* ===== BRACKET VISUAL (Tableau visuel arbre) ===== */
+function showBracketVisual(){
+if(!T||!T.bracket||!T.bracket.rounds.length)return toast('Aucun tableau généré');
+const B=T.bracket;
+const totalRounds=Math.log2(B.size);
+const roundNames=[];
+for(let i=0;i<totalRounds;i++){
+const rem=totalRounds-i;
+if(rem===1)roundNames.push('Finale');
+else if(rem===2)roundNames.push('Demi-F');
+else if(rem===3)roundNames.push('Quarts');
+else if(rem===4)roundNames.push('8èmes');
+else roundNames.push('Tour '+(i+1));
+}
+// Resolve all bracket data into a round-by-round grid
+// Round 0 = first round (size/2 slots), Round 1 = size/4, etc.
+const grid=[];// grid[roundIdx][slotIdx] = {p1Name,p2Name,winnerName,isBye,byeName}
+// === ROUND 1 ===
+const r1=B.rounds[0]||[];
+const r1Data=[];
+for(let i=0;i<B.size/2;i++){
+const entry=r1[i];
+if(!entry){r1Data.push(null);continue;}
+if(typeof entry==='object'&&entry.bye){
+const p=T.players.find(x=>x.id===entry.bye);
+r1Data.push({isBye:true,byeName:p?p.name:'?',winnerId:entry.bye});
+continue;
+}
+const m=T.matches.find(x=>x.id===entry);
+if(!m){r1Data.push(null);continue;}
+const p1=T.players.find(x=>x.id===m.p1);
+const p2=T.players.find(x=>x.id===m.p2);
+const done=m.status==='done';
+const wId=done?(m.score1>m.score2?m.p1:m.p2):null;
+const wP=wId?T.players.find(x=>x.id===wId):null;
+r1Data.push({p1Name:p1?p1.name:'?',p2Name:p2?p2.name:'?',
+done,winnerName:wP?wP.name:null,winnerId:wId,
+score:done?(m.score1+'-'+m.score2):null});
+}
+grid.push(r1Data);
+// === SUBSEQUENT ROUNDS ===
+for(let ri=1;ri<B.rounds.length;ri++){
+const rnd=B.rounds[ri];
+const rData=[];
+for(let i=0;i<rnd.length;i++){
+const entry=rnd[i];
+if(!entry){rData.push(null);continue;}
+if(typeof entry==='object'&&entry.bye){
+const p=T.players.find(x=>x.id===entry.bye);
+rData.push({isBye:true,byeName:p?p.name:'?',winnerId:entry.bye});
+continue;
+}
+const m=T.matches.find(x=>x.id===entry);
+if(!m){rData.push(null);continue;}
+const p1=T.players.find(x=>x.id===m.p1);
+const p2=T.players.find(x=>x.id===m.p2);
+const done=m.status==='done';
+const wId=done?(m.score1>m.score2?m.p1:m.p2):null;
+const wP=wId?T.players.find(x=>x.id===wId):null;
+rData.push({p1Name:p1?p1.name:'?',p2Name:p2?p2.name:'?',
+done,winnerName:wP?wP.name:null,winnerId:wId,
+score:done?(m.score1+'-'+m.score2):null});
+}
+grid.push(rData);
+}
+// Build HTML bracket tree using CSS grid
+const slotH=36;// height per slot line
+const gap=4;
+const colW=130;
+const nbR1Slots=B.size/2;// number of matchups in round 1
+const totalH=nbR1Slots*2*(slotH+gap);// total height for all round1 pairs
+const roundCount=grid.length;
+const svgW=(roundCount+1)*colW+80;// +1 for champion column
+let html='<div style="overflow:auto;max-height:75vh;-webkit-overflow-scrolling:touch;position:relative">';
+// Use SVG for clean lines + foreignObject for text
+html+='<svg width="'+svgW+'" height="'+(totalH+60)+'" xmlns="http://www.w3.org/2000/svg" style="font-family:sans-serif">';
+// Round headers
+for(let ri=0;ri<roundCount;ri++){
+const x=ri*colW+10;
+const label=roundNames[ri]||('Tour '+(ri+1));
+html+='<text x="'+(x+colW/2)+'" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#F3C146">'+label+'</text>';
+}
+html+='<text x="'+(roundCount*colW+10+colW/2)+'" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#43A047">\uD83C\uDFC6</text>';
+const topY=35;
+// For each round, calculate Y positions of each match
+// Round 0: evenly spaced, each match = 2 slots
+// Round N: centered between its two feeder matches from round N-1
+const matchPositions=[];// matchPositions[round][matchIdx] = {y1, y2, midY}
+// Round 0 positions
+const r0pos=[];
+for(let i=0;i<nbR1Slots;i++){
+const y1=topY+i*2*(slotH+gap);
+const y2=y1+slotH+gap;
+r0pos.push({y1,y2,midY:(y1+y2+slotH)/2});
+}
+matchPositions.push(r0pos);
+// Subsequent rounds
+for(let ri=1;ri<roundCount;ri++){
+const prev=matchPositions[ri-1];
+const rpos=[];
+const matchCount=grid[ri].length;
+for(let i=0;i<matchCount;i++){
+const feeder1=prev[i*2];
+const feeder2=prev[i*2+1];
+if(!feeder1||!feeder2){
+// fallback: estimate position
+const estY=topY+i*4*(slotH+gap)*(Math.pow(2,ri));
+rpos.push({y1:estY,y2:estY+slotH+gap,midY:estY+slotH});
+continue;
+}
+const y1=feeder1.midY-slotH/2-gap/2;
+const y2=feeder2.midY-slotH/2+gap/2;
+rpos.push({y1,y2,midY:(y1+y2+slotH)/2});
+}
+matchPositions.push(rpos);
+}
+// Draw rounds
+for(let ri=0;ri<roundCount;ri++){
+const x=ri*colW+10;
+const rData=grid[ri];
+const positions=matchPositions[ri];
+for(let mi=0;mi<rData.length;mi++){
+const d=rData[mi];
+const pos=positions[mi];
+if(!d||!pos)continue;
+if(d.isBye){
+// Single slot for bye - show at midpoint
+const by=pos.y1;
+html+=slotRect(x,by,colW-20,slotH,d.byeName+' (bye)','#1E2D45','#94A3B8','italic');
+// Connector line to next round
+if(ri<roundCount-1){
+const nextPos=matchPositions[ri+1][Math.floor(mi/2)];
+if(nextPos){
+const fromX=x+colW-20;
+const fromY=by+slotH/2;
+const toX=(ri+1)*colW+10;
+const toY=mi%2===0?nextPos.y1+slotH/2:nextPos.y2+slotH/2;
+html+=connectorLine(fromX,fromY,toX,toY);
+}
+}
+}else{
+// Match with 2 players
+const p1bg=d.done&&d.winnerName===d.p1Name?'rgba(76,175,80,.25)':'#162032';
+const p2bg=d.done&&d.winnerName===d.p2Name?'rgba(76,175,80,.25)':'#162032';
+const p1clr=d.done&&d.winnerName===d.p1Name?'#66BB6A':'#94A3B8';
+const p2clr=d.done&&d.winnerName===d.p2Name?'#66BB6A':'#94A3B8';
+const p1fw=d.done&&d.winnerName===d.p1Name?'700':'400';
+const p2fw=d.done&&d.winnerName===d.p2Name?'700':'400';
+const p1Label=d.p1Name+(d.done&&d.score?' ('+d.score.split('-')[0]+')':'');
+const p2Label=d.p2Name+(d.done&&d.score?' ('+d.score.split('-')[1]+')':'');
+html+=slotRect(x,pos.y1,colW-20,slotH,p1Label,p1bg,p1clr,p1fw==='700'?'normal':'normal',p1fw);
+html+=slotRect(x,pos.y2,colW-20,slotH,p2Label,p2bg,p2clr,p2fw==='700'?'normal':'normal',p2fw);
+// Bracket connector line (right side → next round)
+if(ri<roundCount-1){
+const nextPos=matchPositions[ri+1][Math.floor(mi/2)];
+if(nextPos){
+const fromX=x+colW-20;
+const midFromY=(pos.y1+pos.y2+slotH)/2;
+const toX=(ri+1)*colW+10;
+const toY=mi%2===0?nextPos.y1+slotH/2:nextPos.y2+slotH/2;
+html+=connectorLine(fromX,midFromY,toX,toY);
+}
+}
+// Vertical bracket line connecting the two players
+html+='<line x1="'+(x+colW-20)+'" y1="'+(pos.y1+slotH/2)+'" x2="'+(x+colW-20)+'" y2="'+(pos.y2+slotH/2)+'" stroke="#bbb" stroke-width="1.5"/>';
+}
+}
+}
+// Champion box
+const lastRound=grid[roundCount-1];
+const lastPos=matchPositions[roundCount-1];
+if(lastRound&&lastRound.length===1&&lastRound[0]){
+const d=lastRound[0];
+const champX=roundCount*colW+10;
+let champName='En attente...';
+if(d.isBye)champName=d.byeName;
+else if(d.done&&d.winnerName)champName=d.winnerName;
+if(champName!=='En attente...'){
+const champY=lastPos[0]?(lastPos[0].y1+lastPos[0].y2+slotH)/2-18:totalH/2;
+html+='<rect x="'+champX+'" y="'+champY+'" width="'+(colW-10)+'" height="36" rx="8" fill="#E8F5E9" stroke="#43A047" stroke-width="2"/>';
+html+='<text x="'+(champX+(colW-10)/2)+'" y="'+(champY+22)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#2E7D32">\uD83C\uDFC6 '+escSvg(champName)+'</text>';
+// Line from final match to champion
+if(lastPos[0]){
+const fromX=roundCount*colW-10;
+const fromY=(lastPos[0].y1+lastPos[0].y2+slotH)/2;
+html+=connectorLine(fromX,fromY,champX,champY+18);
+}
+}
+}
+html+='</svg></div>';
+// Legend
+html+='<div style="display:flex;gap:12px;margin-top:10px;font-size:.8em;flex-wrap:wrap">';
+html+='<span><span style="display:inline-block;width:14px;height:14px;background:rgba(76,175,80,.25);border:1px solid #1E3A5F;border-radius:3px;vertical-align:middle"></span> Vainqueur</span>';
+html+='<span><span style="display:inline-block;width:14px;height:14px;background:#1E2D45;border:1px solid #1E3A5F;border-radius:3px;vertical-align:middle"></span> Bye (exempté)</span>';
+html+='<span><span style="display:inline-block;width:14px;height:14px;background:#162032;border:1px solid #1E3A5F;border-radius:3px;vertical-align:middle"></span> En attente</span>';
+html+='</div>';
+showModal('Tableau du tournoi',html);
+}
+function slotRect(x,y,w,h,text,bg,color,fontStyle,fontWeight){
+fontStyle=fontStyle||'normal';fontWeight=fontWeight||'400';
+// Truncate text if too long for the slot width (approx 1 char = 6px at font-size 10)
+var maxChars=Math.floor((w-8)/5.5);
+var disp=text.length>maxChars?text.substring(0,maxChars-1)+'\u2026':text;
+return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="'+bg+'" stroke="#bbb" stroke-width="1"/>'+
+'<text x="'+(x+4)+'" y="'+(y+h/2+4)+'" font-size="10" fill="'+color+'" font-style="'+fontStyle+'" font-weight="'+fontWeight+'">'+escSvg(disp)+'</text>';
+}
+function connectorLine(x1,y1,x2,y2){
+const midX=(x1+x2)/2;
+return '<path d="M'+x1+','+y1+' L'+midX+','+y1+' L'+midX+','+y2+' L'+x2+','+y2+'" fill="none" stroke="#bbb" stroke-width="1.5"/>';
+}
+function escSvg(s){
+if(!s)return'';
+return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ===== MODAL UTIL ===== */
+function showModal(title,html){
+const mc=document.getElementById('modal-container');
+mc.innerHTML='<div class="modal-overlay" onclick="closeModal()"><div class="modal" style="max-width:95vw;max-height:90vh;padding:16px" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h2 style="font-size:1.05em;margin:0;color:var(--pri)">'+title+'</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.5em;cursor:pointer;color:var(--txt2);padding:4px 8px">&times;</button></div>'+html+'</div></div>';
+}
+function closeModal(){document.getElementById('modal-container').innerHTML='';}
+
+/* ===== AUTO-SAVE ===== */
+window.addEventListener('beforeunload',()=>save());
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+setInterval(()=>{if(T)save();},15000);
+
+/* ===== INIT ===== */
+load();
+renderHome();
+
+/* PWA Service Worker */
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
