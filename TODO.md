@@ -2,6 +2,7 @@
 
 ## À faire
 
+- **Guide professeur avec le mot de passe `ADMINPROF` à rédiger et mettre en ligne** sur la page de l'application du site `outils-eps.fr` : la modale "Accès professeur" y renvoie déjà ("Vous trouverez le mot de passe dans le guide professeur, sur la page de l'application du site outils-eps.fr"), mais ce guide n'existe pas encore — sans lui, personne ne peut retrouver `ADMINPROF`. Rédaction + mise en ligne WordPress hors de portée d'un agent Claude Code, à faire par Nathalie.
 - **URL de déploiement** `apps.outils-eps.fr/TEN-EPS/` : le dépôt GitHub a été renommé (`msjeps/TEN-EPS` → `msjeps/Match-Manager-EPS`), mais cette URL technique (hébergement/proxy côté outils-eps.fr) doit être reconfigurée manuellement par Nathalie — hors de portée d'un agent Claude Code.
 - **Bouton "Version APK" sur `outils-eps.fr/ten-eps/`** : pointe toujours vers l'ancien fichier `https://outils-eps.fr/wp-content/uploads/apk/ten-eps.apk` (build obsolète, antérieure au renommage et à la Partie B chronomètre). Laissé tel quel pour l'instant (décision Nathalie, 2026-08-02) — à mettre à jour quand une APK à jour sera buildée et uploadée sur WordPress.
 - **Réinitialisation mot de passe admin non revalidée sur tablette** : le clic réel sur la boîte de confirmation (`confirm()`) du bouton "Réinitialiser au mot de passe par défaut" n'a pu être testé que dans un navigateur automatisé (dialogues natifs désactivés) — à revalider sur une vraie tablette avant de diffuser aux élèves.
