@@ -2279,6 +2279,7 @@ function openAdminAccess(){
 adminFailedAttempts=0;
 const html=`<div class="form-group"><label>Mot de passe</label><input type="password" id="admin-pwd-input" placeholder="Entrez le mot de passe" onkeydown="if(event.key==='Enter')verifyAdminPassword()"></div>
 <p style="font-size:.85em;color:var(--txt2)">Vous trouverez le mot de passe dans le guide professeur, sur la page de l'application du site <code>outils-eps.fr</code>.</p>
+<p style="font-size:.85em;color:var(--txt2)">Ce mot de passe peut être modifié à tout moment depuis les Paramètres, une fois connecté.</p>
 <div id="admin-pwd-error" style="color:var(--err);margin-top:8px;display:none">&#10060; Mot de passe incorrect</div>
 <div id="admin-pwd-reset" style="display:none;margin-top:15px;padding-top:15px;border-top:1px solid var(--brd)">
 <p style="font-size:.85em;color:var(--txt2);margin-bottom:8px">Mot de passe personnalisé oublié ?</p>
