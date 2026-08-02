@@ -176,7 +176,7 @@ textarea{resize:vertical;min-height:80px}
 <section id="scr-home" class="screen active">
 <div class="top-bar">
 <div class="logo">&#127955; Match Manager EPS</div>
-<button class="btn-icon" onclick="showScreen('scr-admin')" style="font-size:1.8em;color:#f3c146">&#9881;</button>
+<button class="btn-icon" onclick="openAdminAccess()" style="font-size:1.8em;color:#f3c146">&#9881;</button>
 </div>
 <div class="content">
 <h2 style="margin-bottom:16px">Mes Tournois</h2>
@@ -451,6 +451,16 @@ textarea{resize:vertical;min-height:80px}
 <input type="number" id="adm-refbonuspts" value="1" min="0" max="5" onchange="saveSettings()"></div></div>
 </div>
 <div class="card">
+<h3>&#128273; Mot de passe personnalis&eacute; (optionnel)</h3>
+<p style="font-size:.85em;color:var(--txt2);margin:8px 0">Par d&eacute;faut, cet acc&egrave;s est prot&eacute;g&eacute; par <code>ADMINPROF</code> (voir le guide professeur). Vous pouvez d&eacute;finir ici un mot de passe qui vous est propre &mdash; une fois personnalis&eacute;, <code>ADMINPROF</code> ne fonctionne plus directement (pour emp&ecirc;cher un &eacute;l&egrave;ve qui le conna&icirc;trait de contourner votre mot de passe). En cas d'oubli, 3 tentatives incorrectes sur l'&eacute;cran de connexion font appara&icirc;tre un bouton pour r&eacute;initialiser au mot de passe par d&eacute;faut.</p>
+<div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="adm-nouveau-mdp" placeholder="Laisser vide pour ne rien changer" autocomplete="off"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button type="button" class="btn-secondary" onclick="definirMdpAdmin()">&#128190; Enregistrer ce mot de passe</button>
+<button type="button" class="btn-secondary" onclick="supprimerMdpAdmin()">&#128260; Revenir au mot de passe par d&eacute;faut</button>
+</div>
+<p id="adm-mdp-message" style="display:none;margin-top:8px;color:var(--ok);font-size:.85em"></p>
+</div>
+<div class="card">
 <h3>&#128465; Donn&eacute;es</h3>
 <button class="btn-danger" onclick="resetAll()" style="margin-top:8px">Supprimer toutes les donn&eacute;es</button>
 </div>
@@ -489,6 +499,7 @@ let selectedPlayerForMove=null;
 const LS_KEY='teneps_data';
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
+function escH(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function save(){localStorage.setItem(LS_KEY,JSON.stringify(state))}
 function migrateSettings(settings){
 if(settings.matchFamily)return;
@@ -531,8 +542,8 @@ const modeNames={1:'Poules de niveau',2:'Poules + Finales',3:'Tableau \u00e9limi
 const phaseNames={players:'Inscription',pools:'Configuration',matches:'Matchs en cours',finals:'Finales',bracket:'Bracket',done:'Termin\u00e9'};
 return`<div class="card" style="cursor:pointer" onclick="openTournament('${t.id}')">
 <div style="display:flex;justify-content:space-between;align-items:start">
-<div><h3 style="color:var(--pri)">&#127942; ${t.name}</h3>
-<p style="font-size:.85em;color:var(--txt2)">&#128197; ${t.date} &mdash; ${t.classe||''}</p>
+<div><h3 style="color:var(--pri)">&#127942; ${escH(t.name)}</h3>
+<p style="font-size:.85em;color:var(--txt2)">&#128197; ${escH(t.date)} &mdash; ${escH(t.classe||'')}</p>
 <p style="font-size:.85em">${t.players.length} joueurs &bull; Mode ${t.mode}</p>
 <span class="badge badge-orange">${modeNames[t.mode]}</span>
 <span class="badge badge-blue">${phaseNames[t.phase]||t.phase}</span></div>
@@ -699,7 +710,7 @@ document.getElementById('player-count').textContent='Joueurs inscrits ('+T.playe
 if(!T.players.length){el.innerHTML='';empty.style.display='';return;}
 empty.style.display='none';
 el.innerHTML=T.players.map((p,i)=>`<div class="player-item" onclick="toggleLevelEditor('${p.id}',event)">
-<div class="num">${i+1}</div><div class="name">${p.name}</div>
+<div class="num">${i+1}</div><div class="name">${escH(p.name)}</div>
 <div class="level-trophies">${trophyHtml(p.level)}</div>
 <button class="del" onclick="event.stopPropagation();removePlayer('${p.id}')">&times;</button></div>
 <div class="level-editor" id="lved-${p.id}" style="display:none"><div class="level-editor-inner">
@@ -748,7 +759,7 @@ if(!T||!T.players.length){toast('Aucun joueur \u00e0 sauvegarder');return;}
 let html='<div class="form-group"><label>Nom de la liste</label><input type="text" id="save-list-name" placeholder="ex: 6B - Groupe 1"></div>';
 if(state.savedLists.length){
 html+='<div class="section-title" style="font-size:.9em">Listes existantes</div>';
-html+=state.savedLists.map((l,i)=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid var(--brd)" onclick="document.getElementById(\'save-list-name\').value=\''+l.name.replace(/'/g,"\\'")+'\'"><span style="font-weight:500">'+l.name+'</span><span style="color:var(--txt2);font-size:.85em">'+l.players.length+' joueurs</span></div>').join('');
+html+=state.savedLists.map((l,i)=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid var(--brd)" onclick="document.getElementById(\'save-list-name\').value=\''+escH(l.name.replace(/'/g,"\\'"))+'\'"><span style="font-weight:500">'+escH(l.name)+'</span><span style="color:var(--txt2);font-size:.85em">'+l.players.length+' joueurs</span></div>').join('');
 html+='<p style="font-size:.8em;color:var(--txt2);margin-top:6px">Cliquez sur un nom pour le remplacer</p>';
 }
 html+='<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" style="width:auto" onclick="doSaveList()">Sauvegarder ('+T.players.length+' joueurs)</button></div>';
@@ -772,7 +783,7 @@ save();closeModal();
 
 function showLoadListModal(){
 if(!state.savedLists.length){toast('Aucune liste sauvegard\u00e9e');return;}
-let html=state.savedLists.map((l,i)=>'<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between"><div><strong>'+l.name+'</strong><br><span style="font-size:.85em;color:var(--txt2)">'+l.players.length+' joueur(s)</span></div><button class="btn-danger btn-sm" onclick="deleteSavedList('+i+')" title="Supprimer">&times;</button></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-primary" style="flex:1;padding:10px" onclick="loadSavedList('+i+',true)">Charger (remplacer)</button><button class="btn-secondary" style="flex:1;padding:10px" onclick="loadSavedList('+i+',false)">Ajouter aux joueurs</button></div></div>').join('');
+let html=state.savedLists.map((l,i)=>'<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between"><div><strong>'+escH(l.name)+'</strong><br><span style="font-size:.85em;color:var(--txt2)">'+l.players.length+' joueur(s)</span></div><button class="btn-danger btn-sm" onclick="deleteSavedList('+i+')" title="Supprimer">&times;</button></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-primary" style="flex:1;padding:10px" onclick="loadSavedList('+i+',true)">Charger (remplacer)</button><button class="btn-secondary" style="flex:1;padding:10px" onclick="loadSavedList('+i+',false)">Ajouter aux joueurs</button></div></div>').join('');
 html+='<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Fermer</button></div>';
 showModal('Charger une liste',html);
 }
@@ -939,9 +950,9 @@ const col=POOL_COLORS[pi%POOL_COLORS.length];
 const players=pool.playerIds.map(id=>T.players.find(p=>p.id===id)).filter(Boolean);
 return`<div class="pool-card">
 <div class="pool-header" style="background:linear-gradient(135deg,${col[0]},${col[1]});cursor:pointer" onclick="moveToPool('${pool.id}')">
-<span>&#127942; ${pool.name}</span><span class="badge" style="background:rgba(255,255,255,.3);color:#fff">${players.length} joueurs</span>
+<span>&#127942; ${escH(pool.name)}</span><span class="badge" style="background:rgba(255,255,255,.3);color:#fff">${players.length} joueurs</span>
 ${selectedPlayerForMove?'<span style="font-size:.8em;opacity:.8">&#128071; D\u00e9poser ici</span>':''}
-</div><div class="pool-body">${players.map((p,i)=>`<div class="pool-player${selectedPlayerForMove===p.id?' selected':''}" onclick="selectPlayerForMove('${p.id}',event)" style="cursor:pointer"><div class="seed">${i+1}</div><span>${p.name}</span>${p.level?'<span class="chip" style="background:rgba(77,176,250,.2);color:#4DB0FA">Niv.'+p.level+'</span>':''}</div>`).join('')}
+</div><div class="pool-body">${players.map((p,i)=>`<div class="pool-player${selectedPlayerForMove===p.id?' selected':''}" onclick="selectPlayerForMove('${p.id}',event)" style="cursor:pointer"><div class="seed">${i+1}</div><span>${escH(p.name)}</span>${p.level?'<span class="chip" style="background:rgba(77,176,250,.2);color:#4DB0FA">Niv.'+p.level+'</span>':''}</div>`).join('')}
 ${!players.length?'<p style="padding:12px;color:var(--txt2);text-align:center">Touchez un joueur puis cette poule</p>':''}
 </div></div>`;
 }).join('');
@@ -1091,7 +1102,7 @@ const tableBadge=m.table?`<span class="match-table-badge" onclick="editMatchTabl
 const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
 const candidates=getRefereeCandidates(m);
 const refVal=m.refereeId||'';
-const refSelectHtml='<select class="ref-input" id="ref-'+m.id+'" '+(isDone?'disabled':'')+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.85em"><option value="">&#9999; Arbitre</option>'+candidates.map(p=>'<option value="'+p.id+'"'+(refVal===p.id?' selected':'')+'>'+p.name+'</option>').join('')+'</select>';
+const refSelectHtml='<select class="ref-input" id="ref-'+m.id+'" '+(isDone?'disabled':'')+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.85em"><option value="">&#9999; Arbitre</option>'+candidates.map(p=>'<option value="'+p.id+'"'+(refVal===p.id?' selected':'')+'>'+escH(p.name)+'</option>').join('')+'</select>';
 const actionsHtml=`<div class="match-actions">
 ${refSelectHtml}
 <label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${m.refBonus?'checked':''} ${isDone?'disabled':''}>+1 pt arb.</label>
@@ -1106,9 +1117,9 @@ const w2=isDone&&m.score2>m.score1;
 return`<div class="match-card ${m.status}" onclick="toggleMatchPlaying('${m.id}',event)">
 <div class="match-header"><span class="match-num">Match ${m.matchNum||''}</span>${tableBadge}
 <span class="match-status ${m.status}">${statusLabel}</span></div>
-<div class="match-row"><span class="pname"${w1?' style="color:var(--ok);font-weight:700"':''}>${p1.name}</span>
+<div class="match-row"><span class="pname"${w1?' style="color:var(--ok);font-weight:700"':''}>${escH(p1.name)}</span>
 <input type="number" id="s1-${m.id}" value="${s1}" min="0" max="99" class="${w1?'winner':w2?'loser':''}" ${isDone?'disabled':''}></div>
-<div class="match-row"><span class="pname"${w2?' style="color:var(--ok);font-weight:700"':''}>${p2.name}</span>
+<div class="match-row"><span class="pname"${w2?' style="color:var(--ok);font-weight:700"':''}>${escH(p2.name)}</span>
 <input type="number" id="s2-${m.id}" value="${s2}" min="0" max="99" class="${w2?'winner':w1?'loser':''}" ${isDone?'disabled':''}></div>
 ${T.settings.matchFamily==='time'?renderMatchTimerWidget(m):''}
 ${actionsHtml}</div>`;
@@ -1126,11 +1137,11 @@ return`<div class="match-card ${m.status}" onclick="toggleMatchPlaying('${m.id}'
 <span class="match-status ${m.status}">${statusLabel}</span></div>
 <div class="set-scores">
 <div class="set-header"><div class="pname-col"></div><div class="set-col">S1</div><div class="set-col">S2</div><div class="set-col set3-${m.id}" style="${s3d}">S3</div></div>
-<div class="set-row"><div class="pname-col"${isW1?' style="color:var(--ok);font-weight:700"':''}>${p1.name}</div>
+<div class="set-row"><div class="pname-col"${isW1?' style="color:var(--ok);font-weight:700"':''}>${escH(p1.name)}</div>
 <div class="set-col"><input type="number" id="s1a-${m.id}" value="${sets[0].s1}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
 <div class="set-col"><input type="number" id="s2a-${m.id}" value="${sets[1].s1}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
 <div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3a-${m.id}" value="${sets[2]?sets[2].s1:''}" min="0" max="99" ${isDone?'disabled':''}></div></div>
-<div class="set-row"><div class="pname-col"${isW2?' style="color:var(--ok);font-weight:700"':''}>${p2.name}</div>
+<div class="set-row"><div class="pname-col"${isW2?' style="color:var(--ok);font-weight:700"':''}>${escH(p2.name)}</div>
 <div class="set-col"><input type="number" id="s1b-${m.id}" value="${sets[0].s2}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
 <div class="set-col"><input type="number" id="s2b-${m.id}" value="${sets[1].s2}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
 <div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3b-${m.id}" value="${sets[2]?sets[2].s2:''}" min="0" max="99" ${isDone?'disabled':''}></div></div>
@@ -1490,7 +1501,7 @@ ranking.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const quali=qualiCount&&i<qualiCount;
 html+=`<tr${quali?' style="background:rgba(76,175,80,.08)"':''}>
-<td class="rank">${i+1}${quali?' \u2705':''}</td><td class="pname">${p?p.name:'?'}</td>
+<td class="rank">${i+1}${quali?' \u2705':''}</td><td class="pname">${p?escH(p.name):'?'}</td>
 <td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasAnyD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasAnyL3?`<td>${r.l3||0}</td>`:''}
 <td>${r.pf}</td><td>${r.pa}</td><td>${r.pf-r.pa>=0?'+':''}${r.pf-r.pa}</td>${hasAnyBonus?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
@@ -1838,11 +1849,11 @@ seedHtml=`<div class="info-box" style="margin-bottom:12px">
 <span style="font-size:.85em;color:#4DB0FA"><strong>T\u00eates de s\u00e9rie</strong> (exempt\u00e9es du 1er tour) :</span>
 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${si.map(s=>
 '<span class="chip" style="background:rgba(243,193,70,.15);color:var(--pri-lt);border:1px solid var(--pri)">'+
-'<strong>TS'+s.rank+'</strong> '+s.name+(s.level?' '+'\u{1F3C6}'.repeat(s.level):'')+'</span>').join('')}
+'<strong>TS'+s.rank+'</strong> '+escH(s.name)+(s.level?' '+'\u{1F3C6}'.repeat(s.level):'')+'</span>').join('')}
 </div></div>
 <div style="margin-bottom:12px">${byeEntries.map(e=>{
 const p=T.players.find(x=>x.id===e.bye);
-return p?'<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(76,175,80,.1);border-radius:8px;margin-bottom:4px;border-left:4px solid var(--ok)"><span style="color:var(--ok);font-weight:700">\u2705</span><span style="font-weight:500">'+p.name+'</span><span style="color:var(--txt2);font-size:.85em">\u2192 qualifi\u00e9(e) directement (t\u00eate de s\u00e9rie)</span></div>':'';
+return p?'<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(76,175,80,.1);border-radius:8px;margin-bottom:4px;border-left:4px solid var(--ok)"><span style="color:var(--ok);font-weight:700">\u2705</span><span style="font-weight:500">'+escH(p.name)+'</span><span style="color:var(--txt2);font-size:.85em">\u2192 qualifi\u00e9(e) directement (t\u00eate de s\u00e9rie)</span></div>':'';
 }).join('')}</div>`;
 }
 content.innerHTML=seedHtml+`<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">${done}/${roundMatches.length} matchs</span></div>
@@ -1963,7 +1974,7 @@ if(!ranking.find(r=>r.id===p.id))ranking.push({id:p.id,rank:ranking.length+1,not
 html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Note</th></tr></thead><tbody>`;
 for(const r of ranking){
 const p=T.players.find(x=>x.id===r.id);
-html+=`<tr><td class="rank">${r.rank}</td><td class="pname">${p?p.name:'?'}</td><td style="font-size:.8em">${r.note}</td></tr>`;
+html+=`<tr><td class="rank">${r.rank}</td><td class="pname">${p?escH(p.name):'?'}</td><td style="font-size:.8em">${r.note}</td></tr>`;
 }
 html+='</tbody></table>';
 el.innerHTML=html;
@@ -1983,7 +1994,7 @@ const summary=document.getElementById('export-summary');
 const doneMatches=T.matches.filter(m=>m.status==='done').length;
 const totalMatches=T.matches.length;
 const modeNames={1:'Poules de niveau',2:'Poules + Finales',3:'Tableau \u00e9limination'};
-summary.innerHTML=`<p><strong>${T.name}</strong> &mdash; ${T.classe} &mdash; ${T.date}</p>
+summary.innerHTML=`<p><strong>${escH(T.name)}</strong> &mdash; ${escH(T.classe)} &mdash; ${escH(T.date)}</p>
 <p>${T.players.length} joueurs &bull; ${doneMatches}/${totalMatches} matchs jou\u00e9s</p>
 <p>${modeNames[T.mode]||'Mode '+T.mode} &bull; ${T.pools.length} poule${T.pools.length>1?'s':''}</p>`;
 
@@ -2258,6 +2269,73 @@ const a=document.createElement('a');
 a.href=url;a.download='tournoi_'+T.classe+'_'+today+'.xlsx';
 document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 toast('XLSX t\u00e9l\u00e9charg\u00e9 ✓');
+}
+
+/* ===== ACCÈS PROF ===== */
+const ADMIN_PWD_KEY='mmeps_admin_pwd';
+let adminFailedAttempts=0;
+
+function openAdminAccess(){
+adminFailedAttempts=0;
+const html=`<div class="form-group"><label>Mot de passe</label><input type="password" id="admin-pwd-input" placeholder="Entrez le mot de passe" onkeydown="if(event.key==='Enter')verifyAdminPassword()"></div>
+<p style="font-size:.85em;color:var(--txt2)">Vous trouverez le mot de passe dans le guide professeur, sur la page de l'application du site <code>outils-eps.fr</code>.</p>
+<div id="admin-pwd-error" style="color:var(--err);margin-top:8px;display:none">&#10060; Mot de passe incorrect</div>
+<div id="admin-pwd-reset" style="display:none;margin-top:15px;padding-top:15px;border-top:1px solid var(--brd)">
+<p style="font-size:.85em;color:var(--txt2);margin-bottom:8px">Mot de passe personnalisé oublié ?</p>
+<button type="button" class="btn-secondary" style="width:100%" onclick="resetAdminPasswordFromLogin()">&#128260; Réinitialiser au mot de passe par défaut</button>
+</div>
+<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" style="width:auto" onclick="verifyAdminPassword()">Valider</button></div>`;
+showModal('&#128274; Accès professeur',html);
+setTimeout(()=>{const el=document.getElementById('admin-pwd-input');if(el)el.focus();},50);
+}
+
+function verifyAdminPassword(){
+const pwd=document.getElementById('admin-pwd-input').value;
+const custom=localStorage.getItem(ADMIN_PWD_KEY);
+const valid=custom?pwd===custom:pwd==='ADMINPROF';
+if(valid){
+closeModal();
+showScreen('scr-admin');
+return;
+}
+document.getElementById('admin-pwd-error').style.display='block';
+adminFailedAttempts++;
+if(adminFailedAttempts>=3&&custom){
+document.getElementById('admin-pwd-reset').style.display='block';
+}
+}
+
+function resetAdminPasswordFromLogin(){
+if(!confirm('Réinitialiser le mot de passe personnalisé et revenir à ADMINPROF ?'))return;
+localStorage.removeItem(ADMIN_PWD_KEY);
+adminFailedAttempts=0;
+document.getElementById('admin-pwd-error').style.display='none';
+document.getElementById('admin-pwd-reset').style.display='none';
+document.getElementById('admin-pwd-input').value='';
+alert('Mot de passe personnalisé supprimé. Vous pouvez maintenant vous connecter avec ADMINPROF.');
+}
+
+function definirMdpAdmin(){
+const nouveau=document.getElementById('adm-nouveau-mdp').value.trim();
+const message=document.getElementById('adm-mdp-message');
+if(!nouveau){alert('Saisissez un nouveau mot de passe, ou utilisez "Revenir au mot de passe par défaut" pour le supprimer.');return;}
+if(nouveau==='ADMINPROF'){alert('Ce mot de passe est déjà celui par défaut. Choisissez-en un autre pour renforcer la protection.');return;}
+localStorage.setItem(ADMIN_PWD_KEY,nouveau);
+document.getElementById('adm-nouveau-mdp').value='';
+message.textContent='✅ Mot de passe personnalisé enregistré. ADMINPROF ne fonctionnera plus tant que ce mot de passe est actif.';
+message.style.display='';
+setTimeout(()=>{message.style.display='none';},3500);
+}
+
+function supprimerMdpAdmin(){
+if(!localStorage.getItem(ADMIN_PWD_KEY)){alert("Aucun mot de passe personnalisé n'est actuellement défini.");return;}
+if(!confirm('Revenir au mot de passe par défaut (ADMINPROF) et supprimer le mot de passe personnalisé ?'))return;
+localStorage.removeItem(ADMIN_PWD_KEY);
+document.getElementById('adm-nouveau-mdp').value='';
+const message=document.getElementById('adm-mdp-message');
+message.textContent='✅ Mot de passe personnalisé supprimé - ADMINPROF est de nouveau le seul mot de passe.';
+message.style.display='';
+setTimeout(()=>{message.style.display='none';},3500);
 }
 
 /* ===== ADMIN ===== */
