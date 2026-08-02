@@ -19,6 +19,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .top-bar{background:linear-gradient(135deg,var(--surf2),var(--surf));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.4);border-bottom:2px solid var(--pri)}
 .top-bar h1{font-size:1.1em;flex:1}
 .top-bar .logo{font-size:1.3em;font-weight:700;flex:1}
+.version-tag{display:block;font-size:.6em;font-weight:400;opacity:.75;margin-top:2px}
 .btn-back{background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 14px;border-radius:8px;font-size:.9em;cursor:pointer}
 .btn-icon{background:none;border:none;color:#fff;font-size:1.4em;cursor:pointer;padding:4px 8px}
 .content{padding:16px;max-width:800px;margin:0 auto}
@@ -175,7 +176,7 @@ textarea{resize:vertical;min-height:80px}
 <!-- ==================== HOME ==================== -->
 <section id="scr-home" class="screen active">
 <div class="top-bar">
-<div class="logo">&#127955; Match Manager EPS</div>
+<div class="logo">&#127955; Match Manager EPS<span class="version-tag" id="home-version"></span></div>
 <button class="btn-icon" onclick="openAdminAccess()" style="font-size:1.8em;color:#f3c146">&#9881;</button>
 </div>
 <div class="content">
@@ -470,7 +471,7 @@ textarea{resize:vertical;min-height:80px}
 <button class="btn-secondary" onclick="showHelp()" style="width:100%">Ouvrir l'aide</button>
 </div>
 <div class="card" style="margin-top:20px;text-align:center;color:var(--txt2)">
-<p style="font-size:.85em">Match Manager EPS v1.0 &mdash; Tennis de Table EPS</p>
+<p style="font-size:.85em" id="adm-version">Match Manager EPS &mdash; Tennis de Table EPS</p>
 <p style="font-size:.8em">Application PWA hors-ligne</p>
 <p style="font-size:.75em;margin-top:4px">Nathalie Prenois</p>
 </div>
@@ -497,6 +498,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
+const APP_VERSION='1.1';
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
 function escH(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -2339,6 +2341,7 @@ document.getElementById('adm-drawpts').value=state.settings.drawPts!==undefined?
 document.getElementById('adm-refbonuspts').value=state.settings.refBonusPts||1;
 const tog=document.getElementById('adm-refbonus');
 if(tog)tog.classList.toggle('on',!!state.settings.refBonusEnabled);
+document.getElementById('adm-version').textContent='Match Manager EPS Version '+APP_VERSION+' — Tennis de Table EPS';
 }
 
 function saveSettings(){
@@ -2687,6 +2690,7 @@ document.addEventListener('click',requestAppFullscreen,{once:true});
 /* ===== INIT ===== */
 load();
 renderHome();
+document.getElementById('home-version').textContent='Version '+APP_VERSION;
 ensureWakeLock();
 
 /* PWA Service Worker */
