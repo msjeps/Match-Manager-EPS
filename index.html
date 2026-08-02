@@ -320,6 +320,11 @@ textarea{resize:vertical;min-height:80px}
 <div class="content">
 <div id="rankings-tabs" class="tab-bar"></div>
 <div id="rankings-content"></div>
+<div class="card" style="margin-top:16px">
+<h3 style="margin-bottom:12px">QR Code des r&eacute;sultats</h3>
+<div class="qr-container" id="qr-container-rankings"></div>
+<button class="btn-secondary" onclick="downloadCSV()" style="width:100%;margin-top:12px">&#128196; T&eacute;l&eacute;charger XLSX</button>
+</div>
 </div>
 </section>
 
@@ -1196,6 +1201,7 @@ function renderRankings(){
 if(!T)return;
 const tabs=document.getElementById('rankings-tabs');
 const content=document.getElementById('rankings-content');
+renderQRCode('qr-container-rankings');
 if(T.mode===3){
 renderBracketRankingContent(content);
 return;
@@ -1205,6 +1211,20 @@ if(T.mode===2||(T.mode===1&&T.pools.length>1)){
 tabs.innerHTML+=`<button class="tab-btn" onclick="showRankTab(-1,this)">G\u00e9n\u00e9ral \u2605</button>`;
 }
 showRankTab(0);
+}
+
+function renderQRCode(containerId){
+if(!T)return;
+const container=document.getElementById(containerId);
+if(!container)return;
+container.innerHTML='';
+const canvas=document.createElement('canvas');
+container.appendChild(canvas);
+QRGen.toCanvas(canvas,buildQRData(),5);
+const p=document.createElement('p');
+p.style.cssText='font-size:.8em;color:var(--txt2);margin-top:8px';
+p.textContent='Scannez pour r\u00e9cup\u00e9rer les r\u00e9sultats';
+container.appendChild(p);
 }
 
 function showRankTab(idx,btn){
@@ -1729,17 +1749,9 @@ summary.innerHTML=`<p><strong>${T.name}</strong> &mdash; ${T.classe} &mdash; ${T
 <p>${T.players.length} joueurs &bull; ${doneMatches}/${totalMatches} matchs jou\u00e9s</p>
 <p>${modeNames[T.mode]||'Mode '+T.mode} &bull; ${T.pools.length} poule${T.pools.length>1?'s':''}</p>`;
 
-const qrData=buildQRData();
+renderQRCode('qr-container');
 const container=document.getElementById('qr-container');
-container.innerHTML='';
-const canvas=document.createElement('canvas');
-container.appendChild(canvas);
-QRGen.toCanvas(canvas,qrData,5);
 const today=new Date().toLocaleDateString('fr-FR');
-const _p1=document.createElement('p');
-_p1.style.cssText='font-size:.8em;color:var(--txt2);margin-top:8px';
-_p1.textContent='Scannez pour r\u00e9cup\u00e9rer les r\u00e9sultats';
-container.appendChild(_p1);
 // Info XLS
 const _p2=document.createElement('p');
 _p2.style.cssText='font-size:.75em;color:var(--txt2);margin-top:4px';
