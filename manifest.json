@@ -4,7 +4,7 @@
   "description": "Gestion de tournois de Tennis de Table pour l'EPS",
   "start_url": "./index.html",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#213364",
   "theme_color": "#213364",
   "icons": [
