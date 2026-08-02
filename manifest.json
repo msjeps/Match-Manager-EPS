@@ -1,8 +1,8 @@
 {
-  "name": "TEN EPS - Tennis de Table",
-  "short_name": "TEN EPS",
+  "name": "Match Manager EPS - Tennis de Table",
+  "short_name": "Match Manager EPS",
   "description": "Gestion de tournois de Tennis de Table pour l'EPS",
-  "start_url": "./TEN_EPS.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#213364",

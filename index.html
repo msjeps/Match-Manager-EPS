@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon_192.png">
 <link rel="apple-touch-icon" href="icon_192.png">
-<title>TEN EPS - Tennis de Table</title>
+<title>Match Manager EPS - Tennis de Table</title>
 <style>
 :root{--pri:#F3C146;--pri-lt:#F5D080;--pri-dk:#D4A020;--accent:#4DB0FA;--ok:#4CAF50;--err:#E64D4C;--info:#4DB0FA;--warn:#F3C146;--bg:#213364;--surf:#3e5db3;--surf2:#4A6BC5;--txt:#FFFFFF;--txt2:#BDD3FF;--brd:#5572C8;--sh:0 2px 12px rgba(0,0,0,.4);--rad:12px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -52,6 +52,11 @@ textarea{resize:vertical;min-height:80px}
 .mode-card h3{color:var(--pri);margin-bottom:4px}
 .mode-card p{font-weight:600;margin-bottom:4px}
 .mode-card small{color:var(--txt2)}
+.family-toggle{display:flex;gap:8px}
+.family-btn{flex:1;border:2px solid var(--brd);border-radius:var(--rad);padding:12px 8px;cursor:pointer;background:var(--surf);text-align:center;font-weight:600;font-size:.9em;transition:all .2s}
+.family-btn.selected{border-color:var(--pri);background:rgba(243,193,70,.08);color:var(--pri)}
+.format-group{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.format-group .form-group{flex:1;min-width:120px}
 .player-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;margin-bottom:6px}
 .player-item .num{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--pri-dk));color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85em;flex-shrink:0}
 .player-item .name{flex:1;font-weight:600;letter-spacing:.02em}
@@ -85,6 +90,11 @@ textarea{resize:vertical;min-height:80px}
 .match-actions .ref-input::placeholder{color:var(--txt2)}
 .match-validate{background:var(--ok);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:.9em}
 .match-validate:disabled{opacity:.4;cursor:not-allowed}
+.mtimer{display:flex;align-items:center;gap:10px;background:var(--surf2);border-radius:8px;padding:6px 10px;margin-top:8px}
+.mtimer-period{font-size:.8em;color:var(--txt2);font-weight:600}
+.mtimer-time{font-family:monospace;font-size:1.15em;font-weight:800;color:var(--pri)}
+.mtimer-end{font-size:.8em;color:var(--txt2);font-style:italic}
+.mtimer .btn-secondary{padding:6px 12px;font-size:.8em}
 .progress-bar{height:8px;background:var(--brd);border-radius:4px;overflow:hidden;margin:12px 0}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--ok),var(--accent));transition:width .3s;border-radius:4px}
 .tab-bar{display:flex;gap:0;background:var(--surf);border-radius:var(--rad);overflow:hidden;border:2px solid var(--brd);margin-bottom:16px}
@@ -165,7 +175,7 @@ textarea{resize:vertical;min-height:80px}
 <!-- ==================== HOME ==================== -->
 <section id="scr-home" class="screen active">
 <div class="top-bar">
-<div class="logo">&#127955; TEN EPS</div>
+<div class="logo">&#127955; Match Manager EPS</div>
 <button class="btn-icon" onclick="showScreen('scr-admin')" style="font-size:1.8em;color:#f3c146">&#9881;</button>
 </div>
 <div class="content">
@@ -203,10 +213,26 @@ textarea{resize:vertical;min-height:80px}
 <small>T&ecirc;tes de s&eacute;rie + tableau des perdants pour classer tout le monde.</small>
 </div>
 </div></div>
-<div class="form-group"><label>Nombre de tables disponibles</label>
+<div class="form-group"><label>Nombre de tables ou terrains disponibles</label>
 <div class="stepper"><button onclick="stepV('inp-tables',-1)">&minus;</button><input type="number" id="inp-tables" value="10" min="1" max="20"><button onclick="stepV('inp-tables',1)">+</button></div></div>
 <div class="form-group"><label>Format de match</label>
-<select id="inp-format"><option value="set11">1 set &agrave; 11 pts</option><option value="set21">1 set &agrave; 21 pts</option><option value="bo3">2 sets gagnants &agrave; 11</option></select></div>
+<div class="family-toggle" id="inp-family-toggle">
+<div class="family-btn selected" data-family="score" onclick="onFormatFamilyChange('inp','score')">&#127955; Match au score</div>
+<div class="family-btn" data-family="time" onclick="onFormatFamilyChange('inp','time')">&#9201; Match au temps</div>
+</div>
+<div class="format-group" id="inp-format-score">
+<div class="form-group"><label>Manches gagnantes</label>
+<div class="stepper"><button onclick="stepV('inp-winningsets',-1)">&minus;</button><input type="number" id="inp-winningsets" value="1" min="1" max="2"><button onclick="stepV('inp-winningsets',1)">+</button></div></div>
+<div class="form-group"><label>Points par manche</label>
+<select id="inp-pointsperset"><option value="11">11 pts</option><option value="15">15 pts</option><option value="21">21 pts</option><option value="25">25 pts</option></select></div>
+</div>
+<div class="format-group" id="inp-format-time" style="display:none">
+<div class="form-group"><label>Nombre de p&eacute;riodes</label>
+<select id="inp-nbperiods"><option value="1">1 (p&eacute;riode unique)</option><option value="2">2 (mi-temps)</option><option value="3">3 (tiers-temps)</option><option value="4">4 (quart-temps)</option></select></div>
+<div class="form-group"><label>Dur&eacute;e de chaque p&eacute;riode (min)</label>
+<div class="stepper"><button onclick="stepV('inp-perioddur',-1)">&minus;</button><input type="number" id="inp-perioddur" value="20" min="1" max="60"><button onclick="stepV('inp-perioddur',1)">+</button></div></div>
+</div>
+</div>
 <div class="form-group"><label>Dur&eacute;e de la phase (min, 0 = illimit&eacute;)</label>
 <input type="number" id="inp-duration" value="0" min="0" max="180"></div>
 <button class="btn-primary" onclick="createTournament()">Cr&eacute;er le tournoi &rarr;</button>
@@ -389,16 +415,32 @@ textarea{resize:vertical;min-height:80px}
 <div class="content">
 <div class="card">
 <h3>Format de match par d&eacute;faut</h3>
-<select id="adm-format" onchange="saveSettings()" style="margin-top:8px"><option value="set11">1 set &agrave; 11 pts</option><option value="set21">1 set &agrave; 21 pts</option><option value="bo3">2 sets gagnants &agrave; 11</option></select>
+<div class="family-toggle" id="adm-family-toggle">
+<div class="family-btn selected" data-family="score" onclick="onFormatFamilyChange('adm','score')">&#127955; Match au score</div>
+<div class="family-btn" data-family="time" onclick="onFormatFamilyChange('adm','time')">&#9201; Match au temps</div>
+</div>
+<div class="format-group" id="adm-format-score">
+<div class="form-group"><label>Manches gagnantes</label>
+<div class="stepper"><button onclick="stepV('adm-winningsets',-1)">&minus;</button><input type="number" id="adm-winningsets" value="1" min="1" max="2" onchange="saveSettings()"><button onclick="stepV('adm-winningsets',1)">+</button></div></div>
+<div class="form-group"><label>Points par manche</label>
+<select id="adm-pointsperset" onchange="saveSettings()"><option value="11">11 pts</option><option value="15">15 pts</option><option value="21">21 pts</option><option value="25">25 pts</option></select></div>
+</div>
+<div class="format-group" id="adm-format-time" style="display:none">
+<div class="form-group"><label>Nombre de p&eacute;riodes</label>
+<select id="adm-nbperiods" onchange="saveSettings()"><option value="1">1 (p&eacute;riode unique)</option><option value="2">2 (mi-temps)</option><option value="3">3 (tiers-temps)</option><option value="4">4 (quart-temps)</option></select></div>
+<div class="form-group"><label>Dur&eacute;e de chaque p&eacute;riode (min)</label>
+<div class="stepper"><button onclick="stepV('adm-perioddur',-1)">&minus;</button><input type="number" id="adm-perioddur" value="20" min="1" max="60" onchange="saveSettings()"><button onclick="stepV('adm-perioddur',1)">+</button></div></div>
+</div>
 </div>
 <div class="card">
 <h3>Syst&egrave;me de points (poules)</h3>
 <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
 <div class="form-group" style="flex:1;min-width:80px"><label>Victoire</label><input type="number" id="adm-winpts" value="3" min="0" max="10" onchange="saveSettings()"></div>
-<div class="form-group" style="flex:1;min-width:80px"><label>D&eacute;faite 3 sets</label><input type="number" id="adm-lose3pts" value="2" min="0" max="10" onchange="saveSettings()"></div>
+<div class="form-group" style="flex:1;min-width:80px"><label>D&eacute;faite manche d&eacute;cisive</label><input type="number" id="adm-lose3pts" value="2" min="0" max="10" onchange="saveSettings()"></div>
 <div class="form-group" style="flex:1;min-width:80px"><label>D&eacute;faite</label><input type="number" id="adm-losepts" value="1" min="0" max="10" onchange="saveSettings()"></div>
+<div class="form-group" style="flex:1;min-width:80px"><label>Match nul</label><input type="number" id="adm-drawpts" value="1" min="0" max="10" onchange="saveSettings()"></div>
 </div>
-<p style="font-size:.8em;color:var(--txt2);margin-top:6px">&#9432; D&eacute;faite 3 sets = match nul en bo3 (1-1)</p>
+<p style="font-size:.8em;color:var(--txt2);margin-top:6px">&#9432; D&eacute;faite manche d&eacute;cisive = d&eacute;faite au tie-break en 2 manches gagnantes (1-1). Match nul = uniquement pour les matchs au temps.</p>
 </div>
 <div class="card">
 <h3>&#9989; Bonus arbitre</h3>
@@ -418,7 +460,7 @@ textarea{resize:vertical;min-height:80px}
 <button class="btn-secondary" onclick="showHelp()" style="width:100%">Ouvrir l'aide</button>
 </div>
 <div class="card" style="margin-top:20px;text-align:center;color:var(--txt2)">
-<p style="font-size:.85em">TEN EPS v1.0 &mdash; Tennis de Table EPS</p>
+<p style="font-size:.85em">Match Manager EPS v1.0 &mdash; Tennis de Table EPS</p>
 <p style="font-size:.8em">Application PWA hors-ligne</p>
 <p style="font-size:.75em;margin-top:4px">Nathalie Prenois</p>
 </div>
@@ -435,7 +477,7 @@ qrcode.stringToBytes=qrcode.stringToBytesFuncs['UTF-8'];
 const QRGen={toCanvas:function(canvas,text,cellSize){cellSize=cellSize||6;try{var qr=qrcode(0,'L');qr.addData(text,'Byte');qr.make();var sz=qr.getModuleCount(),quiet=4,total=(sz+quiet*2)*cellSize;canvas.width=total;canvas.height=total;var ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,total,total);ctx.fillStyle='#000';for(var r=0;r<sz;r++)for(var c=0;c<sz;c++)if(qr.isDark(r,c))ctx.fillRect((c+quiet)*cellSize,(r+quiet)*cellSize,cellSize,cellSize);}catch(e){canvas.width=200;canvas.height=50;var ctx2=canvas.getContext('2d');ctx2.fillStyle='red';ctx2.font='14px sans-serif';ctx2.fillText('Donn\u00e9es trop longues pour QR',10,30);}}};
 
 /* ===== APP STATE ===== */
-let state={tournaments:[],savedLists:[],settings:{format:'set11',winPts:3,loseSets3Pts:2,losePts:1,refBonusEnabled:false,refBonusPts:1,tables:10}};
+let state={tournaments:[],savedLists:[],settings:{format:'set11',winPts:3,loseSets3Pts:2,losePts:1,refBonusEnabled:false,refBonusPts:1,tables:10,matchFamily:'score',winningSets:1,pointsPerSet:11,nbPeriods:2,periodDuration:20,drawPts:1}};
 let T=null; // current tournament
 let curPoolIdx=0;
 let curFinalIdx=0;
@@ -448,7 +490,18 @@ const LS_KEY='teneps_data';
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
 function save(){localStorage.setItem(LS_KEY,JSON.stringify(state))}
-function load(){try{const d=JSON.parse(localStorage.getItem(LS_KEY));if(d)state=d;}catch(e){}}
+function migrateSettings(settings){
+if(settings.matchFamily)return;
+const fmt=settings.format||'set11';
+settings.matchFamily='score';
+if(fmt==='set21'){settings.winningSets=1;settings.pointsPerSet=21;}
+else if(fmt==='bo3'){settings.winningSets=2;settings.pointsPerSet=11;}
+else{settings.winningSets=1;settings.pointsPerSet=11;}
+if(settings.nbPeriods===undefined)settings.nbPeriods=2;
+if(settings.periodDuration===undefined)settings.periodDuration=20;
+if(settings.drawPts===undefined)settings.drawPts=1;
+}
+function load(){try{const d=JSON.parse(localStorage.getItem(LS_KEY));if(d){state=d;migrateSettings(state.settings);state.tournaments.forEach(t=>migrateSettings(t.settings));}}catch(e){}}
 
 /* ===== NAVIGATION ===== */
 function showScreen(id){
@@ -504,15 +557,50 @@ function delTournament(id){if(confirm('Supprimer ce tournoi ?')){state.tournamen
 let selModeVal=1;
 function selMode(m){selModeVal=m;document.querySelectorAll('.mode-card').forEach(c=>c.classList.toggle('selected',+c.dataset.mode===m))}
 
+/* ===== FORMAT FIELDS (score/temps) ===== */
+function setFormatFamilyUI(prefix,family){
+const toggle=document.getElementById(prefix+'-family-toggle');
+if(toggle)toggle.querySelectorAll('.family-btn').forEach(b=>b.classList.toggle('selected',b.dataset.family===family));
+const scoreGroup=document.getElementById(prefix+'-format-score');
+const timeGroup=document.getElementById(prefix+'-format-time');
+if(scoreGroup)scoreGroup.style.display=family==='score'?'':'none';
+if(timeGroup)timeGroup.style.display=family==='time'?'':'none';
+}
+function onFormatFamilyChange(prefix,family){
+setFormatFamilyUI(prefix,family);
+if(prefix==='adm')saveSettings();
+}
+function readFormatFields(prefix){
+const toggle=document.getElementById(prefix+'-family-toggle');
+const activeBtn=toggle?toggle.querySelector('.family-btn.selected'):null;
+const matchFamily=activeBtn?activeBtn.dataset.family:'score';
+return{
+matchFamily,
+winningSets:+document.getElementById(prefix+'-winningsets').value||1,
+pointsPerSet:+document.getElementById(prefix+'-pointsperset').value||11,
+nbPeriods:+document.getElementById(prefix+'-nbperiods').value||2,
+periodDuration:+document.getElementById(prefix+'-perioddur').value||20
+};
+}
+function applyFormatFieldsToDOM(prefix,settings){
+setFormatFamilyUI(prefix,settings.matchFamily||'score');
+document.getElementById(prefix+'-winningsets').value=settings.winningSets||1;
+document.getElementById(prefix+'-pointsperset').value=settings.pointsPerSet||11;
+document.getElementById(prefix+'-nbperiods').value=settings.nbPeriods||2;
+document.getElementById(prefix+'-perioddur').value=settings.periodDuration||20;
+}
+
 function createTournament(){
 const name=document.getElementById('inp-tname').value.trim();
 if(!name){toast('Entrez un nom de tournoi');return;}
 T={id:uid(),name,classe:document.getElementById('inp-tclass').value.trim(),
 date:new Date().toLocaleDateString('fr-FR'),mode:selModeVal,
-settings:{tables:+document.getElementById('inp-tables').value||10,format:document.getElementById('inp-format').value,
+settings:{tables:+document.getElementById('inp-tables').value||10,
+...readFormatFields('inp'),
 winPts:state.settings.winPts!==undefined?state.settings.winPts:3,
 loseSets3Pts:state.settings.loseSets3Pts!==undefined?state.settings.loseSets3Pts:2,
 losePts:state.settings.losePts!==undefined?state.settings.losePts:1,
+drawPts:state.settings.drawPts!==undefined?state.settings.drawPts:1,
 refBonusEnabled:!!state.settings.refBonusEnabled,
 refBonusPts:state.settings.refBonusPts||1,
 duration:+document.getElementById('inp-duration').value||0},
@@ -921,6 +1009,7 @@ save();
 /* ===== MATCHES ===== */
 function renderMatches(){
 if(!T)return;
+reattachRunningMatchTimers();
 document.getElementById('matches-title').textContent=T.name+' - Matchs';
 // Pool tabs
 const tabs=document.getElementById('matches-tabs');
@@ -999,8 +1088,7 @@ const isDone=m.status==='done';
 const isPlaying=m.status==='playing';
 const statusLabel=isDone?'\u2705 Termin\u00e9':isPlaying?'\u{1F3D3} En cours':'\u23f3 En attente';
 const tableBadge=m.table?`<span class="match-table-badge" onclick="editMatchTable('${m.id}',event)" title="Modifier la table">T${m.table}</span>`:`<span class="match-table-badge" onclick="editMatchTable('${m.id}',event)" title="Attribuer une table" style="opacity:.5;border-style:dashed">T?</span>`;
-const fmt=T.settings.format||'set11';
-const isBo3=fmt==='bo3';
+const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
 const candidates=getRefereeCandidates(m);
 const refVal=m.refereeId||'';
 const refSelectHtml='<select class="ref-input" id="ref-'+m.id+'" '+(isDone?'disabled':'')+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.85em"><option value="">&#9999; Arbitre</option>'+candidates.map(p=>'<option value="'+p.id+'"'+(refVal===p.id?' selected':'')+'>'+p.name+'</option>').join('')+'</select>';
@@ -1022,6 +1110,7 @@ return`<div class="match-card ${m.status}" onclick="toggleMatchPlaying('${m.id}'
 <input type="number" id="s1-${m.id}" value="${s1}" min="0" max="99" class="${w1?'winner':w2?'loser':''}" ${isDone?'disabled':''}></div>
 <div class="match-row"><span class="pname"${w2?' style="color:var(--ok);font-weight:700"':''}>${p2.name}</span>
 <input type="number" id="s2-${m.id}" value="${s2}" min="0" max="99" class="${w2?'winner':w1?'loser':''}" ${isDone?'disabled':''}></div>
+${T.settings.matchFamily==='time'?renderMatchTimerWidget(m):''}
 ${actionsHtml}</div>`;
 }
 const sets=m.sets||[{s1:'',s2:''},{s1:'',s2:''},{s1:'',s2:''}];
@@ -1062,9 +1151,10 @@ document.querySelectorAll('.set3-'+mid).forEach(el=>{el.style.display=show?'':'n
 function validateMatch(mid){
 const m=T.matches.find(x=>x.id===mid);if(!m)return;
 const ref=document.getElementById('ref-'+mid).value.trim();
-const fmt=T.settings.format||'set11';
+const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
+const drawAllowed=T.settings.matchFamily==='time'&&m.phase!=='bracket';
 const refBonusEl=document.getElementById('refbonus-'+mid);
-if(fmt==='bo3'){
+if(isBo3){
 const g=id=>{const el=document.getElementById(id);return el?+el.value:NaN;};
 const s1a=g('s1a-'+mid),s1b=g('s1b-'+mid),s2a=g('s2a-'+mid),s2b=g('s2b-'+mid);
 if(isNaN(s1a)||isNaN(s1b)){toast('Entrez les scores du Set 1');return;}
@@ -1088,7 +1178,7 @@ m.sets=sets;m.score1=w1;m.score2=w2;m.totalPts1=tp1;m.totalPts2=tp2;
 const s1=+document.getElementById('s1-'+mid).value;
 const s2=+document.getElementById('s2-'+mid).value;
 if(isNaN(s1)||isNaN(s2)){toast('Entrez les scores');return;}
-if(s1===s2){toast('Pas de match nul au tennis de table');return;}
+if(s1===s2&&!drawAllowed){toast('Pas de match nul');return;}
 m.score1=s1;m.score2=s2;m.totalPts1=s1;m.totalPts2=s2;
 }
 m.refereeId=ref||'';
@@ -1096,6 +1186,12 @@ const refPlayer=T.players.find(p=>p.id===ref);
 m.referee=refPlayer?refPlayer.name:'';
 m.status='done';
 m.refBonus=refBonusEl?refBonusEl.checked:false;
+if(m.timer&&m.timer.running){
+m.timer.secondsLeft=Math.max(0,Math.round((m.timer.endsAt-Date.now())/1000));
+m.timer.running=false;m.timer.endsAt=null;
+detachMatchTimerTick(mid);
+releaseWakeLockIfIdle();
+}
 save();
 if(navigator.vibrate)navigator.vibrate(50);
 // Lib\u00e9rer la table et r\u00e9attribuer en mode bracket
@@ -1111,6 +1207,139 @@ m.status='pending';save();
 if(m.phase==='pool')renderMatches();
 else if(m.phase==='final')renderFinals();
 else if(m.phase==='bracket')renderBracket();
+}
+
+/* ===== CHRONO PAR MATCH (format "au temps") ===== */
+const matchTimerUIIntervals={};
+let wakeLockSentinel=null;
+let matchAudioCtx=null;
+
+function fmtMatchTime(sec){
+const m=Math.floor(sec/60),s=sec%60;
+return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+function getOrInitMatchTimer(m){
+if(!m.timer)m.timer={period:1,secondsLeft:T.settings.periodDuration*60,running:false,endsAt:null};
+return m.timer;
+}
+function anyMatchTimerRunning(){
+return!!(T&&T.matches.some(m=>m.timer&&m.timer.running));
+}
+async function ensureWakeLock(){
+if(wakeLockSentinel||!('wakeLock'in navigator))return;
+try{
+wakeLockSentinel=await navigator.wakeLock.request('screen');
+wakeLockSentinel.addEventListener('release',()=>{wakeLockSentinel=null;});
+}catch(e){wakeLockSentinel=null;}
+}
+function releaseWakeLockIfIdle(){
+if(wakeLockSentinel&&!anyMatchTimerRunning()){
+wakeLockSentinel.release().catch(()=>{});
+wakeLockSentinel=null;
+}
+}
+function ensureMatchAudioCtx(){
+if(!matchAudioCtx){
+try{matchAudioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
+}
+if(matchAudioCtx&&matchAudioCtx.state==='suspended')matchAudioCtx.resume().catch(()=>{});
+}
+function buzzMatchTimer(){
+if(navigator.vibrate)navigator.vibrate([300,100,300,100,300]);
+if(!matchAudioCtx)return;
+try{
+const osc=matchAudioCtx.createOscillator();
+const gain=matchAudioCtx.createGain();
+osc.type='sine';osc.frequency.value=880;
+gain.gain.setValueAtTime(.3,matchAudioCtx.currentTime);
+osc.connect(gain);gain.connect(matchAudioCtx.destination);
+osc.start();osc.stop(matchAudioCtx.currentTime+.6);
+}catch(e){}
+}
+function attachMatchTimerTick(mid){
+if(matchTimerUIIntervals[mid])return;
+matchTimerUIIntervals[mid]=setInterval(()=>tickMatchTimerUI(mid),1000);
+}
+function detachMatchTimerTick(mid){
+if(matchTimerUIIntervals[mid]){clearInterval(matchTimerUIIntervals[mid]);delete matchTimerUIIntervals[mid];}
+}
+function reattachRunningMatchTimers(){
+if(!T)return;
+let any=false;
+T.matches.forEach(m=>{if(m.timer&&m.timer.running){attachMatchTimerTick(m.id);any=true;}});
+if(any)ensureWakeLock();
+}
+function tickMatchTimerUI(mid){
+const m=T&&T.matches.find(x=>x.id===mid);
+if(!m||!m.timer||!m.timer.running){detachMatchTimerTick(mid);return;}
+const t=m.timer;
+const remaining=Math.max(0,Math.round((t.endsAt-Date.now())/1000));
+const el=document.querySelector('#mtimer-'+mid+' .mtimer-time');
+if(el)el.textContent=fmtMatchTime(remaining);
+if(remaining<=0){
+t.secondsLeft=0;t.running=false;t.endsAt=null;
+save();
+detachMatchTimerTick(mid);
+releaseWakeLockIfIdle();
+buzzMatchTimer();
+refreshMatchTimerWidget(mid);
+}
+}
+function startMatchTimer(mid,ev){
+if(ev)ev.stopPropagation();
+const m=T.matches.find(x=>x.id===mid);if(!m||m.status==='done')return;
+const t=getOrInitMatchTimer(m);
+if(t.secondsLeft<=0)return;
+ensureMatchAudioCtx();
+t.running=true;
+t.endsAt=Date.now()+t.secondsLeft*1000;
+save();
+ensureWakeLock();
+attachMatchTimerTick(mid);
+refreshMatchTimerWidget(mid);
+}
+function pauseMatchTimer(mid,ev){
+if(ev)ev.stopPropagation();
+const m=T.matches.find(x=>x.id===mid);if(!m||!m.timer)return;
+const t=m.timer;
+if(t.running&&t.endsAt)t.secondsLeft=Math.max(0,Math.round((t.endsAt-Date.now())/1000));
+t.running=false;t.endsAt=null;
+save();
+detachMatchTimerTick(mid);
+releaseWakeLockIfIdle();
+refreshMatchTimerWidget(mid);
+}
+function advanceMatchPeriod(mid,ev){
+if(ev)ev.stopPropagation();
+const m=T.matches.find(x=>x.id===mid);if(!m||!m.timer)return;
+const t=m.timer;
+t.period++;
+if(t.period>T.settings.nbPeriods){t.period=T.settings.nbPeriods;t.secondsLeft=0;}
+else t.secondsLeft=T.settings.periodDuration*60;
+t.running=false;t.endsAt=null;
+save();
+detachMatchTimerTick(mid);
+releaseWakeLockIfIdle();
+refreshMatchTimerWidget(mid);
+}
+function refreshMatchTimerWidget(mid){
+const m=T.matches.find(x=>x.id===mid);if(!m)return;
+const el=document.getElementById('mtimer-'+mid);
+if(el)el.outerHTML=renderMatchTimerWidget(m);
+}
+function renderMatchTimerWidget(m){
+const isDone=m.status==='done';
+const t=getOrInitMatchTimer(m);
+const remaining=t.running&&t.endsAt?Math.max(0,Math.round((t.endsAt-Date.now())/1000)):t.secondsLeft;
+const periodOver=remaining<=0;
+const allPeriodsDone=t.period>=T.settings.nbPeriods&&periodOver;
+let controls='';
+if(!isDone){
+if(t.running)controls='<button class="btn-secondary" onclick="pauseMatchTimer(\''+m.id+'\',event)">&#9208; Pause</button>';
+else if(periodOver)controls=allPeriodsDone?'<span class="mtimer-end">Fin du temps réglementaire</span>':'<button class="btn-secondary" onclick="advanceMatchPeriod(\''+m.id+'\',event)">Période suivante &#8594;</button>';
+else controls='<button class="btn-secondary" onclick="startMatchTimer(\''+m.id+'\',event)">&#9654; Démarrer</button>';
+}
+return'<div class="mtimer" id="mtimer-'+m.id+'"><span class="mtimer-period">Période '+t.period+'/'+T.settings.nbPeriods+'</span><span class="mtimer-time"'+(periodOver?' style="color:var(--err)"':'')+'>'+fmtMatchTime(remaining)+'</span>'+controls+'</div>';
 }
 
 /* ===== TIMER ===== */
@@ -1152,16 +1381,13 @@ else showScreen('scr-distribution');
 }
 
 /* ===== RANKINGS ===== */
-function calcPoolRanking(poolId){
-const pool=T.pools.find(p=>p.id===poolId);if(!pool)return[];
-const matches=T.matches.filter(m=>m.poolId===poolId&&m.phase==='pool'&&m.status==='done');
-const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
-const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
-const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
-const refBP=T.settings.refBonusPts!==undefined?T.settings.refBonusPts:(state.settings.refBonusPts||1);
+// Calcule les stats (v/d/n/pts/pf/pa) d'un ensemble de matchs pour un groupe de joueurs.
+// Partagé par calcPoolRanking, renderOverallRanking (mode 2) et downloadCSV (mode 2) pour
+// éviter de dupliquer 3x la même logique de points/match nul.
+function statsFromMatches(matches,playerIds,cfg){
 const stats={};
-for(const pid of pool.playerIds){
-stats[pid]={id:pid,w:0,l:0,l3:0,pts:0,pf:0,pa:0,played:0,refBonus:0};
+for(const pid of playerIds){
+stats[pid]={id:pid,w:0,l:0,d:0,l3:0,pts:0,pf:0,pa:0,played:0};
 }
 for(const m of matches){
 if(!stats[m.p1]||!stats[m.p2])continue;
@@ -1174,17 +1400,33 @@ stats[m.p2].pf+=pf2;stats[m.p2].pa+=pf1;
 // Détection match en 3 sets (bo3 terminé 1-1 avant le set décisif → sets.length===3)
 const went3Sets=m.sets&&m.sets.length>=3;
 if(m.score1>m.score2){
-stats[m.p1].w++;stats[m.p1].pts+=wPts;
+stats[m.p1].w++;stats[m.p1].pts+=cfg.wPts;
 stats[m.p2].l++;
-if(went3Sets){stats[m.p2].l3++;stats[m.p2].pts+=l3Pts;}
-else{stats[m.p2].pts+=lPts;}
-}else{
-stats[m.p2].w++;stats[m.p2].pts+=wPts;
+if(went3Sets){stats[m.p2].l3++;stats[m.p2].pts+=cfg.l3Pts;}
+else{stats[m.p2].pts+=cfg.lPts;}
+}else if(m.score2>m.score1){
+stats[m.p2].w++;stats[m.p2].pts+=cfg.wPts;
 stats[m.p1].l++;
-if(went3Sets){stats[m.p1].l3++;stats[m.p1].pts+=l3Pts;}
-else{stats[m.p1].pts+=lPts;}
+if(went3Sets){stats[m.p1].l3++;stats[m.p1].pts+=cfg.l3Pts;}
+else{stats[m.p1].pts+=cfg.lPts;}
+}else{ // Match nul (uniquement possible en format "au temps", hors phase bracket)
+stats[m.p1].d++;stats[m.p1].pts+=cfg.drawPts;
+stats[m.p2].d++;stats[m.p2].pts+=cfg.drawPts;
 }
 }
+return stats;
+}
+
+function calcPoolRanking(poolId){
+const pool=T.pools.find(p=>p.id===poolId);if(!pool)return[];
+const matches=T.matches.filter(m=>m.poolId===poolId&&m.phase==='pool'&&m.status==='done');
+const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
+const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
+const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
+const drawPts=T.settings.drawPts!==undefined?T.settings.drawPts:1;
+const refBP=T.settings.refBonusPts!==undefined?T.settings.refBonusPts:(state.settings.refBonusPts||1);
+const stats=statsFromMatches(matches,pool.playerIds,{wPts,l3Pts,lPts,drawPts});
+for(const pid of pool.playerIds)stats[pid].refBonus=0;
 // Bonus arbitre : on parcourt TOUS les matchs de poule du tournoi
 // pour créditer les joueurs de cette poule même s'ils arbitrent ailleurs
 if(T.settings.refBonusEnabled||state.settings.refBonusEnabled){
@@ -1241,14 +1483,15 @@ content.innerHTML=renderRankingTable(ranking,pool.name,T.mode===2?pool.quali:0);
 function renderRankingTable(ranking,title,qualiCount){
 const hasAnyBonus=ranking.some(r=>r.refBonus>0);
 const hasAnyL3=ranking.some(r=>r.l3>0);
+const hasAnyD=ranking.some(r=>r.d>0);
 let html=`<h3 style="margin-bottom:10px;color:var(--pri)">${title}</h3>`;
-html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Pts</th><th>V</th><th>D</th>${hasAnyL3?'<th title="D\u00e9faites en 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence de points (PF\u2212PC)">Diff</th>${hasAnyBonus?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Pts</th><th>V</th>${hasAnyD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasAnyL3?'<th title="D\u00e9faites en 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence de points (PF\u2212PC)">Diff</th>${hasAnyBonus?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
 ranking.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const quali=qualiCount&&i<qualiCount;
 html+=`<tr${quali?' style="background:rgba(76,175,80,.08)"':''}>
 <td class="rank">${i+1}${quali?' \u2705':''}</td><td class="pname">${p?p.name:'?'}</td>
-<td><strong>${r.pts}</strong></td><td>${r.w}</td><td>${r.l}</td>${hasAnyL3?`<td>${r.l3||0}</td>`:''}
+<td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasAnyD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasAnyL3?`<td>${r.l3||0}</td>`:''}
 <td>${r.pf}</td><td>${r.pa}</td><td>${r.pf-r.pa>=0?'+':''}${r.pf-r.pa}</td>${hasAnyBonus?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
 html+='</tbody></table>';
@@ -1293,6 +1536,7 @@ save();
 
 function renderFinals(){
 if(!T)return;
+reattachRunningMatchTimers();
 renderTimerBar('finals-timer',T.settings.duration);
 const tabs=document.getElementById('finals-tabs');
 tabs.innerHTML=T.finals.map((f,i)=>`<button class="tab-btn${i===curFinalIdx?' active':''}" onclick="curFinalIdx=${i};renderFinals()">${f.name}</button>`).join('');
@@ -1317,6 +1561,7 @@ const refBP=T.settings.refBonusPts!==undefined?T.settings.refBonusPts:(state.set
 const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
 const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
 const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
+const drawPts=T.settings.drawPts!==undefined?T.settings.drawPts:1;
 
 // ---- MODE 1 : classement croisé toutes poules ----
 if(T.mode===1){
@@ -1327,14 +1572,15 @@ for(const r of rk)all.push({...r,poolName:pool.name});
 }
 all.sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
 const hasD3=all.some(r=>r.l3>0);
+const hasD=all.some(r=>r.d>0);
 const hasArb=all.some(r=>r.refBonus>0);
 let html=`<h3 style="color:var(--pri);margin-bottom:6px">Classement g\u00e9n\u00e9ral</h3>`;
 html+=`<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Tous les joueurs — tri par points totaux${refEnabled?' (V + D + bonus arb)':' (V + D)'}</p>`;
-html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.75em">Poule</th><th title="Points totaux">Pts</th><th>V</th><th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence">Diff</th>${hasArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.75em">Poule</th><th title="Points totaux">Pts</th><th>V</th>${hasD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence">Diff</th>${hasArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.pf-r.pa;
-html+=`<tr><td class="rank">${i+1}</td><td class="pname">${p?p.name:'?'}</td><td style="font-size:.78em;color:var(--txt2)">${r.poolName}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td><td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr><td class="rank">${i+1}</td><td class="pname">${p?p.name:'?'}</td><td style="font-size:.78em;color:var(--txt2)">${r.poolName}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
 html+='</tbody></table>';
 el.innerHTML=html;
@@ -1348,7 +1594,7 @@ if(!T.finals||!T.finals.length){el.innerHTML='<p style="color:var(--txt2)">Pas e
 const poolStats={};
 for(const pool of T.pools){
 const rk=calcPoolRanking(pool.id);
-for(const r of rk){poolStats[r.id]={w:r.w,l:r.l,l3:r.l3||0,pts:r.pts,pf:r.pf,pa:r.pa,refBonus:r.refBonus||0};}
+for(const r of rk){poolStats[r.id]={w:r.w,l:r.l,d:r.d||0,l3:r.l3||0,pts:r.pts,pf:r.pf,pa:r.pa,refBonus:r.refBonus||0};}
 }
 // Bonus arb finales
 const finalRefBonus={};
@@ -1366,36 +1612,27 @@ html+=`<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Pts = poul
 let globalRank=1;
 
 for(const group of T.finals){
-const matches=T.matches.filter(m=>m.poolId===group.id&&m.phase==='final');
-const fStats={};
-for(const pid of group.playerIds)fStats[pid]={id:pid,w:0,l:0,l3:0,pts:0,pf:0,pa:0};
-for(const m of matches){
-if(m.status!=='done'||!fStats[m.p1]||!fStats[m.p2])continue;
-const pf1=m.totalPts1!==undefined?m.totalPts1:m.score1;
-const pf2=m.totalPts2!==undefined?m.totalPts2:m.score2;
-fStats[m.p1].pf+=pf1;fStats[m.p1].pa+=pf2;fStats[m.p2].pf+=pf2;fStats[m.p2].pa+=pf1;
-const w3s=m.sets&&m.sets.length>=3;
-if(m.score1>m.score2){fStats[m.p1].w++;fStats[m.p1].pts+=wPts;fStats[m.p2].l++;fStats[m.p2].pts+=(w3s?l3Pts:lPts);if(w3s)fStats[m.p2].l3++;}
-else{fStats[m.p2].w++;fStats[m.p2].pts+=wPts;fStats[m.p1].l++;fStats[m.p1].pts+=(w3s?l3Pts:lPts);if(w3s)fStats[m.p1].l3++;}
-}
+const matches=T.matches.filter(m=>m.poolId===group.id&&m.phase==='final'&&m.status==='done');
+const fStats=statsFromMatches(matches,group.playerIds,{wPts,l3Pts,lPts,drawPts});
 const combined=Object.values(fStats).map(fs=>{
-const ps=poolStats[fs.id]||{w:0,l:0,l3:0,pts:0,pf:0,pa:0,refBonus:0};
+const ps=poolStats[fs.id]||{w:0,l:0,d:0,l3:0,pts:0,pf:0,pa:0,refBonus:0};
 const frb=finalRefBonus[fs.id]||0;
 const totalArb=(ps.refBonus||0)+frb;
 return{id:fs.id,finalW:fs.w,
-totalW:ps.w+fs.w,totalL:ps.l+fs.l,totalL3:(ps.l3||0)+fs.l3,
+totalW:ps.w+fs.w,totalL:ps.l+fs.l,totalD:(ps.d||0)+(fs.d||0),totalL3:(ps.l3||0)+fs.l3,
 totalPF:ps.pf+fs.pf,totalPA:ps.pa+fs.pa,
 refBonus:totalArb,
 totalPts:ps.pts+fs.pts+frb};
 });
 const ranked=combined.sort((a,b)=>b.finalW-a.finalW||b.totalPts-a.totalPts||(b.totalPF-b.totalPA)-(a.totalPF-a.totalPA)||b.totalPF-a.totalPF);
 const hasD3=ranked.some(r=>r.totalL3>0);
+const hasD=ranked.some(r=>r.totalD>0);
 html+=`<h4 style="margin:16px 0 8px;color:var(--txt)">${group.name}</h4>`;
-html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th title="Pts poule + finale${refEnabled?' + arb':''}">Pts</th><th>V</th><th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s (toutes phases)">PF</th><th title="Points encaiss\u00e9s (toutes phases)">PC</th><th title="Diff\u00e9rence">Diff</th>${anyArb?'<th title="Bonus arbitre toutes phases">Arb</th>':''}</tr></thead><tbody>`;
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th title="Pts poule + finale${refEnabled?' + arb':''}">Pts</th><th>V</th>${hasD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s (toutes phases)">PF</th><th title="Points encaiss\u00e9s (toutes phases)">PC</th><th title="Diff\u00e9rence">Diff</th>${anyArb?'<th title="Bonus arbitre toutes phases">Arb</th>':''}</tr></thead><tbody>`;
 for(const r of ranked){
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.totalPF-r.totalPA;
-html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${p?p.name:'?'}</td><td><strong>${r.totalPts}</strong></td><td>${r.totalW}</td><td>${r.totalL}</td>${hasD3?`<td>${r.totalL3||0}</td>`:''}<td>${r.totalPF}</td><td>${r.totalPA}</td><td>${diff>=0?'+':''}${diff}</td>${anyArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${p?p.name:'?'}</td><td><strong>${r.totalPts}</strong></td><td>${r.totalW}</td>${hasD?`<td>${r.totalD||0}</td>`:''}<td>${r.totalL}</td>${hasD3?`<td>${r.totalL3||0}</td>`:''}<td>${r.totalPF}</td><td>${r.totalPA}</td><td>${diff>=0?'+':''}${diff}</td>${anyArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 globalRank++;
 }
 html+='</tbody></table>';
@@ -1568,6 +1805,7 @@ return m.score1>m.score2?m.p2:m.p1;
 
 function renderBracket(){
 if(!T||!T.bracket)return;
+reattachRunningMatchTimers();
 renderTimerBar('bracket-timer',T.settings.duration);
 // Check if we need to advance
 checkBracketAdvance();
@@ -1832,6 +2070,7 @@ const refBP=T.settings.refBonusPts!==undefined?T.settings.refBonusPts:(state.set
 const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
 const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
 const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
+const drawPts=T.settings.drawPts!==undefined?T.settings.drawPts:1;
 
 // ======= GÉNÉRATEUR XLSX OOXML (ZIP stocké) =======
 function escX(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -1927,22 +2166,32 @@ else{T.players.forEach((p,i)=>s2rows.push([nm(i+1),sh(p.name)]));}
 // Mode 1 : classement croisé toutes poules
 s2rows.push([sh('Classement g\u00e9n\u00e9ral — toutes poules'+(hasRefBonus?' (victoires + d\u00e9faites + bonus arb)':' (victoires + d\u00e9faites)'),true)]);
 s2rows.push([]);
-const hdr1=[sh('Rang',true),sh('Joueur',true),sh('Poule',true),sh('Points',true),sh('Victoires',true),sh('D\u00e9faites',true),sh('Def.3sets',true),sh('PF',true),sh('PC',true),sh('Diff\u00e9rence',true)];
-if(hasRefBonus)hdr1.push(sh('Bonus.Arb',true));
-s2rows.push(hdr1);
 const all=[];
 for(const pool of T.pools){const rk=calcPoolRanking(pool.id);for(const r of rk)all.push({...r,poolName:pool.name});}
 all.sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+const hasL3_m1=all.some(r=>r.l3>0);
+const hasD_m1=all.some(r=>r.d>0);
+const hdr1=[sh('Rang',true),sh('Joueur',true),sh('Poule',true),sh('Points',true),sh('Victoires',true)];
+if(hasD_m1)hdr1.push(sh('Nuls',true));
+hdr1.push(sh('D\u00e9faites',true));
+if(hasL3_m1)hdr1.push(sh('Def.3sets',true));
+hdr1.push(sh('PF',true),sh('PC',true),sh('Diff\u00e9rence',true));
+if(hasRefBonus)hdr1.push(sh('Bonus.Arb',true));
+s2rows.push(hdr1);
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
-const row=[nm(i+1),sh(p?p.name:'?'),sh(r.poolName),nm(r.pts),nm(r.w),nm(r.l),nm(r.l3||0),nm(r.pf),nm(r.pa),nm(r.pf-r.pa)];
+const row=[nm(i+1),sh(p?p.name:'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
+if(hasD_m1)row.push(nm(r.d||0));
+row.push(nm(r.l));
+if(hasL3_m1)row.push(nm(r.l3||0));
+row.push(nm(r.pf),nm(r.pa),nm(r.pf-r.pa));
 if(hasRefBonus)row.push(nm(r.refBonus||0));
 s2rows.push(row);
 });
 }else{
 // Mode 2 : classement cumulatif poule + finale + bonus arb
 const poolSt={};
-for(const pool of T.pools){const rk=calcPoolRanking(pool.id);for(const r of rk){poolSt[r.id]={w:r.w,l:r.l,l3:r.l3||0,pts:r.pts,pf:r.pf,pa:r.pa,refBonus:r.refBonus||0};}}
+for(const pool of T.pools){const rk=calcPoolRanking(pool.id);for(const r of rk){poolSt[r.id]={w:r.w,l:r.l,d:r.d||0,l3:r.l3||0,pts:r.pts,pf:r.pf,pa:r.pa,refBonus:r.refBonus||0};}}
 const finalArb={};
 if(hasRefBonus){
 const df=T.matches.filter(m=>m.phase==='final'&&m.status==='done'&&m.refBonus);
@@ -1956,29 +2205,30 @@ s2rows.push([]);
 let globalRank=1;
 for(const group of T.finals){
 s2rows.push([sh(group.name,true)]);
-const hdr2=[sh('Rang',true),sh('Joueur',true),sh('Points',true),sh('Victoires',true),sh('D\u00e9faites',true),sh('Def.3sets',true),sh('PF',true),sh('PC',true),sh('Diff\u00e9rence',true)];
-if(hasRefBonus)hdr2.push(sh('Bonus.Arb',true));
-s2rows.push(hdr2);
-const matches=T.matches.filter(m=>m.poolId===group.id&&m.phase==='final');
-const fSt={};
-for(const pid of group.playerIds)fSt[pid]={id:pid,w:0,l:0,l3:0,pts:0,pf:0,pa:0};
-for(const m of matches){
-if(m.status!=='done'||!fSt[m.p1]||!fSt[m.p2])continue;
-const pf1=m.totalPts1!==undefined?m.totalPts1:m.score1,pf2=m.totalPts2!==undefined?m.totalPts2:m.score2;
-fSt[m.p1].pf+=pf1;fSt[m.p1].pa+=pf2;fSt[m.p2].pf+=pf2;fSt[m.p2].pa+=pf1;
-const w3s=m.sets&&m.sets.length>=3;
-if(m.score1>m.score2){fSt[m.p1].w++;fSt[m.p1].pts+=wPts;fSt[m.p2].l++;fSt[m.p2].pts+=(w3s?l3Pts:lPts);if(w3s)fSt[m.p2].l3++;}
-else{fSt[m.p2].w++;fSt[m.p2].pts+=wPts;fSt[m.p1].l++;fSt[m.p1].pts+=(w3s?l3Pts:lPts);if(w3s)fSt[m.p1].l3++;}
-}
+const matches=T.matches.filter(m=>m.poolId===group.id&&m.phase==='final'&&m.status==='done');
+const fSt=statsFromMatches(matches,group.playerIds,{wPts,l3Pts,lPts,drawPts});
 const combined=Object.values(fSt).map(fs=>{
-const ps=poolSt[fs.id]||{w:0,l:0,l3:0,pts:0,pf:0,pa:0,refBonus:0};
+const ps=poolSt[fs.id]||{w:0,l:0,d:0,l3:0,pts:0,pf:0,pa:0,refBonus:0};
 const frb=finalArb[fs.id]||0;
-return{id:fs.id,finalW:fs.w,totalW:ps.w+fs.w,totalL:ps.l+fs.l,totalL3:(ps.l3||0)+fs.l3,totalPF:ps.pf+fs.pf,totalPA:ps.pa+fs.pa,refBonus:(ps.refBonus||0)+frb,totalPts:ps.pts+fs.pts+frb};
+return{id:fs.id,finalW:fs.w,totalW:ps.w+fs.w,totalL:ps.l+fs.l,totalD:(ps.d||0)+(fs.d||0),totalL3:(ps.l3||0)+fs.l3,totalPF:ps.pf+fs.pf,totalPA:ps.pa+fs.pa,refBonus:(ps.refBonus||0)+frb,totalPts:ps.pts+fs.pts+frb};
 });
 const ranked=combined.sort((a,b)=>b.finalW-a.finalW||b.totalPts-a.totalPts||(b.totalPF-b.totalPA)-(a.totalPF-a.totalPA));
+const hasL3_m2=ranked.some(r=>r.totalL3>0);
+const hasD_m2=ranked.some(r=>r.totalD>0);
+const hdr2=[sh('Rang',true),sh('Joueur',true),sh('Points',true),sh('Victoires',true)];
+if(hasD_m2)hdr2.push(sh('Nuls',true));
+hdr2.push(sh('D\u00e9faites',true));
+if(hasL3_m2)hdr2.push(sh('Def.3sets',true));
+hdr2.push(sh('PF',true),sh('PC',true),sh('Diff\u00e9rence',true));
+if(hasRefBonus)hdr2.push(sh('Bonus.Arb',true));
+s2rows.push(hdr2);
 for(const r of ranked){
 const p=T.players.find(x=>x.id===r.id);
-const row=[nm(globalRank),sh(p?p.name:'?'),nm(r.totalPts),nm(r.totalW),nm(r.totalL),nm(r.totalL3||0),nm(r.totalPF),nm(r.totalPA),nm(r.totalPF-r.totalPA)];
+const row=[nm(globalRank),sh(p?p.name:'?'),nm(r.totalPts),nm(r.totalW)];
+if(hasD_m2)row.push(nm(r.totalD||0));
+row.push(nm(r.totalL));
+if(hasL3_m2)row.push(nm(r.totalL3||0));
+row.push(nm(r.totalPF),nm(r.totalPA),nm(r.totalPF-r.totalPA));
 if(hasRefBonus)row.push(nm(r.refBonus||0));
 s2rows.push(row);globalRank++;
 }
@@ -2012,20 +2262,22 @@ toast('XLSX t\u00e9l\u00e9charg\u00e9 ✓');
 
 /* ===== ADMIN ===== */
 function renderAdmin(){
-document.getElementById('adm-format').value=state.settings.format||'set11';
+applyFormatFieldsToDOM('adm',state.settings);
 document.getElementById('adm-winpts').value=state.settings.winPts!==undefined?state.settings.winPts:3;
 document.getElementById('adm-lose3pts').value=state.settings.loseSets3Pts!==undefined?state.settings.loseSets3Pts:2;
 document.getElementById('adm-losepts').value=state.settings.losePts!==undefined?state.settings.losePts:1;
+document.getElementById('adm-drawpts').value=state.settings.drawPts!==undefined?state.settings.drawPts:1;
 document.getElementById('adm-refbonuspts').value=state.settings.refBonusPts||1;
 const tog=document.getElementById('adm-refbonus');
 if(tog)tog.classList.toggle('on',!!state.settings.refBonusEnabled);
 }
 
 function saveSettings(){
-state.settings.format=document.getElementById('adm-format').value;
+Object.assign(state.settings,readFormatFields('adm'));
 state.settings.winPts=+document.getElementById('adm-winpts').value;
 state.settings.loseSets3Pts=+document.getElementById('adm-lose3pts').value;
 state.settings.losePts=+document.getElementById('adm-losepts').value;
+state.settings.drawPts=+document.getElementById('adm-drawpts').value;
 state.settings.refBonusPts=+document.getElementById('adm-refbonuspts').value;
 save();toast('Param\u00e8tres enregistr\u00e9s');
 }
@@ -2042,12 +2294,12 @@ const c=document.getElementById('modal-container');
 c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:12px" onclick="if(event.target===this)this.remove()">
 <div style="background:var(--surf);border-radius:var(--rad);max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:20px;color:var(--txt);box-shadow:var(--sh)">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-<h2 style="color:var(--pri)">Aide - TEN EPS</h2>
+<h2 style="color:var(--pri)">Aide - Match Manager EPS</h2>
 <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;color:var(--txt);font-size:1.5em;cursor:pointer">&times;</button>
 </div>
 <div style="font-size:.9em;line-height:1.6">
 <h3 style="color:var(--pri);margin:12px 0 6px">1. Cr\u00e9er un tournoi</h3>
-<p>Depuis l'\u00e9cran d'accueil, appuyez sur <b>+ Nouveau tournoi</b>. Renseignez le nom, la classe, le nombre de tables disponibles, le format de match et la dur\u00e9e optionnelle du chronometre.</p>
+<p>Depuis l'\u00e9cran d'accueil, appuyez sur <b>+ Nouveau tournoi</b>. Renseignez le nom, la classe, le nombre de tables ou terrains disponibles, le format de match et la dur\u00e9e optionnelle du chronometre.</p>
 <p>Choisissez le mode de tournoi :</p>
 <ul style="margin:4px 0 4px 20px">
 <li><b>Mode 1 - Poules de niveau</b> : poules ind\u00e9pendantes, chaque poule a son propre classement.</li>
@@ -2087,11 +2339,9 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 
 <h3 style="color:var(--pri);margin:12px 0 6px">6. Formats de match</h3>
 <ul style="margin:4px 0 4px 20px">
-<li><b>1 set \u00e0 11 pts</b> : un seul set, le premier \u00e0 11 gagne.</li>
-<li><b>1 set \u00e0 21 pts</b> : un seul set, le premier \u00e0 21 gagne.</li>
-<li><b>2 sets gagnants \u00e0 11</b> (Bo3) : le 3\u00e8me set appara\u00eet uniquement en cas d'\u00e9galit\u00e9 1-1.</li>
+<li><b>Match au score</b> (raquette/filet : tennis de table, badminton, volley...) : choisissez le nombre de <b>manches gagnantes</b> (1 = un seul set d\u00e9cisif, 2 = 2 manches gagnantes sur 3, le 3\u00e8me set n'appara\u00eet qu'en cas d'\u00e9galit\u00e9 1-1) et les <b>points par manche</b> (11/15/21/25). Pas de match nul : les scores \u00e9gaux sont refus\u00e9s.</li>
+<li><b>Match au temps</b> (sports collectifs au chronom\u00e8tre : foot, hand, rugby...) : choisissez le <b>nombre de p\u00e9riodes</b> (1 p\u00e9riode unique, 2 mi-temps, 3 tiers-temps, 4 quart-temps) et leur <b>dur\u00e9e</b>. Le score final peut \u00eatre \u00e9gal (match nul autoris\u00e9), sauf en phase de tableau \u00e0 \u00e9limination (mode 3) o\u00f9 une \u00e9galit\u00e9 n'est jamais permise.</li>
 </ul>
-<p><em>Pas de match nul au tennis de table : les scores \u00e9gaux sont refus\u00e9s.</em></p>
 
 <h3 style="color:var(--pri);margin:12px 0 6px">7. Classements et export</h3>
 <p>Les classements sont calcul\u00e9s automatiquement (points, diff\u00e9rence, points marqu\u00e9s). Vous pouvez :</p>
@@ -2351,7 +2601,10 @@ function closeModal(){document.getElementById('modal-container').innerHTML='';}
 
 /* ===== AUTO-SAVE ===== */
 window.addEventListener('beforeunload',()=>save());
-document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+document.addEventListener('visibilitychange',()=>{
+if(document.hidden)save();
+else if(anyMatchTimerRunning())ensureWakeLock();
+});
 setInterval(()=>{if(T)save();},15000);
 
 /* ===== INIT ===== */

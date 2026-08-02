@@ -1,6 +1,6 @@
-const CACHE_NAME = 'teneps-v1';
+const CACHE_NAME = 'matchmanagereps-v5';
 const ASSETS = [
-  './TEN_EPS.html',
+  './index.html',
   './icon_192.png',
   './icon_512.png',
   './manifest.json'
@@ -28,6 +28,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
       }
       return resp;
-    })).catch(() => caches.match('./TEN_EPS.html'))
+    })).catch(() => caches.match('./index.html'))
   );
 });
