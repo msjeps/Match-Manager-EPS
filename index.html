@@ -1591,7 +1591,7 @@ html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:l
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.pf-r.pa;
-html+=`<tr><td class="rank">${i+1}</td><td class="pname">${p?p.name:'?'}</td><td style="font-size:.78em;color:var(--txt2)">${r.poolName}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr><td class="rank">${i+1}</td><td class="pname">${p?escH(p.name):'?'}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
 html+='</tbody></table>';
 el.innerHTML=html;
@@ -1643,7 +1643,7 @@ html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:l
 for(const r of ranked){
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.totalPF-r.totalPA;
-html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${p?p.name:'?'}</td><td><strong>${r.totalPts}</strong></td><td>${r.totalW}</td>${hasD?`<td>${r.totalD||0}</td>`:''}<td>${r.totalL}</td>${hasD3?`<td>${r.totalL3||0}</td>`:''}<td>${r.totalPF}</td><td>${r.totalPA}</td><td>${diff>=0?'+':''}${diff}</td>${anyArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${p?escH(p.name):'?'}</td><td><strong>${r.totalPts}</strong></td><td>${r.totalW}</td>${hasD?`<td>${r.totalD||0}</td>`:''}<td>${r.totalL}</td>${hasD3?`<td>${r.totalL3||0}</td>`:''}<td>${r.totalPF}</td><td>${r.totalPA}</td><td>${diff>=0?'+':''}${diff}</td>${anyArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 globalRank++;
 }
 html+='</tbody></table>';
