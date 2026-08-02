@@ -20,6 +20,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .top-bar h1{font-size:1.1em;flex:1}
 .top-bar .logo{font-size:1.3em;font-weight:700;flex:1}
 .version-tag{display:block;font-size:.6em;font-weight:400;opacity:.75;margin-top:2px}
+.pied-page{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:30px;padding-top:20px;border-top:1px solid rgba(128,128,128,.3)}
+.pied-page-logo{width:36px;height:36px;border-radius:8px;flex-shrink:0}
+.pied-page p{font-size:.85em;opacity:.7}
 .btn-back{background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 14px;border-radius:8px;font-size:.9em;cursor:pointer}
 .btn-icon{background:none;border:none;color:#fff;font-size:1.4em;cursor:pointer;padding:4px 8px}
 .content{padding:16px;max-width:800px;margin:0 auto}
@@ -183,7 +186,10 @@ textarea{resize:vertical;min-height:80px}
 <h2 style="margin-bottom:16px">Mes Tournois</h2>
 <div id="tournament-list"></div>
 <button class="btn-primary" onclick="showScreen('scr-create')" style="margin-top:16px">+ Nouveau tournoi</button>
-<div style="margin-top:40px;text-align:center;color:var(--txt2);font-size:.8em">Nathalie Prenois</div>
+<div class="pied-page">
+<img src="logo-outils-eps.png" alt="Logo outils-eps.fr" class="pied-page-logo">
+<p>https://outils-eps.fr par Nathalie Prenois</p>
+</div>
 </div>
 </section>
 
@@ -470,11 +476,7 @@ textarea{resize:vertical;min-height:80px}
 <p style="font-size:.85em;color:var(--txt2);margin:8px 0">Guide d'utilisation de l'application</p>
 <button class="btn-secondary" onclick="showHelp()" style="width:100%">Ouvrir l'aide</button>
 </div>
-<div class="card" style="margin-top:20px;text-align:center;color:var(--txt2)">
-<p style="font-size:.85em" id="adm-version">Match Manager EPS &mdash; Tennis de Table EPS</p>
-<p style="font-size:.8em">Application PWA hors-ligne</p>
-<p style="font-size:.75em;margin-top:4px">Nathalie Prenois</p>
-</div>
+<p style="text-align:center;color:var(--txt2);font-size:.85em;margin-top:20px" id="adm-version"></p>
 </div>
 </section>
 
@@ -2341,7 +2343,7 @@ document.getElementById('adm-drawpts').value=state.settings.drawPts!==undefined?
 document.getElementById('adm-refbonuspts').value=state.settings.refBonusPts||1;
 const tog=document.getElementById('adm-refbonus');
 if(tog)tog.classList.toggle('on',!!state.settings.refBonusEnabled);
-document.getElementById('adm-version').textContent='Match Manager EPS Version '+APP_VERSION+' — Tennis de Table EPS';
+document.getElementById('adm-version').textContent='Match Manager EPS — Version '+APP_VERSION;
 }
 
 function saveSettings(){

@@ -1,8 +1,9 @@
-const CACHE_NAME = 'matchmanagereps-v10';
+const CACHE_NAME = 'matchmanagereps-v11';
 const ASSETS = [
   './index.html',
   './icon_192.png',
   './icon_512.png',
+  './logo-outils-eps.png',
   './manifest.json'
 ];
 
