@@ -7,8 +7,6 @@
 - **Bouton "Version APK" sur `outils-eps.fr/ten-eps/`** : pointe toujours vers l'ancien fichier `https://outils-eps.fr/wp-content/uploads/apk/ten-eps.apk` (build obsolète, antérieure au renommage et à la Partie B chronomètre). Laissé tel quel pour l'instant (décision Nathalie, 2026-08-02) — à mettre à jour quand une APK à jour sera buildée et uploadée sur WordPress.
 - **Réinitialisation mot de passe admin non revalidée sur tablette** : le clic réel sur la boîte de confirmation (`confirm()`) du bouton "Réinitialiser au mot de passe par défaut" n'a pu être testé que dans un navigateur automatisé (dialogues natifs désactivés) — à revalider sur une vraie tablette avant de diffuser aux élèves.
 - **Fullscreen immersif et Wake Lock permanent non revalidés sur tablette** : corrigés le 2026-08-02 (voir `MEMORY.md`), mais le navigateur de test automatisé refuse par politique la permission Fullscreen et Wake Lock (`NotAllowedError`/`Permissions check failed`) — comportement attendu de cet environnement, pas du code, mais impossible d'observer visuellement le résultat avant une vraie tablette. À vérifier : la barre de statut/navigation disparaît bien après un premier tap, et l'écran ne s'éteint plus pendant une saisie de score simple (format "au score").
-- **Documentation obsolète** : le `CLAUDE.md` du projet décrit encore un export CSV (`;`, BOM) alors que le code génère un vrai XLSX (générateur ZIP/OOXML fait main) — à mettre à jour ou à clarifier.
-- **Nom de l'app resté "Tennis de Table"** (titre, `manifest.json`) alors que le format de match a été généralisé à d'autres sports (badminton, volley, temps...) — risque de confusion avec VB EPS.
 
 ## Rappel avant chaque commit
 
@@ -17,6 +15,8 @@
 - [ ] Bumper `APP_VERSION` dans `MatchManagerEPS.html` (affiché sous le titre à l'accueil + dans Paramètres) à chaque changement fonctionnel visible pour l'utilisatrice — pas pour un correctif interne invisible.
 
 ## Fait récemment
+
+- [x] Suffixe "Tennis de Table" retiré de `manifest.json` (`name`, `description`) et du `<title>` (`index.html`/`MatchManagerEPS.html`) — plus cohérent depuis la généralisation à d'autres sports (badminton, volley, temps...). Le nom du dépôt GitHub et l'ancien build APK (`android/app/src/main/assets/index.html`, figé/obsolète) mentionnent encore "Tennis de Table" — non touchés (2026-08-03)
 
 - [x] Corrections suite retours Nathalie sur le mode clair : (1) contraste texte doré/vert/rouge/bleu sur fond blanc corrigé partout (nouvelles variables `--pri-lt`/`--ok-txt`/`--err-txt`/`--accent-txt` surchargées en mode clair, ~30 sites : boutons secondaires, titres, badges, scores gagnant/perdant) ; (2) écran Paramètres réorganisé en 3 destinations façon Biathlon VMA — nouvel écran `scr-settings` non protégé (Affichage/Accès professeur/Aide), le mot de passe ne protège plus que la "Configuration avancée" (`scr-admin` : format, points, bonus, mot de passe perso, données). Détails dans `MEMORY.md` (2026-08-02)
 - [x] Mode clair ajouté (l'app est nativement en thème sombre — c'est le mode clair qui manquait, pas l'inverse) : toggle "☀️ Mode clair" dans Paramètres (carte "🎨 Affichage"), persistant (`localStorage['mmeps_light_mode']`), `body.light-mode` qui surcharge les variables CSS de fond/texte/bordure. Barre du haut et barre de chrono gardent leur bleu marine de marque dans les deux thèmes (comme VB EPS le fait pour sa barre `--primary`). Détails et limites de portée dans `MEMORY.md` (2026-08-02)

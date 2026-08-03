@@ -1,7 +1,7 @@
 {
-  "name": "Match Manager EPS - Tennis de Table",
+  "name": "Match Manager EPS",
   "short_name": "Match Manager EPS",
-  "description": "Gestion de tournois de Tennis de Table pour l'EPS",
+  "description": "Gestion de tournois sportifs pour l'EPS",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",

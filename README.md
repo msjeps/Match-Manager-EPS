@@ -8,7 +8,7 @@ Application PWA de gestion de tournois de Tennis de Table pour les cours d'EPS (
 
 - 3 modes de tournoi : poules de niveau, poules + tableau final, bracket élimination directe
 - Gestion des joueurs (saisie manuelle, import CSV, listes sauvegardées, niveaux 0-5)
-- Formats de match configurables (1 set à 11/21 pts, 2 sets gagnants sur 3)
+- Formats de match configurables : match au score (1 ou 2 manches gagnantes, points par manche 11/15/21/25) ou match au temps (périodes chronométrées, match nul autorisé)
 - Classements automatiques (points, différence, points marqués)
 - Export des résultats en QR code (scannable par l'app [SCAN EPS](https://msjeps.github.io/scaneps/)) et en fichier XLSX
 - Sauvegarde automatique continue (localStorage), résiste aux rotations d'écran et sorties d'app
