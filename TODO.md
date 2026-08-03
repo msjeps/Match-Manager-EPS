@@ -2,8 +2,7 @@
 
 ## À faire
 
-- **Guide professeur avec le mot de passe `ADMINPROF` à rédiger et mettre en ligne** sur la page de l'application du site `outils-eps.fr` : la modale "Accès professeur" y renvoie déjà ("Vous trouverez le mot de passe dans le guide professeur, sur la page de l'application du site outils-eps.fr"), mais ce guide n'existe pas encore — sans lui, personne ne peut retrouver `ADMINPROF`. Rédaction + mise en ligne WordPress hors de portée d'un agent Claude Code, à faire par Nathalie.
-- **Bouton "Version APK" sur `outils-eps.fr/ten-eps/`** : pointe toujours vers l'ancien fichier `https://outils-eps.fr/wp-content/uploads/apk/ten-eps.apk` (build obsolète, antérieure au renommage et à la Partie B chronomètre). L'APK devra de toute façon être reconstruite et renommée `match-manager.apk` (nom de fichier actuel `ten-eps.apk` hérité de l'ancien nom) — à faire quand une nouvelle APK sera buildée et uploadée sur WordPress.
+- **Bouton "Version APK" sur `outils-eps.fr/application/match-manager-eps/`** : pointe toujours vers l'ancien fichier `https://outils-eps.fr/wp-content/uploads/apk/ten-eps.apk` (build obsolète, antérieure au renommage et à la Partie B chronomètre). L'APK devra de toute façon être reconstruite et renommée `match-manager.apk` (nom de fichier actuel `ten-eps.apk` hérité de l'ancien nom) — à faire quand une nouvelle APK sera buildée et uploadée sur WordPress.
 - **Réinitialisation mot de passe admin non revalidée sur tablette** : le clic réel sur la boîte de confirmation (`confirm()`) du bouton "Réinitialiser au mot de passe par défaut" n'a pu être testé que dans un navigateur automatisé (dialogues natifs désactivés) — à revalider sur une vraie tablette avant de diffuser aux élèves.
 - **Fullscreen immersif et Wake Lock permanent non revalidés sur tablette** : corrigés le 2026-08-02 (voir `MEMORY.md`), mais le navigateur de test automatisé refuse par politique la permission Fullscreen et Wake Lock (`NotAllowedError`/`Permissions check failed`) — comportement attendu de cet environnement, pas du code, mais impossible d'observer visuellement le résultat avant une vraie tablette. À vérifier : la barre de statut/navigation disparaît bien après un premier tap, et l'écran ne s'éteint plus pendant une saisie de score simple (format "au score").
 
@@ -15,6 +14,7 @@
 
 ## Fait récemment
 
+- [x] Guide professeur en ligne : article migré vers `outils-eps.fr/application/match-manager-eps/`, lien "Guide du professeur — Télécharger le PDF" vérifié en direct et fonctionnel (`https://outils-eps.fr/wp-content/uploads/guides/match-manager-eps.pdf`) — la modale "Accès professeur" de l'app renvoie maintenant vers un guide accessible contenant `ADMINPROF` (2026-08-03)
 - [x] URL de déploiement `apps.outils-eps.fr` déjà reconfigurée côté hébergeur : vérifié en direct que `outils-eps.fr/ten-eps/` pointe maintenant vers `apps.outils-eps.fr/Match-Manager-EPS/` (charge correctement l'app, titre/version à jour), tandis que l'ancien chemin `/TEN-EPS/` renvoie une 404 GitHub Pages (2026-08-03)
 - [x] Suffixe "Tennis de Table" retiré de `manifest.json` (`name`, `description`) et du `<title>` (`index.html`/`MatchManagerEPS.html`) — plus cohérent depuis la généralisation à d'autres sports (badminton, volley, temps...). Le nom du dépôt GitHub et l'ancien build APK (`android/app/src/main/assets/index.html`, figé/obsolète) mentionnent encore "Tennis de Table" — non touchés (2026-08-03)
 
