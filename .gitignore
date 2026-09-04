@@ -5,3 +5,14 @@ MatchManagerEPS.apk
 MatchManagerEPS.html
 android/
 design_preview.html
+
+# Secrets & clés — ne jamais committer
+.env
+.env.*
+*.jks
+*.keystore
+*.p12
+*.pem
+keystore.properties
+local.properties
+google-services.json
