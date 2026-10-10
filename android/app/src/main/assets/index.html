@@ -589,7 +589,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='1.9';
+const APP_VERSION='1.9.1';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const LS_BACKUP_KEY='teneps_data_illisible';
 
@@ -1363,7 +1363,7 @@ const s1=isDone?(m.score1!==null?m.score1:''):draftValue('s1-'+m.id,m.score1!==n
 const s2=isDone?(m.score2!==null?m.score2:''):draftValue('s2-'+m.id,m.score2!==null?m.score2:'');
 const w1=isDone&&m.score1>m.score2;
 const w2=isDone&&m.score2>m.score1;
-return`<div class="match-card ${m.status}" id="mc-${m.id}" onclick="toggleMatchPlaying('${m.id}',event)">
+return`<div class="match-card ${m.status}" id="mc-${m.id}" data-sig="${matchSig(m)}" onclick="toggleMatchPlaying('${m.id}',event)">
 <div class="match-header"><span class="match-num">Match ${m.matchNum||''}</span>${tableBadge}
 <span class="match-status ${m.status}">${statusLabel}</span></div>
 ${m.forfeit?forfeitNote(m):''}
@@ -1386,7 +1386,7 @@ const showS3=isDone?(sets[2]&&sets[2].s1!==''):(sw1===1&&sw2===1);
 const s3d=showS3?'':'display:none';
 const isW1=isDone&&(m.score1||0)>(m.score2||0);
 const isW2=isDone&&(m.score2||0)>(m.score1||0);
-return`<div class="match-card ${m.status}" id="mc-${m.id}" onclick="toggleMatchPlaying('${m.id}',event)">
+return`<div class="match-card ${m.status}" id="mc-${m.id}" data-sig="${matchSig(m)}" onclick="toggleMatchPlaying('${m.id}',event)">
 <div class="match-header"><span class="match-num">Match ${m.matchNum||''}</span>${tableBadge}
 <span class="match-status ${m.status}">${statusLabel}</span></div>
 ${m.forfeit?forfeitNote(m):''}
@@ -1784,8 +1784,21 @@ rows.sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
 return rows;
 }
 
+// Empreinte de tout ce dont dépendent les classements et le QR code : si elle n'a pas changé depuis
+// le dernier affichage, on ne recalcule rien (le QR code est le calcul le plus lourd).
+let rankingsSigLast='';
+function rankingsSig(){
+return [T.id,T.mode,T.phase,T.name,T.classe,T.date,(T.finals||[]).length,T.bracket?T.bracket.rounds.length:0,
+JSON.stringify(T.settings),state.settings.refBonusEnabled?1:0,
+T.pools.map(p=>p.playerIds.join(',')+':'+p.quali).join(';'),
+T.players.map(p=>p.name+(p.out||'')).join(','),
+T.matches.map(matchSig).join(';')].join('#');
+}
 function renderRankings(){
 if(!T)return;
+const sig=rankingsSig();
+if(sig===rankingsSigLast&&document.getElementById('rankings-content').innerHTML)return;
+rankingsSigLast=sig;
 const tabs=document.getElementById('rankings-tabs');
 const content=document.getElementById('rankings-content');
 renderQRCode('qr-container-rankings');
@@ -2176,6 +2189,40 @@ if(!m||m.status!=='done')return null;
 return m.score1>m.score2?m.p2:m.p1;
 }
 
+// Onglets du tableau : tours, petite finale, consolantes (sans doublon avec la petite finale)
+function bracketTabsList(){
+const allTabs=getBracketRoundNames().map((n,i)=>({name:n,type:'main',idx:i}));
+if(T.bracket.petiteFinale)allTabs.push({name:'Petite finale',type:'petite'});
+T.bracket.consolation.forEach((c,i)=>{
+if(c.losers.length<2)return;
+if(T.bracket.petiteFinale&&c.losers.length===2){
+const pf=T.matches.find(m=>m.id===T.bracket.petiteFinale);
+if(pf&&c.losers.includes(pf.p1)&&c.losers.includes(pf.p2))return;
+}
+allTabs.push({name:'Consolante R'+(c.round),type:'consolation',idx:i});
+});
+return allTabs;
+}
+function bracketProgressHtml(tab){
+if(!tab||tab.type!=='main')return '';
+const roundMatches=T.matches.filter(m=>m.phase==='bracket'&&m.bracketRound===(tab.idx+1)&&!m.isPetiteFinale);
+const done=roundMatches.filter(m=>m.status==='done').length;
+return `<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">${done}/${roundMatches.length} matchs</span></div>
+<div class="progress-bar"><div class="progress-fill" style="width:${roundMatches.length?100*done/roundMatches.length:0}%"></div></div>`;
+}
+function renderBracketProgress(){
+const el=document.getElementById('bracket-progress');
+if(!el||!T||!T.bracket)return;
+const tabs=bracketTabsList();
+el.innerHTML=bracketProgressHtml(tabs[curBracketTab]||tabs[0]);
+}
+// Empreinte de la forme du tableau : si elle change (tour généré, consolante créée, onglet), il faut
+// un rendu complet ; sinon on ne met à jour que les cartes concernées.
+function bracketShapeSig(){
+const b=T.bracket;
+return [b.rounds.length,b.rounds.map(r=>r.length).join(','),T.matches.length,b.consolation.length,b.petiteFinale||'',curBracketTab].join('#');
+}
+
 function renderBracket(){
 if(!T||!T.bracket)return;
 reattachRunningMatchTimers();
@@ -2185,25 +2232,13 @@ checkBracketAdvance();
 renderTools('tools-bracket');
 renderQueue('queue-bracket','bracket');
 const tabs=document.getElementById('bracket-tabs');
-const roundNames=getBracketRoundNames();
-const allTabs=[...roundNames.map((n,i)=>({name:n,type:'main',idx:i}))];
-if(T.bracket.petiteFinale)allTabs.push({name:'Petite finale',type:'petite'});
-// Add consolation tabs (skip if redundant with petite finale)
-T.bracket.consolation.forEach((c,i)=>{
-if(c.losers.length<2)return;
-if(T.bracket.petiteFinale&&c.losers.length===2){
-const pf=T.matches.find(m=>m.id===T.bracket.petiteFinale);
-if(pf&&c.losers.includes(pf.p1)&&c.losers.includes(pf.p2))return;
-}
-allTabs.push({name:'Consolante R'+(c.round),type:'consolation',idx:i});
-});
+const allTabs=bracketTabsList();
 tabs.innerHTML=allTabs.map((t,i)=>`<button class="tab-btn${i===curBracketTab?' active':''}" onclick="curBracketTab=${i};renderBracket()">${t.name}</button>`).join('');
 const tab=allTabs[curBracketTab]||allTabs[0];
 const content=document.getElementById('bracket-content');
 if(!tab){content.innerHTML='';return;}
 if(tab.type==='main'){
 const roundMatches=T.matches.filter(m=>m.phase==='bracket'&&m.bracketRound===(tab.idx+1)&&!m.isPetiteFinale);
-const done=roundMatches.filter(m=>m.status==='done').length;
 let seedHtml='';
 if(tab.idx===0&&T.bracket.nbSeeds>0){
 const si=T.bracket.seedInfo||[];
@@ -2220,8 +2255,7 @@ const p=T.players.find(x=>x.id===e.bye);
 return p?'<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(76,175,80,.1);border-radius:8px;margin-bottom:4px;border-left:4px solid var(--ok)"><span style="color:var(--ok-txt);font-weight:700">\u2705</span><span style="font-weight:500">'+escH(p.name)+'</span><span style="color:var(--txt2);font-size:.85em">\u2192 qualifi\u00e9(e) directement (t\u00eate de s\u00e9rie)</span></div>':'';
 }).join('')}</div>`;
 }
-content.innerHTML=seedHtml+`<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">${done}/${roundMatches.length} matchs</span></div>
-<div class="progress-bar"><div class="progress-fill" style="width:${roundMatches.length?100*done/roundMatches.length:0}%"></div></div>
+content.innerHTML=seedHtml+`<div id="bracket-progress">${bracketProgressHtml(tab)}</div>
 ${roundMatches.map(m=>renderMatchCard(m)).join('')}
 ${!roundMatches.length?'<p class="empty-state">Aucun match dans ce tour</p>':''}`;
 }else if(tab.type==='petite'){
@@ -3854,6 +3888,22 @@ el.innerHTML=h;
 // les listes d'arbitres des autres cartes, l'avancement et la file d'attente, sans refaire toute la
 // liste (allège le CPU des tablettes lentes, conserve le défilement). Le tableau (mode 3) reste
 // recalculé en entier : un résultat peut générer le tour suivant.
+// Signature de ce que la carte d'un match affiche (hors champs de saisie, conservés par les
+// brouillons) : sert à ne remplacer que les cartes dont le contenu a réellement changé.
+function matchSig(m){
+return [m.status,m.score1,m.score2,m.table,m.refereeId,m.refBonus?1:0,m.forfeit||'',m.p1,m.p2,
+m.sets?m.sets.map(x=>x.s1+':'+x.s2).join(','):''].join('|');
+}
+function refreshDisplayedCards(){
+document.querySelectorAll('.match-card[id^="mc-"]').forEach(el=>{
+const m=T.matches.find(x=>'mc-'+x.id===el.id);
+if(!m)return;
+if(el.getAttribute('data-sig')===matchSig(m))return;
+const tmp=document.createElement('div');
+tmp.innerHTML=renderMatchCard(m);
+if(tmp.firstElementChild)el.replaceWith(tmp.firstElementChild);
+});
+}
 function refreshMatchCard(m){
 const el=document.getElementById('mc-'+m.id);
 if(!el)return false;
@@ -3870,7 +3920,18 @@ if(m)sel.innerHTML=refOptionsHtml(m);
 });
 }
 function refreshAfterChange(m){
-if(m.phase==='bracket'){renderBracket();return;}
+if(m.phase==='bracket'){
+// Un résultat peut générer le tour suivant ou les consolantes : dans ce cas seulement, rendu complet.
+const shape=bracketShapeSig();
+checkBracketAdvance();
+if(bracketShapeSig()!==shape){renderBracket();return;}
+refreshDisplayedCards();
+refreshRefSelects();
+renderTools('tools-bracket');
+renderBracketProgress();
+renderQueue('queue-bracket','bracket');
+return;
+}
 refreshMatchCard(m);
 refreshRefSelects();
 if(m.phase==='pool'){

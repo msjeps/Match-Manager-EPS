@@ -13,6 +13,12 @@ Journal de contexte et de décisions du projet, pour reprendre le travail sans p
 
 Entrées les plus récentes en premier à partir du 2026-10-10 ; les entrées du 2026-08-02 ci-dessous sont dans l'ordre où elles ont été écrites.
 
+### 2026-10-11 - v1.9.1 : re-rendu ciblé du tableau et des classements
+- **Signatures plutôt que mise à jour écrite à la main.** Chaque carte porte `data-sig` (`matchSig` : statut, scores, table, arbitre, bonus, forfait, joueurs, sets). `refreshDisplayedCards()` ne remplace que les cartes dont la signature a changé : cela couvre sans cas particulier le rebouclage des tables après une validation en tableau (plusieurs cartes changent). Les saisies en cours ne comptent pas dans la signature : elles vivent dans les brouillons.
+- **Tableau : rendu complet seulement si la forme change** (`bracketShapeSig` : nombre de tours, matchs, consolantes, petite finale, onglet). `checkBracketAdvance()` est appelé avant la comparaison : c'est lui qui génère le tour suivant.
+- **Classements : `rankingsSig()` court-circuite `renderRankings`.** La signature couvre tout ce dont dépendent classements et QR (matchs, joueurs retirés, réglages, poules, finales). Piège : toute nouvelle donnée qui influence un classement doit entrer dans cette signature, sinon l'écran restera périmé. Conséquence voulue : on retrouve l'onglet de poule laissé ouvert.
+- **Version 1.9.1** : correctif interne mais une nouvelle APK exige un `versionCode` supérieur pour se mettre à jour par-dessus l'ancienne.
+
 ### 2026-10-11 - Tests Node de la logique (sans modifier l'app)
 - **On charge l'application telle quelle plutôt que d'en extraire un fichier `logic.js`.** Découper le fichier unique aurait cassé le principe « un fichier HTML autonome », multiplié les fichiers à recopier (déjà trois copies) et à mettre en cache. `tests/harness.js` exécute le `<script>` d'`index.html` dans un contexte `vm` avec un DOM factice (mandataire qui absorbe tout appel) et un pont pour les `let` globaux `T` et `state`. Zéro duplication de code : ce qu'on teste est ce qui est livré.
 - **Les tests lisent `index.html`** (suivi par git, identique au fichier de dev), pas `MatchManagerEPS.html` (ignoré par git) ; `HTML=chemin` pour viser un autre fichier. Ils vérifient aussi que les copies `index.html` / assets de l'APK sont identiques et que `versionName` Gradle = `APP_VERSION`.

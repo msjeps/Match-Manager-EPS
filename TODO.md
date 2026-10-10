@@ -22,10 +22,11 @@
 - [ ] Le dépôt GitHub est public : `MEMORY.md` et `TODO.md` y sont publiés. Vérifier qu'ils ne contiennent rien de sensible avant chaque push.
 
 ### Idées retenues de l'audit, non réalisées
-- [ ] Re-rendu ciblé du tableau (mode 3) et des classements : seuls les matchs de poule et de finale sont ciblés (v1.8).
 - [ ] Réduire à un seul fichier source HTML (aujourd'hui trois copies : `MatchManagerEPS.html`, `index.html`, `android/app/src/main/assets/index.html`).
 
 ## Fait récemment
+
+- [x] v1.9.1 (2026-10-11, versionCode 11, `CACHE_NAME` v27) : re-rendu ciblé du tableau (cartes à signature, rendu complet seulement si un tour est généré) et des classements (pas de recalcul ni de QR si rien n'a changé). 22 tests. Vérifié dans le navigateur ; à valider sur la tablette (fluidité en tableau de 16).
 
 - [x] Tests Node de la logique (2026-10-11, aucun changement de l'app, version 1.9 inchangée) : `npm test` (ou `node --test tests/*.test.js`), 19 tests sans dépendance : round-robin, statistiques et classement de poule (départage direct, forfait), tableau (byes, progression, vainqueur), export XLSX (CRC du ZIP, 2 onglets, détail des sets), sauvegarde / import assaini, `load()` données illisibles, annuler, mot de passe, palmarès, cohérence des versions et des copies. Non couvert : rendu et interactions (écrans, boîtes, chronomètre), APK. Voir `tests/README.md`.
 

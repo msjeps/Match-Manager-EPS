@@ -45,7 +45,7 @@ Contrôles rapides :
 ```bash
 AAPT=$(ls -d ~/Library/Android/sdk/build-tools/*/aapt2 | tail -1)
 "$AAPT" dump badging app/build/outputs/apk/debug/app-debug.apk | grep package:
-unzip -p app/build/outputs/apk/debug/app-debug.apk assets/index.html | grep -c "APP_VERSION='1.9'"
+unzip -p app/build/outputs/apk/debug/app-debug.apk assets/index.html | grep -c "APP_VERSION='1.9.1'"
 ```
 
 ## Signature

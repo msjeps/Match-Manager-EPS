@@ -299,3 +299,51 @@ test('copies de l\'application identiques (index.html et assets de l\'APK)', () 
   const b = fs.readFileSync(path.join(__dirname, '..', 'android', 'app', 'src', 'main', 'assets', 'index.html'));
   assert.ok(a.equals(b), 'index.html et android/app/src/main/assets/index.html diffèrent : recopier avant le build');
 });
+
+// ----- re-rendu ciblé : empreintes -----
+test('matchSig : change avec le résultat, la table ou l\'arbitre, pas avec le reste', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'm1', names: ['A', 'B', 'C'] });
+  const m = t.matches[0];
+  const sig = () => app.fn('matchSig')(m);
+  const s0 = sig();
+  assert.equal(sig(), s0, 'stable sans changement');
+  m.matchNum = 99;
+  assert.equal(sig(), s0, 'le numéro de match n\'est pas affiché dans la signature');
+  m.table = 3;
+  const s1 = sig(); assert.notEqual(s1, s0);
+  m.refereeId = 'm1p2';
+  const s2 = sig(); assert.notEqual(s2, s1);
+  play(m, 11, 4);
+  assert.notEqual(sig(), s2);
+});
+
+test('rankingsSig : stable sans changement, différente après un résultat ou un retrait', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'k1', names: ['A', 'B', 'C'] });
+  app.state.tournaments.push(t);
+  app.T = t;
+  const s0 = app.fn('rankingsSig')();
+  assert.equal(app.fn('rankingsSig')(), s0);
+  play(t.matches[0], 11, 4);
+  const s1 = app.fn('rankingsSig')();
+  assert.notEqual(s1, s0);
+  t.players[0].out = 'forfait';
+  assert.notEqual(app.fn('rankingsSig')(), s1);
+});
+
+test('bracketShapeSig : change quand un tour est généré, pas quand un match est joué', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'k2', mode: 3, names: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'], pools: 'none' });
+  app.T = t;
+  app.fn('generateBracket')();
+  const shape = () => app.fn('bracketShapeSig')();
+  const s0 = shape();
+  const round1 = t.matches.filter(m => m.phase === 'bracket' && m.bracketRound === 1);
+  play(round1[0], 11, 3);
+  app.fn('checkBracketAdvance')();
+  assert.equal(shape(), s0, 'un match joué ne change pas la forme');
+  round1.slice(1).forEach(m => play(m, 11, 3));
+  app.fn('checkBracketAdvance')();
+  assert.notEqual(shape(), s0, 'tour complet : le tour suivant est généré');
+});
