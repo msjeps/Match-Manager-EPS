@@ -12,10 +12,10 @@
 <title>Match Manager EPS</title>
 <meta name="description" content="Match Manager EPS - Organiser les rencontres, les terrains, les arbitres et les classements sans jongler entre plusieurs feuilles.">
 <style>
-:root{--pri:#F3C146;--pri-lt:#F5D080;--pri-dk:#D4A020;--accent:#4DB0FA;--accent-txt:#4DB0FA;--ok:#4CAF50;--ok-txt:#4CAF50;--err:#E64D4C;--err-txt:#E64D4C;--info:#4DB0FA;--warn:#F3C146;--bg:#213364;--surf:#3e5db3;--surf2:#4A6BC5;--txt:#FFFFFF;--txt2:#BDD3FF;--brd:#5572C8;--sh:0 2px 12px rgba(0,0,0,.4);--rad:12px;--chrome1:#4A6BC5;--chrome2:#3e5db3}
-body.light-mode{--bg:#EEF2FA;--surf:#FFFFFF;--surf2:#F1F4FB;--txt:#1A2540;--txt2:#5A6B8C;--brd:#D7DEEC;--sh:0 2px 12px rgba(30,50,90,.12);--pri-lt:#8A6400;--accent-txt:#1565C0;--ok-txt:#2E7D32;--err-txt:#C62828}
+:root{--pri:#F3C146;--pri-lt:#F5D080;--pri-dk:#D4A020;--accent:#4DB0FA;--accent-txt:#4DB0FA;--ok:#4CAF50;--ok-txt:#4CAF50;--err:#E64D4C;--err-txt:#E64D4C;--info:#4DB0FA;--warn:#F3C146;--bg:#213364;--surf:#3e5db3;--surf2:#4A6BC5;--txt:#FFFFFF;--txt2:#D6E4FF;--brd:#5572C8;--ombre-douce:0 4px 15px rgba(0,0,0,.25);--ombre-forte:0 8px 25px rgba(0,0,0,.4);--sh:var(--ombre-douce);--rad:16px;--chrome1:#4A6BC5;--chrome2:#3e5db3}
+body.light-mode{--bg:#EEF2FA;--surf:#FFFFFF;--surf2:#F1F4FB;--txt:#1A2540;--txt2:#5A6B8C;--brd:#D7DEEC;--ombre-douce:0 4px 15px rgba(30,50,90,.12);--ombre-forte:0 8px 25px rgba(30,50,90,.18);--pri-lt:#8A6400;--accent-txt:#1565C0;--ok-txt:#2E7D32;--err-txt:#C62828}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
 .screen{display:none;min-height:100vh;padding-bottom:20px}
 .screen.active{display:block}
 .top-bar{background:linear-gradient(135deg,var(--chrome1),var(--chrome2));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.4);border-bottom:2px solid var(--pri)}
@@ -41,13 +41,21 @@ textarea{resize:vertical;min-height:80px}
 .btn-secondary:active{background:var(--pri);color:#000}
 .btn-success{background:var(--ok);color:#fff;border:none;padding:10px 18px;border-radius:var(--rad);font-size:.9em;font-weight:600;cursor:pointer}
 .btn-danger{background:var(--err);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:.85em;cursor:pointer}
-.btn-sm{padding:8px 14px;font-size:.85em}
+.btn-primary,.btn-secondary,.btn-success,.btn-danger,.match-validate{border-radius:25px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;min-height:44px;box-shadow:var(--ombre-douce);transition:transform .15s,background .2s}
+.btn-secondary{box-shadow:none}
+.btn-success,.btn-danger,.match-validate{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-sm{padding:8px 16px;font-size:.85em}
+.btn-primary:active,.btn-secondary:active,.btn-success:active,.btn-danger:active,.match-validate:active,.btn-back:active,.family-btn:active,.mode-card:active,.lvl-btn:active,.level-select button:active,.pool-nav button:active{transform:scale(.95)}
+.btn-back,.tab-btn,.pool-nav button,.lvl-btn{transition:transform .15s,background .2s}
+.tab-btn{min-height:44px}
+.btn-back{border-radius:22px;min-height:44px;padding:8px 16px}
+.btn-icon{min-width:44px;min-height:44px}
 .btn-group{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.stepper{display:flex;align-items:center;gap:0}
-.stepper button{width:44px;height:44px;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-size:1.3em;cursor:pointer;border-radius:var(--rad) 0 0 var(--rad)}
-.stepper button:last-child{border-radius:0 var(--rad) var(--rad) 0}
-.stepper input{width:60px;height:44px;text-align:center;border:2px solid var(--brd);border-left:none;border-right:none;font-size:1.1em;font-weight:700}
-.card{background:var(--surf);border-radius:var(--rad);padding:16px;margin-bottom:12px;box-shadow:var(--sh);border:1px solid var(--brd)}
+.stepper{display:flex;align-items:stretch;gap:8px;max-width:260px}
+.stepper button{width:44px;min-height:44px;flex-shrink:0;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-size:1.3em;font-weight:700;cursor:pointer;border-radius:10px}
+.stepper button:active{background:var(--pri);color:#000;border-color:var(--pri)}
+.stepper input{flex:1;min-width:0;width:auto;height:44px;text-align:center;border:2px solid var(--brd);border-radius:10px;font-size:1.1em;font-weight:700}
+.card{background:var(--surf);border-radius:var(--rad);padding:16px;margin-bottom:12px;box-shadow:var(--sh);border:1px solid var(--brd);border-left:5px solid var(--pri)}
 .card-header{padding:12px 16px;border-radius:var(--rad) var(--rad) 0 0;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:space-between;margin:-16px -16px 12px -16px}
 .badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:.75em;font-weight:600}
 .badge-orange{background:rgba(243,193,70,.2);color:#F3C146}
@@ -60,7 +68,7 @@ body.light-mode .badge-blue{color:#1565C0}
 body.light-mode .badge-red{color:#C62828}
 .mode-cards{display:grid;gap:12px}
 .mode-card{border:2px solid var(--brd);border-radius:var(--rad);padding:16px;cursor:pointer;transition:all .2s;background:var(--surf)}
-.mode-card.selected{border-color:var(--pri);background:rgba(243,193,70,.08)}
+.mode-card.selected{border-color:var(--pri);border-left-width:5px;background:rgba(243,193,70,.08)}
 .mode-card h3{color:var(--pri-lt);margin-bottom:4px}
 .mode-card p{font-weight:600;margin-bottom:4px}
 .mode-card small{color:var(--txt2)}
@@ -73,9 +81,9 @@ body.light-mode .badge-red{color:#C62828}
 .player-item .num{width:30px;height:30px;border-radius:50%;background:var(--pri);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85em;flex-shrink:0}
 .player-item .name{flex:1;font-weight:600;letter-spacing:.02em}
 .player-item .level{font-size:.8em;color:var(--txt2)}
-.player-item .del{background:none;border:none;color:var(--err-txt);font-size:1.2em;cursor:pointer;padding:4px 8px}
+.player-item .del{background:none;border:none;color:var(--err-txt);font-size:1.2em;cursor:pointer;min-width:44px;min-height:44px;padding:4px 8px}
 .pool-card{border-radius:var(--rad);overflow:hidden;margin-bottom:16px;box-shadow:var(--sh);background:var(--surf);border:1px solid var(--brd)}
-.pool-header{padding:12px 16px;color:#fff;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.pool-header{padding:12px 16px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45);font-weight:700;display:flex;justify-content:space-between;align-items:center}
 .pool-body{padding:12px}
 .pool-player{padding:8px 12px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
 .pool-player:last-child{border-bottom:none}
@@ -85,7 +93,7 @@ body.light-mode .badge-red{color:#C62828}
 .match-card.pending{border-left-color:var(--warn)}
 .match-card.playing{border-left-color:var(--accent);background:rgba(77,176,250,.1);box-shadow:0 0 0 2px var(--accent),var(--sh)}
 .match-status.playing{color:var(--accent-txt)}
-.match-table-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(243,193,70,.15);color:var(--pri-lt);border:1px solid var(--pri);border-radius:6px;padding:2px 8px;font-size:.78em;font-weight:700;cursor:pointer}
+.match-table-badge{display:inline-flex;align-items:center;gap:3px;min-height:44px;background:rgba(243,193,70,.15);color:var(--pri-lt);border:1px solid var(--pri);border-radius:6px;padding:2px 8px;font-size:.78em;font-weight:700;cursor:pointer}
 .match-table-badge:empty{display:none}
 .match-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .match-num{font-weight:700;color:var(--pri-lt)}
@@ -105,7 +113,7 @@ body.light-mode .match-row input.winner{color:#2E7D32}
 .match-validate:disabled{opacity:.4;cursor:not-allowed}
 .mtimer{display:flex;align-items:center;gap:10px;background:var(--surf2);border-radius:8px;padding:6px 10px;margin-top:8px}
 .mtimer-period{font-size:.8em;color:var(--txt2);font-weight:600}
-.mtimer-time{font-family:monospace;font-size:1.15em;font-weight:800;color:var(--pri-lt)}
+.mtimer-time{font-family:'Courier New',monospace;font-size:1.15em;font-weight:800;color:var(--pri-lt)}
 .mtimer-end{font-size:.8em;color:var(--txt2);font-style:italic}
 .mtimer .btn-secondary{padding:6px 12px;font-size:.8em}
 .progress-bar{height:8px;background:var(--brd);border-radius:4px;overflow:hidden;margin:12px 0}
@@ -114,17 +122,20 @@ body.light-mode .match-row input.winner{color:#2E7D32}
 .tab-btn{flex:1;padding:10px 8px;border:none;background:none;font-weight:600;font-size:.85em;cursor:pointer;transition:all .2s;color:var(--txt2)}
 .tab-btn.active{background:var(--pri);color:#000}
 .ranking-table{width:100%;border-collapse:collapse;font-size:.9em}
-.ranking-table th{background:linear-gradient(135deg,var(--pri-dk),var(--pri));color:#fff;padding:10px 8px;text-align:center;font-size:.8em}
+.ranking-table th{background:linear-gradient(135deg,var(--pri-dk),var(--pri));color:#1A2540;padding:10px 8px;text-align:center;font-size:.8em}
 .ranking-table td{padding:8px;text-align:center;border-bottom:1px solid var(--brd);color:var(--txt)}
 .ranking-table tr:nth-child(even){background:rgba(255,255,255,.03)}
 body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
-.ranking-table .rank{font-weight:700;color:var(--pri-lt)}
+.ranking-table .rank{font-weight:700;color:var(--pri-lt);white-space:nowrap}
+.ranking-table tr.podium-1{background:rgba(243,193,70,.14)}
+.ranking-table tr.podium-2{background:rgba(200,210,230,.1)}
+.ranking-table tr.podium-3{background:rgba(205,127,50,.12)}
 .ranking-table .pname{text-align:left;font-weight:500}
 .timer-bar{background:linear-gradient(135deg,var(--chrome2),var(--chrome1));color:#fff;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:1.1em;border-bottom:2px solid var(--pri)}
-.timer-bar .time{font-family:monospace;font-size:1.3em;color:var(--pri)}
+.timer-bar .time{font-family:'Courier New',monospace;font-size:1.3em;color:var(--pri)}
 .timer-bar button{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:.9em;cursor:pointer}
 .pool-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px}
-.pool-nav button{width:40px;height:40px;border-radius:50%;border:2px solid var(--brd);background:var(--surf);color:var(--txt);font-size:1.2em;cursor:pointer}
+.pool-nav button{width:44px;height:44px;border-radius:50%;border:2px solid var(--brd);background:var(--surf);color:var(--txt);font-size:1.2em;cursor:pointer}
 .pool-nav .pool-name{font-size:1.1em;font-weight:700;color:var(--pri-lt)}
 .empty-state{text-align:center;padding:40px 20px;color:var(--txt2)}
 .empty-state .icon{font-size:3em;margin-bottom:12px}
@@ -143,6 +154,9 @@ body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
 .modal h2{margin-bottom:16px;color:var(--pri-lt)}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 .section-title{font-size:1.1em;font-weight:700;color:var(--pri-lt);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.section-title::before,.bracket-round h3::before{content:'';flex-shrink:0;width:6px;height:22px;background:var(--pri);border-radius:3px;display:inline-block;vertical-align:middle;margin-right:8px}
+.section-title::before{margin-right:0}
+.bracket-round h3::before{background:var(--accent)}
 .info-box{background:rgba(77,176,250,.1);border-left:4px solid var(--info);padding:12px;border-radius:0 8px 8px 0;margin-bottom:16px;font-size:.9em;color:var(--txt2)}
 .stat-row{display:flex;justify-content:space-around;padding:12px;background:var(--surf2);border-radius:8px;margin-bottom:12px;border:1px solid var(--brd)}
 .stat-item{text-align:center}
@@ -151,17 +165,17 @@ body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
 #inp-pname::placeholder,#inp-plist::placeholder{color:#f4eac5}
 body.light-mode #inp-pname::placeholder,body.light-mode #inp-plist::placeholder{color:var(--txt2)}
 .level-select{display:flex;gap:4px}
-.level-select button{width:32px;height:32px;border-radius:50%;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-weight:700;font-size:.8em;cursor:pointer}
+.level-select button{width:44px;height:44px;border-radius:50%;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-weight:700;font-size:.8em;cursor:pointer}
 .level-select button.active{background:var(--pri);color:#000;border-color:var(--pri)}
-.toggle{position:relative;width:50px;height:28px;background:var(--brd);border-radius:14px;cursor:pointer;transition:background .2s}
+.toggle{position:relative;width:58px;height:32px;background:var(--brd);border-radius:16px;cursor:pointer;transition:background .2s}
 .toggle.on{background:var(--ok)}
-.toggle::after{content:'';position:absolute;width:24px;height:24px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.toggle.on::after{left:24px}
+.toggle::after{content:'';position:absolute;width:28px;height:28px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{left:28px}
 .player-item{cursor:pointer;transition:background .15s}
 .player-item:active{background:rgba(243,193,70,.08)}
 .level-editor{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:8px;margin:-2px 0 6px 0;animation:slideDown .2s ease}
 .level-editor-inner{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.lvl-btn{padding:6px 12px;border:2px solid var(--brd);border-radius:8px;background:var(--surf);color:var(--txt);cursor:pointer;font-size:.85em;transition:all .15s}
+.lvl-btn{min-height:44px;padding:6px 14px;border:2px solid var(--brd);border-radius:8px;background:var(--surf);color:var(--txt);cursor:pointer;font-size:.85em;transition:all .15s}
 .lvl-btn.active{background:var(--pri);color:#000;border-color:var(--pri)}
 .trophy-display{color:var(--pri-lt);font-size:.9em}
 .no-level{color:var(--txt2);font-size:.8em;font-style:italic}
@@ -178,7 +192,7 @@ body.light-mode #inp-pname::placeholder,body.light-mode #inp-plist::placeholder{
 .set-col input.loser{border-color:var(--err);background:rgba(244,67,54,.08);color:#EF9A9A}
 body.light-mode .set-col input.winner{color:#2E7D32}
 body.light-mode .set-col input.loser{color:#C62828}
-.ref-bonus-label{display:flex;align-items:center;gap:4px;font-size:.8em;white-space:nowrap;cursor:pointer;color:var(--txt)}
+.ref-bonus-label{min-height:44px;display:flex;align-items:center;gap:4px;font-size:.8em;white-space:nowrap;cursor:pointer;color:var(--txt)}
 .ref-bonus-label input[type=checkbox]{width:18px;height:18px;accent-color:var(--pri)}
 .bv-slot{padding:3px 6px;border:1px solid var(--brd);font-size:.72em;background:var(--surf2);color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:24px;line-height:18px}
 .bv-w{background:rgba(76,175,80,.2);font-weight:700;color:#66BB6A}
@@ -209,9 +223,13 @@ body.light-mode .badge-out{color:#C62828}
 .live-btn{display:block;width:100%;height:76px;margin-top:8px;border-radius:var(--rad);border:3px solid var(--brd);background:var(--surf2);color:var(--txt);font-size:2.8em;font-weight:800;cursor:pointer}
 .live-btn.plus{background:var(--ok);border-color:var(--ok);color:#fff}
 .live-btn:active{opacity:.7}
+.live-score.lead,.live-num.lead{color:var(--ok-txt)}
+.live-side.lead{border-color:var(--ok)}
+@keyframes liveBump{from{transform:scale(1.25)}to{transform:scale(1)}}
+.live-score.bump,.live-num.bump{animation:liveBump .18s ease-out}
 .live-timer{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;background:var(--surf2);border-radius:var(--rad);padding:10px;margin:12px 0}
 .live-timer>*{margin:4px 8px}
-.live-time{font-family:monospace;font-size:2.6em;font-weight:900;color:var(--pri-lt)}
+.live-time{font-family:'Courier New',monospace;font-size:2.6em;font-weight:900;color:var(--pri-lt)}
 .live-actions{margin-top:14px}
 .live-actions .btn-primary{height:64px;font-size:1.3em}
 .live-ok{text-align:center;padding:30px 10px}
@@ -252,17 +270,17 @@ body.light-mode .badge-out{color:#C62828}
 <div class="form-group"><label>Mode de jeu</label>
 <div class="mode-cards">
 <div class="mode-card selected" data-mode="1" onclick="selMode(1)">
-<h3>&#127942; Mode 1 - Poules de niveau</h3>
+<h3>&#127937; Mode 1 - Poules de niveau</h3>
 <p>Poules ind&eacute;pendantes par niveau</p>
 <small>Chaque poule a son classement. Id&eacute;al pour diff&eacute;rencier les niveaux.</small>
 </div>
 <div class="mode-card" data-mode="2" onclick="selMode(2)">
-<h3>&#127942; Mode 2 - Poules + Tableau final</h3>
+<h3>&#128256; Mode 2 - Poules + Tableau final</h3>
 <p>Phase de poules puis finales crois&eacute;es</p>
 <small>Les 1ers se rencontrent, les 2e aussi, etc. Classement g&eacute;n&eacute;ral.</small>
 </div>
 <div class="mode-card" data-mode="3" onclick="selMode(3)">
-<h3>&#127942; Mode 3 - Tableau &agrave; &eacute;limination</h3>
+<h3>&#127919; Mode 3 - Tableau &agrave; &eacute;limination</h3>
 <p>Bracket + tableaux consolante</p>
 <small>T&ecirc;tes de s&eacute;rie + tableau des perdants pour classer tout le monde.</small>
 </div>
@@ -311,9 +329,9 @@ body.light-mode .badge-out{color:#C62828}
 <button class="tab-btn" onclick="setPlayerTab(2,this)">&#8613; Import CSV</button>
 </div>
 <div id="player-tab-0">
-<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start">
-<input type="text" id="inp-pname" placeholder="Nom du joueur" style="flex:1" onkeydown="if(event.key==='Enter')addPlayer()">
-<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="level-select" id="level-btns"></div><span style="font-size:.65em;color:var(--txt2)">Choix du niveau</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;align-items:flex-start">
+<input type="text" id="inp-pname" placeholder="Nom du joueur" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')addPlayer()">
+<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="level-select" id="level-btns"></div><span style="font-size:.8em;color:var(--txt2)">Choix du niveau</span></div>
 <button class="btn-success" onclick="addPlayer()">+ Ajouter</button>
 </div>
 </div>
@@ -386,7 +404,7 @@ body.light-mode .badge-out{color:#C62828}
 <div id="matches-progress"></div>
 <div id="matches-list"></div>
 <div class="btn-group" style="margin-top:20px">
-<button class="btn-secondary" onclick="showScreen('scr-rankings')">&#127942; Classements</button>
+<button class="btn-secondary" onclick="showScreen('scr-rankings')">&#128202; Classements</button>
 <button class="btn-primary" id="btn-next-phase" style="display:none" onclick="goNextPhase()"></button>
 </div>
 </div>
@@ -433,7 +451,7 @@ body.light-mode .badge-out{color:#C62828}
 <div id="queue-finals"></div>
 <div id="finals-tabs" class="tab-bar"></div>
 <div id="finals-list"></div>
-<button class="btn-secondary" onclick="showFinalRankings()" style="margin-top:16px;width:100%">&#127942; Classement g&eacute;n&eacute;ral</button>
+<button class="btn-secondary" onclick="showFinalRankings()" style="margin-top:16px;width:100%">&#128202; Classement g&eacute;n&eacute;ral</button>
 </div>
 </section>
 
@@ -451,7 +469,7 @@ body.light-mode .badge-out{color:#C62828}
 <div id="bracket-tabs" class="tab-bar"></div>
 <div id="bracket-content"></div>
 <div style="display:flex;gap:8px;margin-top:16px">
-<button class="btn-secondary" onclick="showBracketRanking()" style="flex:1">&#127942; Classement complet</button>
+<button class="btn-secondary" onclick="showBracketRanking()" style="flex:1">&#128202; Classement complet</button>
 <button class="btn-primary" onclick="showBracketVisual()" style="flex:1">&#128204; Tableau</button>
 </div>
 </div>
@@ -591,7 +609,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='1.9.1';
+const APP_VERSION='2.0';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const LS_BACKUP_KEY='teneps_data_illisible';
 
@@ -1190,7 +1208,7 @@ const col=POOL_COLORS[pi%POOL_COLORS.length];
 const players=pool.playerIds.map(id=>T.players.find(p=>p.id===id)).filter(Boolean);
 return`<div class="pool-card">
 <div class="pool-header" style="background:linear-gradient(135deg,${col[0]},${col[1]});cursor:pointer" onclick="moveToPool('${pool.id}')">
-<span>&#127942; ${escH(pool.name)}</span><span class="badge" style="background:rgba(255,255,255,.3);color:#fff">${players.length} joueurs</span>
+<span>&#127937; ${escH(pool.name)}</span><span class="badge" style="background:rgba(255,255,255,.3);color:#fff">${players.length} joueurs</span>
 ${selectedPlayerForMove?'<span style="font-size:.8em;opacity:.8">&#128071; D\u00e9poser ici</span>':''}
 </div><div class="pool-body">${players.map((p,i)=>`<div class="pool-player${selectedPlayerForMove===p.id?' selected':''}" onclick="selectPlayerForMove('${p.id}',event)" style="cursor:pointer"><div class="seed">${i+1}</div><span>${escH(p.name)}</span>${p.level?'<span class="chip" style="background:rgba(77,176,250,.2);color:#4DB0FA">Niv.'+p.level+'</span>':''}</div>`).join('')}
 ${!players.length?'<p style="padding:12px;color:var(--txt2);text-align:center">Touchez un joueur puis cette poule</p>':''}
@@ -1840,6 +1858,13 @@ const ranking=calcPoolRanking(pool.id);
 content.innerHTML=renderRankingTable(ranking,pool.name,T.mode===2?pool.quali:0);
 }
 
+// Médailles 1-3 : seulement si au moins un match est joué (sinon le 1er n'est qu'un ordre d'inscription)
+function medal(n,ranking){
+if(n<1||n>3)return n;
+if(ranking&&!ranking.some(r=>(r.w||0)+(r.l||0)+(r.d||0)+(r.totalW||0)+(r.totalL||0)>0))return n;
+return ['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'][n-1]+' '+n;
+}
+function podiumCls(n,ranking){return typeof medal(n,ranking)==='string'?' class="podium-'+n+'"':'';}
 function renderRankingTable(ranking,title,qualiCount){
 const hasAnyBonus=ranking.some(r=>r.refBonus>0);
 const hasAnyL3=ranking.some(r=>r.l3>0);
@@ -1849,8 +1874,8 @@ html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:l
 ranking.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const quali=qualiCount&&i<qualiCount;
-html+=`<tr${quali?' style="background:rgba(76,175,80,.08)"':''}>
-<td class="rank">${i+1}${quali?' \u2705':''}</td><td class="pname">${pnameHtml(p)}</td>
+html+=`<tr${quali?' style="background:rgba(76,175,80,.08)"':podiumCls(i+1,ranking)}>
+<td class="rank">${medal(i+1,ranking)}${quali?' \u2705':''}</td><td class="pname">${pnameHtml(p)}</td>
 <td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasAnyD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasAnyL3?`<td>${r.l3||0}</td>`:''}
 <td>${r.pf}</td><td>${r.pa}</td><td>${r.pf-r.pa>=0?'+':''}${r.pf-r.pa}</td>${hasAnyBonus?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
@@ -1952,7 +1977,7 @@ html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:l
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.pf-r.pa;
-html+=`<tr><td class="rank">${i+1}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr${podiumCls(i+1,all)}><td class="rank">${medal(i+1,all)}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
 html+='</tbody></table>';
 el.innerHTML=html;
@@ -2004,7 +2029,7 @@ html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:l
 for(const r of ranked){
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.totalPF-r.totalPA;
-html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${pnameHtml(p)}</td><td><strong>${r.totalPts}</strong></td><td>${r.totalW}</td>${hasD?`<td>${r.totalD||0}</td>`:''}<td>${r.totalL}</td>${hasD3?`<td>${r.totalL3||0}</td>`:''}<td>${r.totalPF}</td><td>${r.totalPA}</td><td>${diff>=0?'+':''}${diff}</td>${anyArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr${podiumCls(globalRank,ranked)}><td class="rank">${medal(globalRank,ranked)}</td><td class="pname">${pnameHtml(p)}</td><td><strong>${r.totalPts}</strong></td><td>${r.totalW}</td>${hasD?`<td>${r.totalD||0}</td>`:''}<td>${r.totalL}</td>${hasD3?`<td>${r.totalL3||0}</td>`:''}<td>${r.totalPF}</td><td>${r.totalPA}</td><td>${diff>=0?'+':''}${diff}</td>${anyArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 globalRank++;
 }
 html+='</tbody></table>';
@@ -2381,7 +2406,7 @@ if(!ranking.find(r=>r.id===p.id))ranking.push({id:p.id,rank:ranking.length+1,not
 html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Note</th></tr></thead><tbody>`;
 for(const r of ranking){
 const p=T.players.find(x=>x.id===r.id);
-html+=`<tr><td class="rank">${r.rank}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.8em">${r.note}</td></tr>`;
+html+=`<tr${podiumCls(r.rank)}><td class="rank">${medal(r.rank)}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.8em">${r.note}</td></tr>`;
 }
 html+='</tbody></table>';
 el.innerHTML=html;
@@ -3626,12 +3651,15 @@ const fb=liveFallback(key,m);
 const v=draftValue(key,fb===null||fb===undefined?'':fb);
 return v===''?'':String(v);
 }
+let liveBumpKey=null;
 function liveAdj(key,d){
 const m=liveMatch();if(!m||m.status==='done')return;
 const cur=parseInt(liveVal(key,m),10)||0;
 state.drafts[key]=String(Math.max(0,Math.min(99,cur+d)));
+liveBumpKey=d>0?key:null;
 clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(save,400);
 renderLive();
+liveBumpKey=null;
 }
 function liveSetBonus(on){
 const m=liveMatch();if(!m)return;
@@ -3645,9 +3673,14 @@ const rp=T.players.find(p=>p.id===val);
 m.referee=rp?rp.name:'';
 save();
 }
-function liveSideHtml(name,key,m,col){
-const v=liveVal(key,m);
-return '<div class="live-side"><div class="live-name">'+name+'</div><div class="live-score">'+(v===''?'0':escH(v))+'</div>'+
+// 'lead' si cette valeur dépasse celle de l'adversaire ; 'bump' si c'est le point qui vient d'être marqué
+function liveCls(key,a,b){
+const x=parseInt(a,10)||0,y=parseInt(b,10)||0;
+return (x>y?' lead':'')+(key===liveBumpKey?' bump':'');
+}
+function liveSideHtml(name,key,m,otherKey){
+const v=liveVal(key,m),c=liveCls(key,v,liveVal(otherKey,m));
+return '<div class="live-side'+(c.indexOf('lead')>=0?' lead':'')+'"><div class="live-name">'+name+'</div><div class="live-score'+c+'">'+(v===''?'0':escH(v))+'</div>'+
 '<button class="live-btn plus" onclick="liveAdj(\''+key+'\',1)">+</button>'+
 '<button class="live-btn" onclick="liveAdj(\''+key+'\',-1)">&minus;</button></div>';
 }
@@ -3686,7 +3719,7 @@ return;
 let html='<div class="live-info">'+(m.round?'Tour '+m.round+' &bull; ':'')+(isBo3?'2 manches gagnantes':(T.settings.matchFamily==='time'?'Match au temps':'Match au score'))+'</div>';
 if(T.settings.matchFamily==='time')html+=liveTimerHtml(m);
 if(!isBo3){
-html+='<div class="live-sides">'+liveSideHtml(n1,'s1-'+m.id,m)+liveSideHtml(n2,'s2-'+m.id,m)+'</div>';
+html+='<div class="live-sides">'+liveSideHtml(n1,'s1-'+m.id,m,'s2-'+m.id)+liveSideHtml(n2,'s2-'+m.id,m,'s1-'+m.id)+'</div>';
 }else{
 const num=(k)=>parseInt(liveVal(k,m),10)||0;
 const has=(k)=>liveVal(k,m)!=='';
@@ -3699,8 +3732,8 @@ if(i===3&&!show3)return;
 const ka='s'+i+'a-'+m.id,kb='s'+i+'b-'+m.id;
 const va=liveVal(ka,m),vb=liveVal(kb,m);
 html+='<div class="live-set-label">Manche '+i+'</div><div class="live-sides">'+
-'<div class="live-side"><div class="live-num">'+(va===''?'0':escH(va))+'</div><button class="live-btn plus" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+ka+'\',1)">+</button><button class="live-btn" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+ka+'\',-1)">&minus;</button></div>'+
-'<div class="live-side"><div class="live-num">'+(vb===''?'0':escH(vb))+'</div><button class="live-btn plus" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+kb+'\',1)">+</button><button class="live-btn" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+kb+'\',-1)">&minus;</button></div></div>';
+'<div class="live-side"><div class="live-num'+liveCls(ka,va,vb)+'">'+(va===''?'0':escH(va))+'</div><button class="live-btn plus" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+ka+'\',1)">+</button><button class="live-btn" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+ka+'\',-1)">&minus;</button></div>'+
+'<div class="live-side"><div class="live-num'+liveCls(kb,vb,va)+'">'+(vb===''?'0':escH(vb))+'</div><button class="live-btn plus" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+kb+'\',1)">+</button><button class="live-btn" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+kb+'\',-1)">&minus;</button></div></div>';
 });
 }
 const cands=getRefereeCandidates(m);
@@ -4166,7 +4199,7 @@ return rows;
 function palmaresTableHtml(c,rows){
 let h='<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th title="Tournois jou&eacute;s">Tn</th><th title="Victoires">V</th><th title="D&eacute;faites">D</th><th title="Pourcentage de victoires">%V</th><th title="Points marqu&eacute;s moins encaiss&eacute;s">Diff</th><th title="Points de classement cumul&eacute;s">Pts</th><th title="Premi&egrave;res places">&#129351;</th><th title="Podiums (places 1 &agrave; 3)">Pod.</th></tr></thead><tbody>';
 rows.forEach((r,i)=>{
-h+='<tr><td class="rank">'+(i+1)+'</td><td class="pname">'+escH(r.name)+'</td><td>'+r.tn+'</td><td>'+r.w+'</td><td>'+(r.l+r.d)+'</td><td>'+r.pct+'%</td><td>'+(r.diff>=0?'+':'')+r.diff+'</td><td><strong>'+r.pts+'</strong></td><td>'+r.first+'</td><td>'+r.podium+'</td></tr>';
+h+='<tr'+podiumCls(i+1)+'><td class="rank">'+medal(i+1)+'</td><td class="pname">'+escH(r.name)+'</td><td>'+r.tn+'</td><td>'+r.w+'</td><td>'+(r.l+r.d)+'</td><td>'+r.pct+'%</td><td>'+(r.diff>=0?'+':'')+r.diff+'</td><td><strong>'+r.pts+'</strong></td><td>'+r.first+'</td><td>'+r.podium+'</td></tr>';
 });
 return h+'</tbody></table>';
 }

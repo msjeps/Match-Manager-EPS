@@ -13,6 +13,12 @@ Journal de contexte et de décisions du projet, pour reprendre le travail sans p
 
 Entrées les plus récentes en premier à partir du 2026-10-10 ; les entrées du 2026-08-02 ci-dessous sont dans l'ordre où elles ont été écrites.
 
+### 2026-10-11 - v2.0 : alignement sur la charte Biathlon VMA
+- **Forme et composants, pas la palette.** La charte fixe boutons en pilule, majuscules, liserés de section, stepper, police ; la palette de Biathlon (rose/turquoise sur crème) est son identité et le logo de Match Manager est bleu/or. On a donc repris la forme et gardé les couleurs, thème nativement sombre compris.
+- **Médailles seulement si un match est joué** (`medal()` teste `w`/`l`/`d`) : avant, le 1er d'une poule vierge n'est qu'un ordre d'inscription et recevrait un 🥇 trompeur.
+- **Une seule `@keyframes`** (rebond du score, 180 ms, `transform`) ; pas de confettis ni d'animation canvas (P22T / PowerVR). `.live-score.bump` est posé par `liveAdj` via `liveBumpKey`, retiré juste après le rendu.
+- **Version `2.0`** : la charte impose `X.Y` sans patch ; changement visible sur tous les écrans donc passage de version majeure.
+
 ### 2026-10-11 - v1.9.1 : re-rendu ciblé du tableau et des classements
 - **Signatures plutôt que mise à jour écrite à la main.** Chaque carte porte `data-sig` (`matchSig` : statut, scores, table, arbitre, bonus, forfait, joueurs, sets). `refreshDisplayedCards()` ne remplace que les cartes dont la signature a changé : cela couvre sans cas particulier le rebouclage des tables après une validation en tableau (plusieurs cartes changent). Les saisies en cours ne comptent pas dans la signature : elles vivent dans les brouillons.
 - **Tableau : rendu complet seulement si la forme change** (`bracketShapeSig` : nombre de tours, matchs, consolantes, petite finale, onglet). `checkBracketAdvance()` est appelé avant la comparaison : c'est lui qui génère le tour suivant.

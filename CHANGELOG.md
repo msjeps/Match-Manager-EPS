@@ -6,6 +6,27 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.0 - 2026-10-11 (APK versionCode 12, cache v29)
+
+Refonte visuelle : alignement sur la charte [DESIGN-SYSTEM-EPS.md](../DESIGN-SYSTEM-EPS.md) (style Biathlon VMA) et plus de plaisir d'usage. Palette bleu/or et logique de l'app inchangées. Le numéro passe au format `X.Y` de la charte.
+
+### Style (charte flotte)
+- **Boutons en pilule** (rayon 25 px, majuscules, ombre douce, retour de pression au toucher), police `Segoe UI / Tahoma / Geneva / Verdana`, chronos en `Courier New`, rayon des cartes 16 px.
+- **Encadrés** : liseré gauche de 5 px et puce colorée avant les titres de section (tableau : puce bleue).
+- **Stepper +/-** : boutons séparés de 44 px, rempli en or au toucher.
+
+### Plaisir d'usage
+- **Médailles 🥇🥈🥉** et ligne teintée pour le top 3 de chaque classement (poule, général, tableau, palmarès), seulement une fois un match joué.
+- **Mode tablette élève** : le score en tête passe en vert (cadre vert), léger rebond à chaque point marqué.
+- **Pictos par rôle** : 🏁 poules, 🔀 poules + tableau, 🎯 tableau, 📊 classements ; 🏆 reste pour le tournoi.
+
+### Lisibilité et accessibilité
+- **En-tête des tableaux de classement** : texte sombre sur or (le blanc faisait 1,7:1 de contraste).
+- Texte secondaire éclairci (4,1:1 → 4,8:1), libellé « Choix du niveau » agrandi, ombre légère sous le nom des poules.
+- **Zones tactiles à 44 px** : boutons de niveau, `.btn-sm`, « Valider », retour, onglets, badge de table, case bonus arbitre, interrupteurs, flèches de poule.
+
+---
+
 ## 1.9.1 - 2026-10-11 (APK versionCode 11, cache v27)
 
 ### Changements internes (sans nouvelle fonction)

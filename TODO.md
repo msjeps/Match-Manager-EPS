@@ -2,11 +2,12 @@
 
 ## À faire
 
-### Avant de diffuser les v1.5 à v1.9.1 (validation sur la tablette Lenovo, Android 10)
+### Avant de diffuser les v1.5 à v2.0 (validation sur la tablette Lenovo, Android 10)
 - [ ] v1.6 : file d'attente lisible et « Lancer ce match » utilisable au doigt ; Imprimer / PDF ouvre le gestionnaire d'impression et produit un PDF correct (classements, arbre en paysage).
 - [ ] v1.7 : l'export XLSX d'un tournoi en 2 manches gagnantes s'ouvre dans Excel avec les colonnes Set 1 à Set 3 et Total pts.
 - [ ] v1.8 : boîtes de dialogue (suppression, modification d'un résultat, n° de table, mot de passe) lisibles et utilisables au doigt ; bouton Retour les ferme.
 - [ ] v1.9 : palmarès par classe avec de vrais tournois (homonymes, classes écrites différemment, tournoi en cours).
+- [ ] v2.0 : rendu sur la tablette la plus lente (boutons en pilule, ombres, liseré des cartes, rebond du score) et zones tactiles à 44 px (boutons de niveau sur 5 pouces : la ligne d'ajout passe à la ligne).
 - [ ] v1.9.1 : fluidité en tableau de 16 joueurs (validation d'un résultat, passage de tour), défilement conservé.
 - [ ] Écran qui ne s'éteint plus pendant une saisie ; barres système masquées (mode immersif) et qui reviennent au balayage.
 - [ ] Bouton Retour : ferme la fenêtre ouverte, puis accueil, puis quitte au deuxième appui.
@@ -19,7 +20,7 @@
 
 ### Publication
 - [ ] Uploader `MatchManagerEPS.apk` sur WordPress. Le bouton « Version APK » de `outils-eps.fr/application/match-manager-eps/` pointe toujours vers `https://outils-eps.fr/wp-content/uploads/apk/ten-eps.apk` (ancienne build) ; renommer le fichier côté WordPress en `match-manager.apk` à ce moment.
-- [ ] Mettre à jour le **guide professeur** PDF (`Guide_Professeur_MatchManagerEPS.pdf`) : absents / forfaits, annuler, mode tablette élève, sauvegarde et transfert, départage, file d'attente, impression / PDF, palmarès par classe, détail des sets dans l'export XLSX. Sans tiret cadratin. Le mot de passe par défaut n'y change pas.
+- [ ] Uploader le **guide professeur** mis à jour (`match-manager-eps.pdf`, v1.9.1, régénéré le 2026-10-11) sur WordPress, à la place de `https://outils-eps.fr/wp-content/uploads/guides/match-manager-eps.pdf`. Le mot de passe par défaut n'y change pas.
 
 ### Décisions en attente
 - [ ] **Sauvegarder la clé de release dans 1Password** (`~/Documents/MatchManagerEPS-cle-de-signature/` : `.jks` + `LISEZ-MOI.txt` avec le mot de passe), puis supprimer le `LISEZ-MOI.txt` du disque. Avant d'installer la nouvelle APK : exporter les sauvegardes JSON des tablettes et **désinstaller l'ancienne** (signée debug).
@@ -37,6 +38,7 @@
 
 - [x] Source HTML unique (2026-10-11, aucun changement de l'app) : `index.html` seul, `MatchManagerEPS.html` supprimé, assets de l'APK générés par la tâche Gradle `syncWebApp` (plus versionnés, `android/.gitignore`), test d'identité des copies remplacé par un contrôle de la tâche. 22 tests ; `assembleDebug` vérifié.
 
+- [x] v2.0 (2026-10-11, versionCode 12, `CACHE_NAME` v29) : refonte visuelle alignée sur la charte Biathlon VMA + médailles, mode élève, pictos, contrastes, zones tactiles (voir CHANGELOG). Vérifié dans le navigateur ; `npm test` 22/22. APK non reconstruite.
 - [x] v1.9.1 (2026-10-11, versionCode 11, `CACHE_NAME` v27) : re-rendu ciblé du tableau (cartes à signature, rendu complet seulement si un tour est généré) et des classements (pas de recalcul ni de QR si rien n'a changé). 22 tests. Vérifié dans le navigateur ; à valider sur la tablette (fluidité en tableau de 16).
 
 - [x] Tests Node de la logique (2026-10-11, aucun changement de l'app) : `npm test` (ou `node --test tests/*.test.js`), 19 tests au départ (22 depuis la 1.9.1), sans dépendance : round-robin, statistiques et classement de poule (départage direct, forfait), tableau (byes, progression, vainqueur), export XLSX (CRC du ZIP, 2 onglets, détail des sets), sauvegarde / import assaini, `load()` données illisibles, annuler, mot de passe, palmarès, cohérence des versions et des copies. Non couvert : rendu et interactions (écrans, boîtes, chronomètre), APK. Voir `tests/README.md`.
