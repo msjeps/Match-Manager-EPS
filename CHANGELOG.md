@@ -13,6 +13,9 @@ Troisième lot de l'audit d'interface (l'alignement sur la charte avait été fa
 ### Ajout
 - **Sons optionnels** (Paramètres, carte « 🔊 Sons », désactivé par défaut, réglage local `mmeps_sound`) : un « ding » à deux notes à chaque résultat validé, une courte mélodie à la place à la fin du tournoi. La sonnerie du chronomètre reste indépendante et toujours active.
 
+### Livraison
+- APK 2.2 (`versionCode 14`) reconstruite et signée avec la clé de release (même clé que la 1.9.1). Dépôt poussé sur GitHub, version en ligne sur `apps.outils-eps.fr/Match-Manager-EPS/`.
+
 ---
 
 ## 2.1 - 2026-10-11 (APK versionCode 13, cache v30)

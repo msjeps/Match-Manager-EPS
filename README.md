@@ -12,7 +12,10 @@ Application PWA de gestion de tournois pour les cours d'EPS (collège & lycée) 
 - Classements automatiques avec départage par confrontation directe
 - Absents, forfaits et joueurs ajoutés en cours de tournoi
 - File d'attente : tables libres, prochain match libre, table et arbitre suggérés, « Lancer ce match »
-- Mode tablette élève (un match, gros boutons) et bouton Annuler à plusieurs niveaux
+- Mode tablette élève (un match, gros boutons, score en tête en vert) et bouton Annuler à plusieurs niveaux
+- Fin de tournoi : fenêtre et carte Podium, médailles 🥇🥈🥉 dans les classements, progression et « Reprendre » sur l'accueil
+- Sons optionnels (désactivés par défaut) à la validation d'un match et en fin de tournoi
+- Interface alignée sur la charte des apps EPS (boutons en pilule, liserés, stepper), thème sombre ou clair, zones tactiles de 44 px
 - Impression / PDF A4 noir et blanc : classements, arbre du tableau, matchs et scores
 - Palmarès par classe : cumul des tournois d'une classe (victoires, % victoires, points, podiums)
 - Export XLSX (détail des sets et totaux en 2 manches gagnantes), QR code des résultats (lisible par [SCAN EPS](https://msjeps.github.io/scaneps/)), sauvegarde et transfert de tournoi en JSON
@@ -20,7 +23,7 @@ Application PWA de gestion de tournois pour les cours d'EPS (collège & lycée) 
 
 Tests : `npm test` (Node 20 ou plus, aucune dépendance), voir [tests/README.md](tests/README.md).
 
-Version actuelle : **2.2**. Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md).
+Version actuelle : **2.2** (APK `versionCode 14`). Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md).
 
 ## Documentation du projet
 

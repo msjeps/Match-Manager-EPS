@@ -30,7 +30,7 @@ Node 20 ou plus, aucune dépendance. Les tests tournent sans navigateur, sans r�
 
 ## Ce qui n'est pas couvert
 
-Rendu et interactions (écrans, boîtes de dialogue, chronomètre, mode tablette élève), impression, APK (Java). Ces points restent à vérifier dans le navigateur et sur la tablette.
+Rendu et interactions (écrans, boîtes de dialogue, chronomètre, mode tablette élève, podium et fenêtre de fin de tournoi, médailles, avatars, sons, fondu entre écrans), impression, APK (Java). Ces points restent à vérifier dans le navigateur et sur la tablette.
 
 ## Écrire un test
 

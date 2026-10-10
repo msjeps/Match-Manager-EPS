@@ -53,6 +53,8 @@ unzip -p app/build/outputs/apk/debug/app-debug.apk assets/index.html | grep -c "
 
 Depuis le 2026-10-11, l'APK diffusée est signée avec une **clé de release** (`~/Documents/MatchManagerEPS-cle-de-signature/matchmanager-release.jks`, alias `matchmanager`, copie dans 1Password). `android/keystore.properties` (non versionné) en donne le chemin et les mots de passe ; `build.gradle` signe le build `release` avec. Les APK signées avec l'ancienne clé debug doivent être **désinstallées** avant d'installer celle-ci. Ne jamais versionner la clé.
 
+Empreinte SHA-256 du certificat (à comparer avec `apksigner verify --print-certs`) : `0c5ec62a9549faa23aaa2c186191d1cc744da7394ec3566abf87822e7f799309`. Dernière APK diffusée : **2.2** (`versionCode 14`), reconstruite le 2026-10-11.
+
 Build de diffusion :
 ```bash
 ./gradlew assembleRelease --offline -x lintVitalAnalyzeRelease -x lintVitalReportRelease -x lintVitalRelease

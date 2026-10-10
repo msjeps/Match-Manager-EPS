@@ -5,13 +5,18 @@ Journal de contexte et de décisions du projet, pour reprendre le travail sans p
 ## Conventions du projet
 
 - **Source unique** (depuis le 2026-10-11) : `index.html` est le seul fichier HTML, on l'édite directement (suivi par git, servi par GitHub Pages, lu par les tests). `MatchManagerEPS.html` n'existe plus ; `android/app/src/main/assets/index.html` est généré par la tâche Gradle `syncWebApp` (non versionné). Pourquoi : trois copies à resynchroniser à la main, avec un test d'identité qui ne servait qu'à rattraper l'oubli.
-- **Dépôt distant** : github.com/msjeps/Match-Manager-EPS (renommé depuis msjeps/TEN-EPS le 2026-08-02, GitHub redirige l'ancienne URL), déployé sur https://apps.outils-eps.fr/TEN-EPS/ via GitHub Pages (branche `main`, racine `/`) - **URL technique pas encore reconfigurée**, voir `TODO.md`.
+- **Dépôt distant** : github.com/msjeps/Match-Manager-EPS (renommé depuis msjeps/TEN-EPS le 2026-08-02, GitHub redirige l'ancienne URL), déployé sur https://apps.outils-eps.fr/Match-Manager-EPS/ via GitHub Pages (branche `main`, racine `/`) ; l'ancienne adresse `.../TEN-EPS/` renvoie 404 (vérifié le 2026-10-11, la page en ligne était déjà en v2.2).
 - **Fichiers suivis par git** (depuis le 2026-10-10) : `index.html`, `sw.js`, `manifest.json`, icônes et logo, `README.md`, `CHANGELOG.md`, `FONCTIONNALITES.md`, `MEMORY.md`, `TODO.md`, `package.json` et `tests/` (tests Node, `npm test`), le PDF du guide professeur et `android/` (sources du wrapper, avec son propre `.gitignore`). Restent hors dépôt (`.gitignore`) : `CLAUDE.md`, `MatchManagerEPS.html` (fichier de dev), `MatchManagerEPS.apk`, `design_preview.html`, `.claude/`, `.DS_Store`.
 - **App compagnon** : [SCAN EPS](file:///Users/nathalieprenois/AndroidStudioProjects/SCAN%20EPS) scanne le QR code des résultats généré par Match Manager EPS (préfixe technique inchangé `TENEPS|`, comparaison de chaîne exacte côté SCAN EPS). Compatibilité vérifiée pour les modes 1/2/3 le 2026-08-02.
 
 ## Décisions & historique
 
 Entrées les plus récentes en premier à partir du 2026-10-10 ; les entrées du 2026-08-02 ci-dessous sont dans l'ordre où elles ont été écrites.
+
+### 2026-10-11 - APK 2.2 signée et publication
+- **APK 2.2 reconstruite avec la clé de release existante** (`matchmanager-release.jks`, même clé que la 1.9.1 : mise à jour par-dessus sans désinstaller). Contrôlée : `versionCode 14`, `index.html` embarqué identique à celui du dépôt, empreinte du certificat consignée dans `android/README.md`.
+- **Dépôt poussé** (`1ecc4df..83314f4`) ; GitHub Pages servait déjà la 2.2 quelques minutes plus tard.
+- **Reste hors de portée d'un agent** : mise en ligne de l'APK et du guide professeur sur WordPress (voir `TODO.md`), validation sur la tablette lente.
 
 ### 2026-10-11 - v2.2 : sons optionnels
 - **Désactivés par défaut** : le gymnase est bruyant et 15 tablettes qui « dingent » en même temps gênent le cours ; c'est à l'enseignante de l'activer, tablette par tablette (réglage local `mmeps_sound`, non protégé par mot de passe, comme le mode clair).

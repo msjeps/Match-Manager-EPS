@@ -44,7 +44,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Saisie des scores avec **brouillons conservés** (un choix d'arbitre ou un changement de carte n'efface rien).
 - Arbitres : liste filtrée (ni les joueurs du match, ni ceux en cours de jeu, ni les arbitres déjà affectés, ni les joueurs retirés), bonus arbitre réglable.
 - **File d'attente** : carte au-dessus des matchs (poules, finales, tableau) avec tables libres / occupées, prochain match libre (joueurs ni en jeu ni arbitres, priorité à ceux qui ont le moins joué), table et arbitre suggérés, « Lancer ce match ».
-- **Mode tablette élève** (📱) : un match en grand, boutons + et -, confirmation, match suivant.
+- **Mode tablette élève** (📱) : un match en grand, boutons + et -, confirmation, match suivant. Le score en tête passe en vert, léger rebond à chaque point.
 - **Annuler** (↩) : retour à l'état exact d'avant la dernière action, 8 niveaux par tournoi.
 - **Mise à jour ciblée** : un changement sur un match ne remplace que les cartes dont l'affichage change (le défilement est conservé) ; le tableau n'est reconstruit en entier que lorsqu'un tour ou une consolante est généré.
 - **Modifier** un résultat : si des finales ou des tours suivants en dépendent, ils sont supprimés après confirmation puis recalculés.
@@ -55,6 +55,8 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Tri : points, puis **confrontation directe** (réglable, nouveaux tournois), puis différence de points, puis points marqués. Les forfaits sont classés en dernier.
 - Mode 2 : classement par groupe de finale (rang déterminé par les victoires en finale), puis bloc **« Hors finales »** pour les non-qualifiés.
 - Mode 3 : vainqueur, finaliste, 3ᵉ et 4ᵉ (petite finale), consolantes, autres joueurs.
+- **Médailles** 🥇🥈🥉 et ligne teintée pour le top 3 de chaque classement, seulement une fois un match joué.
+- **Podium** : tournoi terminé (poules de niveau : tous les matchs joués ; poules + finales : finales jouées ; tableau : finale et consolantes jouées).
 - L'écran Classements ne recalcule ni le classement ni le QR code tant que rien n'a changé.
 - **Palmarès par classe** (accueil) : voir § 7.
 
@@ -73,7 +75,8 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Fin de tournoi : fenêtre « Tournoi terminé ! » avec podium (une fois par podium), carte Podium en haut des Classements, médailles 🥇🥈🥉 dans les classements.
 - Sons (Paramètres, désactivé par défaut) : ding à la validation d'un match, mélodie en fin de tournoi.
 - Avatars : pastille à l'initiale, couleur de la poule du joueur, dans les cartes de match. Fondu de 150 ms entre écrans.
-- **Paramètres** (libre) : mode clair / sombre, accès à la configuration avancée, aide.
+- **Paramètres** (libre) : mode clair / sombre, sons, accès à la configuration avancée, aide.
+- **Style** : charte des apps EPS (voir [DESIGN-SYSTEM-EPS.md](../DESIGN-SYSTEM-EPS.md)) : boutons en pilule en majuscules, liseré de 5 px et puce colorée sur les encadrés, stepper +/- de 44 px, police système. Palette bleu marine et or conservée, thème nativement sombre.
 - **Configuration avancée** (mot de passe professeur) : format par défaut, points, départage, bonus arbitre, mot de passe personnalisé, suppression de toutes les données.
 - Aide intégrée à jour des fonctions ci-dessus.
 

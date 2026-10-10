@@ -7,10 +7,10 @@
 - [ ] v1.7 : l'export XLSX d'un tournoi en 2 manches gagnantes s'ouvre dans Excel avec les colonnes Set 1 à Set 3 et Total pts.
 - [ ] v1.8 : boîtes de dialogue (suppression, modification d'un résultat, n° de table, mot de passe) lisibles et utilisables au doigt ; bouton Retour les ferme.
 - [ ] v1.9 : palmarès par classe avec de vrais tournois (homonymes, classes écrites différemment, tournoi en cours).
-- [ ] v2.2 : sons optionnels sur la tablette (volume audible en gymnase, premier son après activation dans le WebView de l'APK).
-- [ ] v2.1 : fondu entre écrans et fenêtre de podium sur la tablette la plus lente ; cartes d'accueil avec beaucoup de tournois (le calcul « terminé » rejoue le classement de chacun).
-- [ ] v2.0 : rendu sur la tablette la plus lente (boutons en pilule, ombres, liseré des cartes, rebond du score) et zones tactiles à 44 px (boutons de niveau sur 5 pouces : la ligne d'ajout passe à la ligne).
 - [ ] v1.9.1 : fluidité en tableau de 16 joueurs (validation d'un résultat, passage de tour), défilement conservé.
+- [ ] v2.0 : rendu sur la tablette la plus lente (boutons en pilule, ombres, liseré des cartes, rebond du score) et zones tactiles à 44 px (boutons de niveau sur 5 pouces : la ligne d'ajout passe à la ligne).
+- [ ] v2.1 : fondu entre écrans et fenêtre de podium sur la tablette la plus lente ; cartes d'accueil avec beaucoup de tournois (le calcul « terminé » rejoue le classement de chacun).
+- [ ] v2.2 : sons optionnels sur la tablette (volume audible en gymnase, premier son après activation dans le WebView de l'APK).
 - [ ] Écran qui ne s'éteint plus pendant une saisie ; barres système masquées (mode immersif) et qui reviennent au balayage.
 - [ ] Bouton Retour : ferme la fenêtre ouverte, puis accueil, puis quitte au deuxième appui.
 - [ ] Import d'un fichier via le sélecteur Android : CSV de joueurs et sauvegarde JSON.
@@ -21,8 +21,8 @@
 - [ ] Mise à jour de l'APK par-dessus l'ancienne sans perdre les tournois existants.
 
 ### Publication
-- [ ] Uploader `MatchManagerEPS.apk` sur WordPress. Le bouton « Version APK » de `outils-eps.fr/application/match-manager-eps/` pointe toujours vers `https://outils-eps.fr/wp-content/uploads/apk/ten-eps.apk` (ancienne build) ; renommer le fichier côté WordPress en `match-manager.apk` à ce moment.
-- [ ] Uploader le **guide professeur** mis à jour (`match-manager-eps.pdf`, v1.9.1, régénéré le 2026-10-11) sur WordPress, à la place de `https://outils-eps.fr/wp-content/uploads/guides/match-manager-eps.pdf`. Le mot de passe par défaut n'y change pas.
+- [ ] Uploader `MatchManagerEPS.apk` (**2.2**, `versionCode 14`, signée release, reconstruite le 2026-10-11) sur WordPress. Le bouton « Version APK » de `outils-eps.fr/application/match-manager-eps/` pointe toujours vers `https://outils-eps.fr/wp-content/uploads/apk/ten-eps.apk` (ancienne build) ; renommer le fichier côté WordPress en `match-manager.apk` à ce moment.
+- [ ] **Régénérer le guide professeur** (`match-manager-eps.pdf` date de la v1.9.1 : il ne décrit ni le nouveau style, ni le podium, ni les sons, ni l'accueil enrichi) puis l'uploader sur WordPress, à la place de `https://outils-eps.fr/wp-content/uploads/guides/match-manager-eps.pdf`. Le mot de passe par défaut n'y change pas.
 
 ### Décisions en attente
 - [ ] **Sauvegarder la clé de release dans 1Password** (`~/Documents/MatchManagerEPS-cle-de-signature/` : `.jks` + `LISEZ-MOI.txt` avec le mot de passe), puis supprimer le `LISEZ-MOI.txt` du disque. Avant d'installer la nouvelle APK : exporter les sauvegardes JSON des tablettes et **désinstaller l'ancienne** (signée debug).
@@ -35,6 +35,8 @@
 - [ ] Documentation : CHANGELOG, FONCTIONNALITES, MEMORY, TODO, aide intégrée. Aucun tiret cadratin.
 
 ## Fait récemment
+
+- [x] APK 2.2 reconstruite et signée en release (2026-10-11, `versionCode 14`, certificat vérifié avec `apksigner`) ; dépôt poussé sur GitHub (`83314f4`) ; la page en ligne `apps.outils-eps.fr/Match-Manager-EPS/` sert la 2.2.
 
 - [x] Clé de release créée et APK signée en release (2026-10-11, v1.9.1, aucun changement de l'app) : `signingConfigs.release` lue depuis `android/keystore.properties` (non versionné), APK `MatchManagerEPS.apk` reconstruite. Voir `android/README.md`.
 
