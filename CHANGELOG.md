@@ -6,6 +6,15 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.2 - 2026-10-11 (APK versionCode 14, cache v31)
+
+Troisième lot de l'audit d'interface (l'alignement sur la charte avait été fait en 2.0).
+
+### Ajout
+- **Sons optionnels** (Paramètres, carte « 🔊 Sons », désactivé par défaut, réglage local `mmeps_sound`) : un « ding » à deux notes à chaque résultat validé, une courte mélodie à la place à la fin du tournoi. La sonnerie du chronomètre reste indépendante et toujours active.
+
+---
+
 ## 2.1 - 2026-10-11 (APK versionCode 13, cache v30)
 
 Deuxième lot de l'audit d'interface : les moments de plaisir.

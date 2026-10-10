@@ -13,6 +13,11 @@ Journal de contexte et de décisions du projet, pour reprendre le travail sans p
 
 Entrées les plus récentes en premier à partir du 2026-10-10 ; les entrées du 2026-08-02 ci-dessous sont dans l'ordre où elles ont été écrites.
 
+### 2026-10-11 - v2.2 : sons optionnels
+- **Désactivés par défaut** : le gymnase est bruyant et 15 tablettes qui « dingent » en même temps gênent le cours ; c'est à l'enseignante de l'activer, tablette par tablette (réglage local `mmeps_sound`, non protégé par mot de passe, comme le mode clair).
+- **Synthèse par `AudioContext`**, pas de fichier audio (100 % offline, rien à embarquer). Réutilise `matchAudioCtx` du chronomètre ; le premier son suit un geste de l'utilisatrice (activation du réglage ou validation), ce que les WebView exigent.
+- **Un seul son par validation** : à la fin du tournoi la mélodie remplace le ding (`maybeCelebrate()` renvoie `true`).
+
 ### 2026-10-11 - v2.1 : podium, accueil, avatars
 - **Podium = `tournamentOrder()`**, déjà utilisé par le palmarès : `finished` et `ids` y sont définis par mode, donc le podium affiché et celui du palmarès ne peuvent pas diverger.
 - **Célébration une seule fois par podium** (`T.celebratedSig` = 3 premiers ids) et non par drapeau booléen : un « Annuler » qui rouvre le tournoi puis une nouvelle fin avec le même podium ne ré-affiche pas la fenêtre, avec un autre podium si. Appelée en fin de `validateMatch`, donc aussi depuis le mode tablette élève.

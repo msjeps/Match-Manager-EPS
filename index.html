@@ -519,6 +519,13 @@ body.light-mode .badge-out{color:#C62828}
 <span>&#9728;&#65039; Mode clair</span></div>
 </div>
 <div class="card">
+<h3>&#128266; Sons</h3>
+<div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+<div class="toggle" id="set-sound" onclick="toggleSound()"></div>
+<span>&#128276; Son &agrave; la validation d'un match</span></div>
+<p style="font-size:.85em;color:var(--txt2);margin-top:8px">D&eacute;sactiv&eacute; par d&eacute;faut. Un petit &laquo; ding &raquo; &agrave; chaque r&eacute;sultat valid&eacute;, une m&eacute;lodie plus longue &agrave; la fin du tournoi. La sonnerie du chronom&egrave;tre reste toujours active.</p>
+</div>
+<div class="card">
 <h3>&#128274; Acc&egrave;s professeur</h3>
 <p style="font-size:.85em;color:var(--txt2);margin:8px 0">Configuration du format de match, du syst&egrave;me de points, du bonus arbitre et des donn&eacute;es.</p>
 <button class="btn-secondary" onclick="openAdminAccess()" style="width:100%">&#128273; Configuration avanc&eacute;e</button>
@@ -620,8 +627,9 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.1';
+const APP_VERSION='2.2';
 const LIGHT_MODE_KEY='mmeps_light_mode';
+const SOUND_KEY='mmeps_sound';
 const LS_BACKUP_KEY='teneps_data_illisible';
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
@@ -757,6 +765,7 @@ if(id==='scr-admin')renderAdmin();
 }
 
 function renderSettings(){
+const sg=document.getElementById('set-sound');if(sg)sg.classList.toggle('on',soundOn());
 document.getElementById('set-version').textContent='Match Manager EPS - Version '+APP_VERSION;
 }
 
@@ -785,15 +794,17 @@ return '<div class="card done"><h3 style="margin-bottom:4px;color:var(--pri-lt)"
 // Fin de tournoi : modale de félicitations, une fois par podium (T.celebratedSig)
 function maybeCelebrate(){
 let ord;
-try{ord=tournamentOrder();}catch(e){return;}
-if(!ord.finished||!ord.ids.length)return;
+try{ord=tournamentOrder();}catch(e){return false;}
+if(!ord.finished||!ord.ids.length)return false;
 const sig=ord.ids.slice(0,3).join('|');
-if(T.celebratedSig===sig)return;
+if(T.celebratedSig===sig)return false;
 T.celebratedSig=sig;save();
 if(navigator.vibrate)navigator.vibrate([100,60,100,60,200]);
+playDing(true);
 showModal('&#127881; Tournoi termin&eacute; !','<p style="text-align:center;color:var(--txt2)">'+escH(T.name)+'</p>'+podiumHtml(ord)+
 '<div class="modal-actions" style="justify-content:center"><button class="btn-secondary" onclick="closeModal()">Fermer</button>'+
 '<button class="btn-primary" style="width:auto" onclick="closeModal();showScreen(\'scr-rankings\')">Voir les classements</button></div>');
+return true;
 }
 function openResults(id){
 T=state.tournaments.find(t=>t.id===id);
@@ -1543,7 +1554,7 @@ if(navigator.vibrate)navigator.vibrate(50);
 // Lib\u00e9rer la table et r\u00e9attribuer en mode bracket
 if(m.phase==='bracket'){const freedTable=m.table;m.table=null;assignBracketTables();save();}
 refreshAfterChange(m);
-maybeCelebrate();
+if(!maybeCelebrate())playDing();
 }
 
 // Matchs bracket qui découlent des résultats du tour r : tours suivants, petite finale et
@@ -1629,6 +1640,31 @@ if(!matchAudioCtx){
 try{matchAudioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
 }
 if(matchAudioCtx&&matchAudioCtx.state==='suspended')matchAudioCtx.resume().catch(()=>{});
+}
+// Sons optionnels (réglage local, désactivé par défaut) : ding à la validation, mélodie en fin de tournoi
+function soundOn(){try{return localStorage.getItem(SOUND_KEY)==='1';}catch(e){return false;}}
+function toggleSound(){
+const on=!soundOn();
+try{localStorage.setItem(SOUND_KEY,on?'1':'0');}catch(e){}
+const sg=document.getElementById('set-sound');if(sg)sg.classList.toggle('on',on);
+if(on)playDing();
+}
+function playDing(fin){
+if(!soundOn())return;
+ensureMatchAudioCtx();
+if(!matchAudioCtx)return;
+const notes=fin?[523,659,784,1047]:[660,880];
+const step=fin?.16:.11;
+try{
+notes.forEach((f,i)=>{
+const t=matchAudioCtx.currentTime+i*step;
+const osc=matchAudioCtx.createOscillator(),g=matchAudioCtx.createGain();
+osc.type='sine';osc.frequency.value=f;
+g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+(fin&&i===notes.length-1?.5:.22));
+osc.connect(g);g.connect(matchAudioCtx.destination);
+osc.start(t);osc.stop(t+.55);
+});
+}catch(e){}
 }
 function buzzMatchTimer(){
 if(navigator.vibrate)navigator.vibrate([300,100,300,100,300]);
@@ -3092,6 +3128,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Palmar&egrave;s par classe</h3>
 <p>Sur l'&eacute;cran d'accueil, <b>&#127941; Palmar&egrave;s par classe</b> additionne les r&eacute;sultats de tous les tournois d'une m&ecirc;me classe (joueurs rapproch&eacute;s par nom) : tournois jou&eacute;s, victoires, d&eacute;faites, % de victoires, diff&eacute;rence de points, points de classement, premi&egrave;res places et podiums. Triez par points, % de victoires ou podiums, d&eacute;cochez un tournoi (copie, essai) pour l'exclure, puis imprimez ou enregistrez en PDF.</p>
 <p><b>&#127942; Fin de tournoi</b> : quand le dernier match est valid&eacute;, une fen&ecirc;tre affiche le <b>podium</b> (une seule fois par podium). Il reste visible en haut de l'&eacute;cran Classements et, sur l'accueil, le tournoi passe en vert avec le bouton &laquo; Voir le podium &raquo;. Les m&eacute;dailles &#129351;&#129352;&#129353; apparaissent dans les classements d&egrave;s qu'un match est jou&eacute;.</p>
+<p><b>&#128266; Sons</b> : dans les Param&egrave;tres, un petit son peut accompagner chaque r&eacute;sultat valid&eacute; (d&eacute;sactiv&eacute; par d&eacute;faut, r&eacute;glage propre &agrave; chaque tablette).</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Annuler</h3>
 <p>Le bouton <b>&#8617; Annuler</b> remet le tournoi exactement dans l'&eacute;tat d'avant la derni&egrave;re action (r&eacute;sultat valid&eacute;, modification, joueur retir&eacute;...), tours et finales g&eacute;n&eacute;r&eacute;s ensuite compris. On peut annuler plusieurs actions de suite.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Mode tablette &eacute;l&egrave;ve</h3>
