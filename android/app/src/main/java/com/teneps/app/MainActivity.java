@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Intent;
+import android.net.Uri;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,7 +30,12 @@ public class MainActivity extends Activity {
 
     private static final int REQ_STORAGE = 42;
 
+    private static final int REQ_FILE = 43;
+
     private WebView webView;
+
+    // Sélecteur de fichier (import de joueurs CSV, import d'une sauvegarde de tournoi)
+    private ValueCallback<Uri[]> filePathCallback;
 
     // Fichier en attente quand la permission stockage (Android 6-9) doit être demandée
     private byte[] pendingData;
@@ -90,7 +97,24 @@ public class MainActivity extends Activity {
         // Interface JS -> Java pour les téléchargements (XLSX des classements)
         webView.addJavascriptInterface(new DownloadInterface(), "AndroidDownload");
 
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback,
+                                             FileChooserParams params) {
+                if (filePathCallback != null) filePathCallback.onReceiveValue(null);
+                filePathCallback = callback;
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                try {
+                    startActivityForResult(Intent.createChooser(intent, "Choisir un fichier"), REQ_FILE);
+                } catch (Exception e) {
+                    filePathCallback = null;
+                    return false;
+                }
+                return true;
+            }
+        });
 
         // Charger l'application depuis les assets
         webView.loadUrl("file:///android_asset/index.html");
@@ -197,6 +221,20 @@ public class MainActivity extends Activity {
             Toast.makeText(this, "✅ " + fileName + " sauvegardé dans Téléchargements", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             Toast.makeText(this, "❌ Erreur : " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQ_FILE) return;
+        Uri[] result = null;
+        if (resultCode == RESULT_OK && data != null) {
+            result = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+        }
+        if (filePathCallback != null) {
+            filePathCallback.onReceiveValue(result);
+            filePathCallback = null;
         }
     }
 

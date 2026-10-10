@@ -184,6 +184,29 @@ body.light-mode .set-col input.loser{color:#C62828}
 body.light-mode .bv-bye{background:rgba(0,0,0,.03)}
 .bv-champ{padding:6px 8px;border:2px solid var(--ok);border-radius:8px;background:rgba(76,175,80,.1);text-align:center;font-weight:700;font-size:.85em;color:#66BB6A}
 body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
+.tools-bar{display:flex;flex-wrap:wrap;margin:0 -4px 8px}
+.tools-bar button{margin:4px}
+.badge-out{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;font-size:.7em;font-weight:700;background:rgba(244,67,54,.2);color:#EF5350}
+body.light-mode .badge-out{color:#C62828}
+.forfeit-note{font-size:.8em;color:var(--err-txt);font-weight:600;margin:2px 0 6px}
+.live-content{max-width:900px}
+.live-info{text-align:center;color:var(--txt2);font-size:.95em;margin-bottom:10px}
+.live-sides{display:flex;margin:0 -6px}
+.live-side{flex:1;margin:0 6px;background:var(--surf);border:2px solid var(--brd);border-radius:var(--rad);padding:12px 8px;text-align:center}
+.live-name{font-size:1.4em;font-weight:800;margin-bottom:6px;word-wrap:break-word}
+.live-score{font-size:5.5em;font-weight:900;line-height:1.1;color:var(--pri-lt)}
+.live-set-label{font-size:.9em;font-weight:700;color:var(--txt2);margin:10px 0 2px;text-transform:uppercase}
+.live-num{font-size:3em;font-weight:900;line-height:1.1;color:var(--pri-lt)}
+.live-btn{display:block;width:100%;height:76px;margin-top:8px;border-radius:var(--rad);border:3px solid var(--brd);background:var(--surf2);color:var(--txt);font-size:2.8em;font-weight:800;cursor:pointer}
+.live-btn.plus{background:var(--ok);border-color:var(--ok);color:#fff}
+.live-btn:active{opacity:.7}
+.live-timer{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;background:var(--surf2);border-radius:var(--rad);padding:10px;margin:12px 0}
+.live-timer>*{margin:4px 8px}
+.live-time{font-family:monospace;font-size:2.6em;font-weight:900;color:var(--pri-lt)}
+.live-actions{margin-top:14px}
+.live-actions .btn-primary{height:64px;font-size:1.3em}
+.live-ok{text-align:center;padding:30px 10px}
+.live-ok .big{font-size:2em;font-weight:800;margin:14px 0}
 @media(max-width:600px){.content{padding:12px}.match-row .pname{font-size:.85em}.set-col{width:46px}.set-col input[type=number]{width:42px;font-size:.9em}}
 </style>
 </head>
@@ -199,6 +222,7 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 <h2 style="margin-bottom:16px">Mes Tournois</h2>
 <div id="tournament-list"></div>
 <button class="btn-primary" onclick="showScreen('scr-create')" style="margin-top:16px">+ Nouveau tournoi</button>
+<button class="btn-secondary" onclick="showBackupModal()" style="margin-top:10px;width:100%">&#128190; Sauvegarde / transfert de tournoi</button>
 <div class="pied-page">
 <img src="logo-outils-eps.png" alt="Logo outils-eps.fr" class="pied-page-logo">
 <p>https://outils-eps.fr par Nathalie Prenois</p>
@@ -346,6 +370,7 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 <button class="btn-icon" onclick="showScreen('scr-export')">&#128228;</button>
 </div>
 <div class="content">
+<div id="tools-matches"></div>
 <div id="matches-tabs" class="tab-bar"></div>
 <div id="matches-progress"></div>
 <div id="matches-list"></div>
@@ -354,6 +379,15 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 <button class="btn-primary" id="btn-next-phase" style="display:none" onclick="goNextPhase()"></button>
 </div>
 </div>
+</section>
+
+<!-- ==================== LIVE (mode tablette élève) ==================== -->
+<section id="scr-live" class="screen">
+<div class="top-bar">
+<button class="btn-back" onclick="closeLive()">&larr; Liste</button>
+<h1 id="live-title">Match</h1>
+</div>
+<div class="content live-content" id="live-content"></div>
 </section>
 
 <!-- ==================== RANKINGS ==================== -->
@@ -383,6 +417,7 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 <button class="btn-icon" onclick="showScreen('scr-export')">&#128228;</button>
 </div>
 <div class="content">
+<div id="tools-finals"></div>
 <div id="finals-tabs" class="tab-bar"></div>
 <div id="finals-list"></div>
 <button class="btn-secondary" onclick="showFinalRankings()" style="margin-top:16px;width:100%">&#127942; Classement g&eacute;n&eacute;ral</button>
@@ -398,6 +433,7 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 <button class="btn-icon" onclick="showScreen('scr-export')">&#128228;</button>
 </div>
 <div class="content">
+<div id="tools-bracket"></div>
 <div id="bracket-tabs" class="tab-bar"></div>
 <div id="bracket-content"></div>
 <div style="display:flex;gap:8px;margin-top:16px">
@@ -490,6 +526,13 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 <p style="font-size:.8em;color:var(--txt2);margin-top:6px">&#9432; D&eacute;faite manche d&eacute;cisive = d&eacute;faite au tie-break en 2 manches gagnantes (1-1). Match nul = uniquement pour les matchs au temps.</p>
 </div>
 <div class="card">
+<h3>&#129309; D&eacute;partage</h3>
+<div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+<div class="toggle" id="adm-h2h" onclick="toggleH2H()"></div>
+<span>Confrontation directe avant la diff&eacute;rence de points</span></div>
+<p style="font-size:.8em;color:var(--txt2);margin-top:6px">&#9432; S'applique aux nouveaux tournois (poules). &Agrave; &eacute;galit&eacute; de points : r&eacute;sultat entre les joueurs &agrave; &eacute;galit&eacute;, puis diff&eacute;rence de points, puis points marqu&eacute;s.</p>
+</div>
+<div class="card">
 <h3>&#9989; Bonus arbitre</h3>
 <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
 <div class="toggle" id="adm-refbonus" onclick="toggleRefBonus()"></div>
@@ -524,7 +567,7 @@ qrcode.stringToBytes=qrcode.stringToBytesFuncs['UTF-8'];
 const QRGen={toCanvas:function(canvas,text,cellSize){cellSize=cellSize||6;try{var qr=qrcode(0,'L');qr.addData(text,'Byte');qr.make();var sz=qr.getModuleCount(),quiet=4,total=(sz+quiet*2)*cellSize;canvas.width=total;canvas.height=total;var ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,total,total);ctx.fillStyle='#000';for(var r=0;r<sz;r++)for(var c=0;c<sz;c++)if(qr.isDark(r,c))ctx.fillRect((c+quiet)*cellSize,(r+quiet)*cellSize,cellSize,cellSize);}catch(e){canvas.width=200;canvas.height=50;var ctx2=canvas.getContext('2d');ctx2.fillStyle='red';ctx2.font='14px sans-serif';ctx2.fillText('Donn\u00e9es trop longues pour QR',10,30);}}};
 
 /* ===== APP STATE ===== */
-let state={tournaments:[],savedLists:[],drafts:{},settings:{format:'set11',winPts:3,loseSets3Pts:2,losePts:1,refBonusEnabled:false,refBonusPts:1,tables:10,matchFamily:'score',winningSets:1,pointsPerSet:11,nbPeriods:2,periodDuration:20,drawPts:1}};
+let state={tournaments:[],savedLists:[],drafts:{},settings:{h2hTiebreak:true,format:'set11',winPts:3,loseSets3Pts:2,losePts:1,refBonusEnabled:false,refBonusPts:1,tables:10,matchFamily:'score',winningSets:1,pointsPerSet:11,nbPeriods:2,periodDuration:20,drawPts:1}};
 let T=null; // current tournament
 let curPoolIdx=0;
 let curFinalIdx=0;
@@ -534,7 +577,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='1.4';
+const APP_VERSION='1.5';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const LS_BACKUP_KEY='teneps_data_illisible';
 
@@ -666,6 +709,7 @@ if(id==='scr-finals')renderFinals();
 if(id==='scr-bracket')renderBracket();
 if(id==='scr-export')renderExport();
 if(id==='scr-settings')renderSettings();
+if(id==='scr-live')renderLive();
 if(id==='scr-admin')renderAdmin();
 }
 
@@ -673,6 +717,7 @@ function renderSettings(){
 document.getElementById('set-version').textContent='Match Manager EPS — Version '+APP_VERSION;
 }
 
+function pnameHtml(p){return p?escH(p.name)+(p.out?'<span class="badge-out">'+(p.out==='absent'?'Absent':'Forfait')+'</span>':''):'?';}
 function toast(msg,ms){const d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),ms||2500)}
 
 /* ===== HOME ===== */
@@ -696,6 +741,9 @@ return`<div class="card" style="cursor:pointer" onclick="openTournament('${t.id}
 function openTournament(id){
 T=state.tournaments.find(t=>t.id===id);
 if(!T)return;
+gotoPhaseScreen();
+}
+function gotoPhaseScreen(){
 if(T.phase==='players')showScreen('scr-players');
 else if(T.phase==='pools')showScreen('scr-pool-config');
 else if(T.phase==='matches')showScreen('scr-matches');
@@ -707,6 +755,7 @@ else showScreen('scr-matches');
 function delTournament(id){if(confirm('Supprimer ce tournoi ?')){
 const dt=state.tournaments.find(t=>t.id===id);
 if(dt)dt.matches.forEach(m=>clearMatchDrafts(m.id));
+delete undoStacks[id];saveUndo();
 state.tournaments=state.tournaments.filter(t=>t.id!==id);save();renderHome()}}
 
 /* ===== CREATE ===== */
@@ -758,6 +807,7 @@ loseSets3Pts:state.settings.loseSets3Pts!==undefined?state.settings.loseSets3Pts
 losePts:state.settings.losePts!==undefined?state.settings.losePts:1,
 drawPts:state.settings.drawPts!==undefined?state.settings.drawPts:1,
 refBonusEnabled:!!state.settings.refBonusEnabled,
+h2hTiebreak:state.settings.h2hTiebreak!==false,
 refBonusPts:state.settings.refBonusPts||1,
 duration:+document.getElementById('inp-duration').value||0},
 players:[],pools:[],matches:[],phase:'players',finals:[],bracket:null};
@@ -1195,9 +1245,10 @@ function renderMatches(){
 if(!T)return;
 reattachRunningMatchTimers();
 document.getElementById('matches-title').textContent=T.name+' - Matchs';
+renderTools('tools-matches');
 // Pool tabs
 const tabs=document.getElementById('matches-tabs');
-tabs.innerHTML=T.pools.map((p,i)=>`<button class="tab-btn${i===curPoolIdx?' active':''}" onclick="curPoolIdx=${i};renderMatches()">${p.name}</button>`).join('');
+tabs.innerHTML=T.pools.map((p,i)=>`<button class="tab-btn${i===curPoolIdx?' active':''}" onclick="curPoolIdx=${i};renderMatches()">${escH(p.name)}</button>`).join('');
 const pool=T.pools[curPoolIdx];
 if(!pool)return;
 const matches=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool');
@@ -1241,7 +1292,7 @@ const excluded=new Set([m.p1,m.p2]);
 T.matches.forEach(x=>{if(x.id!==m.id&&x.status==='playing'){excluded.add(x.p1);excluded.add(x.p2);}});
 // Arbitres déjà assignés à d'autres matchs non terminés
 T.matches.forEach(x=>{if(x.id!==m.id&&x.status!=='done'&&x.refereeId)excluded.add(x.refereeId);});
-return T.players.filter(p=>!excluded.has(p.id));
+return T.players.filter(p=>!excluded.has(p.id)&&!p.out);
 }
 
 function toggleMatchPlaying(mid,ev){
@@ -1264,6 +1315,10 @@ else if(m.phase==='final')renderFinals();
 else if(m.phase==='bracket')renderBracket();
 }
 
+function forfeitNote(m){
+const p=T.players.find(x=>x.id===m.forfeit);
+return '<div class="forfeit-note">Forfait de '+escH(p?p.name:'?')+'</div>';
+}
 function renderMatchCard(m){
 const p1=T.players.find(p=>p.id===m.p1);
 const p2=T.players.find(p=>p.id===m.p2);
@@ -1279,8 +1334,8 @@ const refSelectHtml='<select class="ref-input" id="ref-'+m.id+'" '+(isDone?'disa
 const actionsHtml=`<div class="match-actions">
 ${refSelectHtml}
 <label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${(isDone?m.refBonus:draftValue('refbonus-'+m.id,m.refBonus))?'checked':''} ${isDone?'disabled':''}>+1 pt arb.</label>
-${isDone?'<button class="btn-secondary btn-sm" onclick="unlockMatch(\''+m.id+'\')">&#9998; Modifier</button>':
-'<button class="match-validate" onclick="validateMatch(\''+m.id+'\')">&#10003; Valider</button>'}
+${isDone?(m.forfeit?'':'<button class="btn-secondary btn-sm" onclick="unlockMatch(\''+m.id+'\')">&#9998; Modifier</button>'):
+'<button class="btn-secondary btn-sm" style="min-height:44px" title="Mode tablette \u00e9l\u00e8ve" onclick="openLive(\''+m.id+'\',event)">&#128241;</button><button class="match-validate" onclick="validateMatch(\''+m.id+'\')">&#10003; Valider</button>'}
 </div>`;
 if(!isBo3){
 const s1=isDone?(m.score1!==null?m.score1:''):draftValue('s1-'+m.id,m.score1!==null?m.score1:'');
@@ -1290,6 +1345,7 @@ const w2=isDone&&m.score2>m.score1;
 return`<div class="match-card ${m.status}" onclick="toggleMatchPlaying('${m.id}',event)">
 <div class="match-header"><span class="match-num">Match ${m.matchNum||''}</span>${tableBadge}
 <span class="match-status ${m.status}">${statusLabel}</span></div>
+${m.forfeit?forfeitNote(m):''}
 <div class="match-row"><span class="pname"${w1?' style="color:var(--ok-txt);font-weight:700"':''}>${escH(p1.name)}</span>
 <input type="number" id="s1-${m.id}" value="${s1}" min="0" max="99" class="${w1?'winner':w2?'loser':''}" ${isDone?'disabled':''}></div>
 <div class="match-row"><span class="pname"${w2?' style="color:var(--ok-txt);font-weight:700"':''}>${escH(p2.name)}</span>
@@ -1312,6 +1368,7 @@ const isW2=isDone&&(m.score2||0)>(m.score1||0);
 return`<div class="match-card ${m.status}" onclick="toggleMatchPlaying('${m.id}',event)">
 <div class="match-header"><span class="match-num">Match ${m.matchNum||''}</span>${tableBadge}
 <span class="match-status ${m.status}">${statusLabel}</span></div>
+${m.forfeit?forfeitNote(m):''}
 <div class="set-scores">
 <div class="set-header"><div class="pname-col"></div><div class="set-col">S1</div><div class="set-col">S2</div><div class="set-col set3-${m.id}" style="${s3d}">S3</div></div>
 <div class="set-row"><div class="pname-col"${isW1?' style="color:var(--ok-txt);font-weight:700"':''}>${escH(p1.name)}</div>
@@ -1338,7 +1395,7 @@ document.querySelectorAll('.set3-'+mid).forEach(el=>{el.style.display=show?'':'n
 
 function validateMatch(mid){
 const m=T.matches.find(x=>x.id===mid);if(!m)return;
-const ref=document.getElementById('ref-'+mid).value.trim();
+const ref=(m.refereeId||'').trim();
 const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
 const drawAllowed=T.settings.matchFamily==='time'&&m.phase!=='bracket';
 const refBonusEl=document.getElementById('refbonus-'+mid);
@@ -1361,12 +1418,14 @@ if(s3a===s3b){toast('Set 3 : pas de score \u00e9gal');return;}
 sets.push({s1:s3a,s2:s3b});tp1+=s3a;tp2+=s3b;
 if(s3a>s3b)w1++;else w2++;
 }
+pushUndo('R\u00e9sultat : '+matchLabel(m)+' ('+w1+'-'+w2+')',[mid]);
 m.sets=sets;m.score1=w1;m.score2=w2;m.totalPts1=tp1;m.totalPts2=tp2;
 }else{
 const s1=+document.getElementById('s1-'+mid).value;
 const s2=+document.getElementById('s2-'+mid).value;
 if(isNaN(s1)||isNaN(s2)){toast('Entrez les scores');return;}
 if(s1===s2&&!drawAllowed){toast('Pas de match nul');return;}
+pushUndo('R\u00e9sultat : '+matchLabel(m)+' ('+s1+'-'+s2+')',[mid]);
 m.score1=s1;m.score2=s2;m.totalPts1=s1;m.totalPts2=s2;
 }
 m.refereeId=ref||'';
@@ -1399,22 +1458,28 @@ x.consolationRound===undefined?(x.bracketRound>r||x.isPetiteFinale):dropIdx.has(
 }
 
 function unlockMatch(mid){
-const m=T.matches.find(x=>x.id===mid);if(!m)return;
+const m=T.matches.find(x=>x.id===mid);if(!m||m.forfeit)return;
 // Rouvrir un résultat dont d'autres matchs dépendent : on prévient puis on retire ce qui en découle,
 // pour éviter des finales / tours suivants calculés avec l'ancien résultat.
+let dropFinals=false,dep=null,r=0;
 if(m.phase==='pool'&&T.mode===2&&((T.finals&&T.finals.length)||T.matches.some(x=>x.phase==='final'))){
 const played=T.matches.filter(x=>x.phase==='final'&&x.status==='done').length;
-if(played&&!confirm('Les finales ont déjà été générées ('+played+' match(s) joué(s)).\nModifier ce match supprimera les finales : elles seront recalculées à la fin des poules et leurs résultats seront perdus.\n\nContinuer ?'))return;
+if(played&&!confirm('Les finales ont d\u00e9j\u00e0 \u00e9t\u00e9 g\u00e9n\u00e9r\u00e9es ('+played+' match(s) jou\u00e9(s)).\nModifier ce match supprimera les finales : elles seront recalcul\u00e9es \u00e0 la fin des poules et leurs r\u00e9sultats seront perdus.\n\nContinuer ?'))return;
+dropFinals=true;
+}else if(m.phase==='bracket'&&m.consolationRound===undefined&&!m.isPetiteFinale&&T.bracket&&m.bracketRound>=1&&T.bracket.rounds.length>m.bracketRound){
+r=m.bracketRound;
+dep=bracketDependentMatches(r);
+const played=dep.filter(x=>x.status==='done').length;
+if(played&&!confirm('Les tours suivants ont d\u00e9j\u00e0 \u00e9t\u00e9 g\u00e9n\u00e9r\u00e9s ('+played+' match(s) jou\u00e9(s)).\nModifier ce match supprimera les tours suivants, la petite finale et les consolantes qui en d\u00e9coulent : leurs r\u00e9sultats seront perdus.\n\nContinuer ?'))return;
+}
+pushUndo('Modification : '+matchLabel(m),[mid]);
+if(dropFinals){
 T.matches.filter(x=>x.phase==='final').forEach(x=>clearMatchDrafts(x.id));
 T.matches=T.matches.filter(x=>x.phase!=='final');
 T.finals=[];
 if(T.phase==='finals')T.phase='matches';
-toast('Finales supprimées : elles seront recalculées');
-}else if(m.phase==='bracket'&&m.consolationRound===undefined&&!m.isPetiteFinale&&T.bracket&&m.bracketRound>=1&&T.bracket.rounds.length>m.bracketRound){
-const r=m.bracketRound;
-const dep=bracketDependentMatches(r);
-const played=dep.filter(x=>x.status==='done').length;
-if(played&&!confirm('Les tours suivants ont déjà été générés ('+played+' match(s) joué(s)).\nModifier ce match supprimera les tours suivants, la petite finale et les consolantes qui en découlent : leurs résultats seront perdus.\n\nContinuer ?'))return;
+toast('Finales supprim\u00e9es : elles seront recalcul\u00e9es');
+}else if(dep){
 const ids=new Set(dep.map(x=>x.id));
 dep.forEach(x=>{clearMatchDrafts(x.id);detachMatchTimerTick(x.id);});
 T.matches=T.matches.filter(x=>!ids.has(x.id));
@@ -1422,7 +1487,7 @@ T.bracket.rounds.splice(r);
 T.bracket.consolation=T.bracket.consolation.filter(c=>c.round<r);
 delete T.bracket.petiteFinale;
 curBracketTab=0;
-toast('Tours suivants supprimés : ils seront recalculés');
+toast('Tours suivants supprim\u00e9s : ils seront recalcul\u00e9s');
 }
 m.status='pending';clearMatchDrafts(mid);
 if(m.phase==='bracket')assignBracketTables();
@@ -1493,6 +1558,7 @@ const t=m.timer;
 const remaining=Math.max(0,Math.round((t.endsAt-Date.now())/1000));
 const el=document.querySelector('#mtimer-'+mid+' .mtimer-time');
 if(el)el.textContent=fmtMatchTime(remaining);
+if(liveMid===mid){const lt=document.querySelector('#live-content .live-time');if(lt)lt.textContent=fmtMatchTime(remaining);}
 if(remaining<=0){
 t.secondsLeft=0;t.running=false;t.endsAt=null;
 save();
@@ -1540,6 +1606,7 @@ function refreshMatchTimerWidget(mid){
 const m=T.matches.find(x=>x.id===mid);if(!m)return;
 const el=document.getElementById('mtimer-'+mid);
 if(el)el.outerHTML=renderMatchTimerWidget(m);
+if(liveMid===mid)renderLive();
 }
 function renderMatchTimerWidget(m){
 const isDone=m.status==='done';
@@ -1650,7 +1717,29 @@ const refId=m.refereeId||(m.referee?((T.players.find(p=>p.name.toLowerCase()===m
 if(refId&&stats[refId]){stats[refId].refBonus+=refBP;stats[refId].pts+=refBP;}
 }
 }
-return Object.values(stats).sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+const arr=Object.values(stats);
+arr.forEach(r=>{const pl=T.players.find(x=>x.id===r.id);r.out=pl&&pl.out?pl.out:null;});
+return sortPoolRanking(arr,matches,{wPts,l3Pts,lPts,drawPts},T.settings.h2hTiebreak===true);
+}
+
+// Tri d'un classement de poule : forfaits en dernier, points, puis (si activé) confrontation
+// directe entre les joueurs à égalité (mini-classement : points puis différence), puis
+// différence générale et points marqués.
+function sortPoolRanking(arr,matches,cfg,h2h){
+if(h2h){
+const groups={};
+arr.forEach(r=>{if(!r.out)(groups[r.pts]=groups[r.pts]||[]).push(r);});
+Object.keys(groups).forEach(k=>{
+const g=groups[k];
+if(g.length<2)return;
+const ids=g.map(r=>r.id);
+const mini=statsFromMatches(matches,ids,cfg);
+g.forEach(r=>{const m=mini[r.id];r.h2hPts=m.pts;r.h2hDiff=m.pf-m.pa;});
+});
+}
+return arr.sort((a,b)=>(a.out?1:0)-(b.out?1:0)||b.pts-a.pts
+||(b.h2hPts||0)-(a.h2hPts||0)||(b.h2hDiff||0)-(a.h2hDiff||0)
+||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
 }
 
 // Mode 2 : joueurs qui ne sont dans aucune finale (non qualifiés, ou qualifié seul à son rang),
@@ -1679,7 +1768,7 @@ if(T.mode===3){
 renderBracketRankingContent(content);
 return;
 }
-tabs.innerHTML=T.pools.map((p,i)=>`<button class="tab-btn${i===0?' active':''}" onclick="showRankTab(${i},this)">${p.name}</button>`).join('');
+tabs.innerHTML=T.pools.map((p,i)=>`<button class="tab-btn${i===0?' active':''}" onclick="showRankTab(${i},this)">${escH(p.name)}</button>`).join('');
 if(T.mode===2||(T.mode===1&&T.pools.length>1)){
 tabs.innerHTML+=`<button class="tab-btn" onclick="showRankTab(-1,this)">G\u00e9n\u00e9ral \u2605</button>`;
 }
@@ -1715,23 +1804,25 @@ function renderRankingTable(ranking,title,qualiCount){
 const hasAnyBonus=ranking.some(r=>r.refBonus>0);
 const hasAnyL3=ranking.some(r=>r.l3>0);
 const hasAnyD=ranking.some(r=>r.d>0);
-let html=`<h3 style="margin-bottom:10px;color:var(--pri-lt)">${title}</h3>`;
+let html=`<h3 style="margin-bottom:10px;color:var(--pri-lt)">${escH(title)}</h3>`;
 html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Pts</th><th>V</th>${hasAnyD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasAnyL3?'<th title="D\u00e9faites en 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence de points (PF\u2212PC)">Diff</th>${hasAnyBonus?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
 ranking.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const quali=qualiCount&&i<qualiCount;
 html+=`<tr${quali?' style="background:rgba(76,175,80,.08)"':''}>
-<td class="rank">${i+1}${quali?' \u2705':''}</td><td class="pname">${p?escH(p.name):'?'}</td>
+<td class="rank">${i+1}${quali?' \u2705':''}</td><td class="pname">${pnameHtml(p)}</td>
 <td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasAnyD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasAnyL3?`<td>${r.l3||0}</td>`:''}
 <td>${r.pf}</td><td>${r.pa}</td><td>${r.pf-r.pa>=0?'+':''}${r.pf-r.pa}</td>${hasAnyBonus?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
 html+='</tbody></table>';
+if(T.settings.h2hTiebreak===true)html+='<p style="font-size:.78em;color:var(--txt2);margin-top:6px">&Eacute;galit&eacute; de points : confrontation directe, puis diff&eacute;rence de points, puis points marqu&eacute;s.</p>';
 return html;
 }
 
 /* ===== FINALS (Mode 2) ===== */
 function goNextPhase(){
 if(T.mode===2){
+pushUndo('Passage aux finales',[]);
 generateFinals();
 T.phase='finals';save();
 showScreen('scr-finals');
@@ -1743,7 +1834,7 @@ function generateFinals(){
 // On teste T.matches (pas T.finals) pour éviter un état incohérent
 if(T.matches.some(m=>m.phase==='final'))return;
 T.finals=[];T.matches=T.matches.filter(m=>m.phase==='pool');
-const rankings=T.pools.map(p=>calcPoolRanking(p.id));
+const rankings=T.pools.map(p=>calcPoolRanking(p.id).filter(r=>!r.out));
 const maxQuali=Math.max(...T.pools.map(p=>p.quali||2));
 for(let rank=0;rank<maxQuali;rank++){
 const groupPlayers=[];
@@ -1770,8 +1861,9 @@ function renderFinals(){
 if(!T)return;
 reattachRunningMatchTimers();
 renderTimerBar('finals-timer',T.settings.duration);
+renderTools('tools-finals');
 const tabs=document.getElementById('finals-tabs');
-tabs.innerHTML=T.finals.map((f,i)=>`<button class="tab-btn${i===curFinalIdx?' active':''}" onclick="curFinalIdx=${i};renderFinals()">${f.name}</button>`).join('');
+tabs.innerHTML=T.finals.map((f,i)=>`<button class="tab-btn${i===curFinalIdx?' active':''}" onclick="curFinalIdx=${i};renderFinals()">${escH(f.name)}</button>`).join('');
 const group=T.finals[curFinalIdx];
 if(!group){document.getElementById('finals-list').innerHTML='<p class="empty-state">Aucune finale</p>';return;}
 const matches=T.matches.filter(m=>m.poolId===group.id&&m.phase==='final');
@@ -1802,7 +1894,7 @@ for(const pool of T.pools){
 const rk=calcPoolRanking(pool.id);
 for(const r of rk)all.push({...r,poolName:pool.name});
 }
-all.sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+all.sort((a,b)=>(a.out?1:0)-(b.out?1:0)||b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
 const hasD3=all.some(r=>r.l3>0);
 const hasD=all.some(r=>r.d>0);
 const hasArb=all.some(r=>r.refBonus>0);
@@ -1812,7 +1904,7 @@ html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:l
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.pf-r.pa;
-html+=`<tr><td class="rank">${i+1}</td><td class="pname">${p?escH(p.name):'?'}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr><td class="rank">${i+1}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
 html+='</tbody></table>';
 el.innerHTML=html;
@@ -1859,12 +1951,12 @@ totalPts:ps.pts+fs.pts+frb};
 const ranked=combined.sort((a,b)=>b.finalW-a.finalW||b.totalPts-a.totalPts||(b.totalPF-b.totalPA)-(a.totalPF-a.totalPA)||b.totalPF-a.totalPF);
 const hasD3=ranked.some(r=>r.totalL3>0);
 const hasD=ranked.some(r=>r.totalD>0);
-html+=`<h4 style="margin:16px 0 8px;color:var(--txt)">${group.name}</h4>`;
+html+=`<h4 style="margin:16px 0 8px;color:var(--txt)">${escH(group.name)}</h4>`;
 html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th title="Pts poule + finale${refEnabled?' + arb':''}">Pts</th><th>V</th>${hasD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s (toutes phases)">PF</th><th title="Points encaiss\u00e9s (toutes phases)">PC</th><th title="Diff\u00e9rence">Diff</th>${anyArb?'<th title="Bonus arbitre toutes phases">Arb</th>':''}</tr></thead><tbody>`;
 for(const r of ranked){
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.totalPF-r.totalPA;
-html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${p?escH(p.name):'?'}</td><td><strong>${r.totalPts}</strong></td><td>${r.totalW}</td>${hasD?`<td>${r.totalD||0}</td>`:''}<td>${r.totalL}</td>${hasD3?`<td>${r.totalL3||0}</td>`:''}<td>${r.totalPF}</td><td>${r.totalPA}</td><td>${diff>=0?'+':''}${diff}</td>${anyArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${pnameHtml(p)}</td><td><strong>${r.totalPts}</strong></td><td>${r.totalW}</td>${hasD?`<td>${r.totalD||0}</td>`:''}<td>${r.totalL}</td>${hasD3?`<td>${r.totalL3||0}</td>`:''}<td>${r.totalPF}</td><td>${r.totalPA}</td><td>${diff>=0?'+':''}${diff}</td>${anyArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 globalRank++;
 }
 html+='</tbody></table>';
@@ -1878,7 +1970,7 @@ html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:l
 for(const r of hors){
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.pf-r.pa;
-html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${p?escH(p.name):'?'}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 globalRank++;
 }
 html+='</tbody></table>';
@@ -1910,7 +2002,7 @@ return result;
 }
 
 function generateBracket(){
-let players=[...T.players];
+let players=T.players.filter(p=>!p.out);
 // Tri par niveau d\u00e9croissant (meilleurs en premier = meilleures t\u00eates de s\u00e9rie)
 players.sort((a,b)=>(b.level||0)-(a.level||0)||(a.name<b.name?-1:1));
 let size=1;while(size<players.length)size*=2;
@@ -1997,6 +2089,7 @@ const m={id:uid(),phase:'bracket',bracketRound:rounds.length+1,bracketPos:Math.f
 p1:w1,p2:w2,score1:null,score2:null,referee:'',status:'pending',table:null,
 matchNum:T.matches.filter(x=>x.phase==='bracket').length+1};
 T.matches.push(m);
+autoForfeitIfOut(m);
 nextEntries.push(m.id);
 }else{
 nextEntries.push(w1?{bye:w1}:{bye:w2});
@@ -2025,6 +2118,7 @@ p1:losers[0],p2:losers[1],score1:null,score2:null,
 referee:'',status:'pending',table:null,matchNum:T.matches.filter(x=>x.phase==='bracket').length+1,
 isPetiteFinale:true};
 T.matches.push(m);
+autoForfeitIfOut(m);
 T.bracket.petiteFinale=m.id;
 }
 assignBracketTables();
@@ -2055,6 +2149,7 @@ reattachRunningMatchTimers();
 renderTimerBar('bracket-timer',T.settings.duration);
 // Check if we need to advance
 checkBracketAdvance();
+renderTools('tools-bracket');
 const tabs=document.getElementById('bracket-tabs');
 const roundNames=getBracketRoundNames();
 const allTabs=[...roundNames.map((n,i)=>({name:n,type:'main',idx:i}))];
@@ -2113,7 +2208,8 @@ content.innerHTML=consMatches.map(m=>renderMatchCard(m)).join('');
 function generateConsolationMatches(consIdx){
 const cons=T.bracket.consolation[consIdx];
 if(!cons||cons.losers.length<2)return;
-const losers=cons.losers;
+const losers=cons.losers.filter(id=>!isOut(id));
+if(losers.length<2)return;
 const rrMatches=generateRoundRobin(losers);
 for(let i=0;i<rrMatches.length;i++){
 T.matches.push({id:uid(),phase:'bracket',consolationRound:consIdx,
@@ -2127,6 +2223,8 @@ save();
 
 function checkBracketAdvance(){
 if(!T||!T.bracket)return;
+// plusieurs passes : un tour dont tous les matchs sont des forfaits automatiques en génère un autre
+for(let guard=0;guard<8;guard++){
 const rounds=T.bracket.rounds;
 const lastRound=rounds[rounds.length-1];
 if(!lastRound||lastRound.length<=1)return;
@@ -2137,7 +2235,11 @@ if(typeof entry==='object'&&entry.bye)continue;
 const m=T.matches.find(x=>x.id===entry);
 if(!m||m.status!=='done'){allDone=false;break;}
 }
-if(allDone)advanceBracket();
+if(!allDone)return;
+const before=rounds.length;
+advanceBracket();
+if(T.bracket.rounds.length===before)return;
+}
 }
 
 function getBracketRoundNames(){
@@ -2209,7 +2311,7 @@ if(!ranking.find(r=>r.id===p.id))ranking.push({id:p.id,rank:ranking.length+1,not
 html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Note</th></tr></thead><tbody>`;
 for(const r of ranking){
 const p=T.players.find(x=>x.id===r.id);
-html+=`<tr><td class="rank">${r.rank}</td><td class="pname">${p?escH(p.name):'?'}</td><td style="font-size:.8em">${r.note}</td></tr>`;
+html+=`<tr><td class="rank">${r.rank}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.8em">${r.note}</td></tr>`;
 }
 html+='</tbody></table>';
 el.innerHTML=html;
@@ -2456,7 +2558,7 @@ s2rows.push([sh('Classement g\u00e9n\u00e9ral — toutes poules'+(hasRefBonus?' 
 s2rows.push([]);
 const all=[];
 for(const pool of T.pools){const rk=calcPoolRanking(pool.id);for(const r of rk)all.push({...r,poolName:pool.name});}
-all.sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+all.sort((a,b)=>(a.out?1:0)-(b.out?1:0)||b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
 const hasL3_m1=all.some(r=>r.l3>0);
 const hasD_m1=all.some(r=>r.d>0);
 const hdr1=[sh('Rang',true),sh('Joueur',true),sh('Poule',true),sh('Points',true),sh('Victoires',true)];
@@ -2468,7 +2570,7 @@ if(hasRefBonus)hdr1.push(sh('Bonus.Arb',true));
 s2rows.push(hdr1);
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
-const row=[nm(i+1),sh(p?p.name:'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
+const row=[nm(i+1),sh(p?p.name+(p.out?' ('+(p.out==='absent'?'absent':'forfait')+')':''):'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
 if(hasD_m1)row.push(nm(r.d||0));
 row.push(nm(r.l));
 if(hasL3_m1)row.push(nm(r.l3||0));
@@ -2512,7 +2614,7 @@ if(hasRefBonus)hdr2.push(sh('Bonus.Arb',true));
 s2rows.push(hdr2);
 for(const r of ranked){
 const p=T.players.find(x=>x.id===r.id);
-const row=[nm(globalRank),sh(p?p.name:'?'),nm(r.totalPts),nm(r.totalW)];
+const row=[nm(globalRank),sh(p?p.name+(p.out?' ('+(p.out==='absent'?'absent':'forfait')+')':''):'?'),nm(r.totalPts),nm(r.totalW)];
 if(hasD_m2)row.push(nm(r.totalD||0));
 row.push(nm(r.totalL));
 if(hasL3_m2)row.push(nm(r.totalL3||0));
@@ -2536,7 +2638,7 @@ if(hasRefBonus)hdr3.push(sh('Bonus.Arb',true));
 s2rows.push(hdr3);
 for(const r of hors){
 const p=T.players.find(x=>x.id===r.id);
-const row=[nm(globalRank),sh(p?p.name:'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
+const row=[nm(globalRank),sh(p?p.name+(p.out?' ('+(p.out==='absent'?'absent':'forfait')+')':''):'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
 if(hD)row.push(nm(r.d||0));
 row.push(nm(r.l));
 if(hL3)row.push(nm(r.l3||0));
@@ -2709,6 +2811,14 @@ document.getElementById('adm-drawpts').value=state.settings.drawPts!==undefined?
 document.getElementById('adm-refbonuspts').value=state.settings.refBonusPts||1;
 const tog=document.getElementById('adm-refbonus');
 if(tog)tog.classList.toggle('on',!!state.settings.refBonusEnabled);
+const th=document.getElementById('adm-h2h');
+if(th)th.classList.toggle('on',state.settings.h2hTiebreak!==false);
+}
+function toggleH2H(){
+state.settings.h2hTiebreak=state.settings.h2hTiebreak===false;
+const th=document.getElementById('adm-h2h');
+if(th)th.classList.toggle('on',state.settings.h2hTiebreak!==false);
+save();
 }
 
 function saveSettings(){
@@ -2792,6 +2902,19 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">8. Param\u00e8tres</h3>
 <p>Configurez les points de victoire/d\u00e9faite, le bonus arbitre, et le format par d\u00e9faut. Ces r\u00e9glages s'appliquent aux nouveaux tournois.</p>
 <p>Le bouton <b>"Supprimer toutes les donn\u00e9es"</b> r\u00e9initialise l'application \u00e0 son \u00e9tat d'origine : tous les param\u00e8tres personnalis\u00e9s (format, points, bonus) sont remis aux valeurs par d\u00e9faut et tous les tournois cr\u00e9\u00e9s sont supprim\u00e9s.</p>
+
+<h3 style="color:var(--pri-lt);margin:12px 0 6px">Absents, forfaits et nouveaux joueurs</h3>
+<p>Pendant le tournoi, le bouton <b>&#128101; Joueurs</b> (en haut de la liste des matchs) permet de :</p>
+<ul style="margin:4px 0 4px 20px">
+<li><b>Retirer un joueur</b> : <i>Absent</i> (retir&eacute; de la poule, tous ses matchs sont annul&eacute;s) ou <i>Forfait</i> (ses matchs jou&eacute;s restent compt&eacute;s, les autres sont annul&eacute;s, il est class&eacute; en bas de poule). En tableau &agrave; &eacute;limination, l'adversaire est qualifi&eacute;.</li>
+<li><b>Ajouter un joueur</b> &agrave; une poule (avant les finales) : il rencontre tous les joueurs de la poule.</li>
+</ul>
+<h3 style="color:var(--pri-lt);margin:12px 0 6px">Annuler</h3>
+<p>Le bouton <b>&#8617; Annuler</b> remet le tournoi exactement dans l'&eacute;tat d'avant la derni&egrave;re action (r&eacute;sultat valid&eacute;, modification, joueur retir&eacute;...), tours et finales g&eacute;n&eacute;r&eacute;s ensuite compris. On peut annuler plusieurs actions de suite.</p>
+<h3 style="color:var(--pri-lt);margin:12px 0 6px">Mode tablette &eacute;l&egrave;ve</h3>
+<p>Le bouton <b>&#128241;</b> d'un match affiche un &eacute;cran avec de gros boutons + et &minus; pour saisir le score &agrave; la touche, puis une confirmation avant validation.</p>
+<h3 style="color:var(--pri-lt);margin:12px 0 6px">Sauvegarde et transfert</h3>
+<p>Sur l'&eacute;cran d'accueil, <b>&#128190; Sauvegarde / transfert</b> enregistre un tournoi dans un fichier, ou copie son texte pour le coller sur une autre tablette (messagerie, cl&eacute; USB...). L'import se fait depuis le m&ecirc;me &eacute;cran.</p>
 
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">9. Installation sur tablette (PWA)</h3>
 <p>L'application peut s'installer comme une application native :</p>
@@ -3032,6 +3155,486 @@ if(!s)return'';
 return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+/* ===== ANNULER (pile d'annulation par tournoi) ===== */
+// Avant toute action qui modifie un tournoi (résultat, modification, retrait de joueur...), on
+// garde un instantané des données de jeu. « Annuler » restaure l'état exact d'avant, y compris les
+// tours / finales générés par la suite et les scores qui étaient en cours de saisie.
+const UNDO_KEY='mmeps_undo';
+const UNDO_MAX=8;
+const UNDO_FIELDS=['players','pools','poolSizes','poolTables','matches','finals','bracket','phase'];
+let undoStacks={};
+function loadUndo(){
+try{undoStacks=JSON.parse(localStorage.getItem(UNDO_KEY))||{};}catch(e){undoStacks={};}
+if(!undoStacks||typeof undoStacks!=='object'||Array.isArray(undoStacks))undoStacks={};
+const ids=new Set(state.tournaments.map(t=>t.id));
+Object.keys(undoStacks).forEach(k=>{if(!ids.has(k)||!Array.isArray(undoStacks[k]))delete undoStacks[k];});
+}
+function saveUndo(){
+try{localStorage.setItem(UNDO_KEY,JSON.stringify(undoStacks));}
+catch(e){
+// mémoire pleine : on ne garde que la dernière entrée de chaque tournoi
+try{Object.keys(undoStacks).forEach(k=>{undoStacks[k]=undoStacks[k].slice(-1);});localStorage.setItem(UNDO_KEY,JSON.stringify(undoStacks));}catch(e2){}
+}
+}
+function matchLabel(m){
+const a=T.players.find(p=>p.id===m.p1),b=T.players.find(p=>p.id===m.p2);
+return (a?a.name:'?')+' / '+(b?b.name:'?');
+}
+function pushUndo(label,mids){
+if(!T)return;
+const snap={};
+UNDO_FIELDS.forEach(k=>{if(T[k]!==undefined)snap[k]=T[k];});
+const drafts={};
+(mids||[]).forEach(mid=>Object.keys(state.drafts).forEach(k=>{if(k.endsWith('-'+mid))drafts[k]=state.drafts[k];}));
+const st=undoStacks[T.id]||(undoStacks[T.id]=[]);
+st.push({label:String(label).slice(0,80),at:Date.now(),snap:JSON.stringify(snap),drafts});
+while(st.length>UNDO_MAX)st.shift();
+saveUndo();
+}
+function lastUndo(){const st=T&&undoStacks[T.id];return st&&st.length?st[st.length-1]:null;}
+function confirmUndo(){
+const e=lastUndo();if(!e)return;
+showModal('&#8617; Annuler la derni&egrave;re action',
+'<p style="margin-bottom:6px">'+escH(e.label)+'</p><p style="font-size:.85em;color:var(--txt2)">Le tournoi revient exactement &agrave; l\'&eacute;tat d\'avant (tours et finales g&eacute;n&eacute;r&eacute;s ensuite compris).</p>'+
+'<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Non</button><button class="btn-primary" style="width:auto" onclick="undoLast()">Oui, annuler</button></div>');
+}
+function undoLast(){
+closeModal();
+const st=T&&undoStacks[T.id];
+const e=st&&st.pop();
+if(!e)return;
+T.matches.forEach(m=>detachMatchTimerTick(m.id));
+const snap=JSON.parse(e.snap);
+UNDO_FIELDS.forEach(k=>{if(k in snap)T[k]=snap[k];else delete T[k];});
+const keep=new Set(T.matches.map(m=>m.id));
+Object.keys(state.drafts).forEach(k=>{if(!keep.has(k.slice(k.indexOf('-')+1)))delete state.drafts[k];});
+Object.assign(state.drafts,e.drafts||{});
+saveUndo();save();
+curBracketTab=0;
+gotoPhaseScreen();
+toast('Annulé : '+e.label,3500);
+}
+function renderTools(containerId){
+const el=document.getElementById(containerId);
+if(!el||!T)return;
+const e=lastUndo();
+el.innerHTML='<div class="tools-bar">'+
+(e?'<button class="btn-secondary btn-sm" onclick="confirmUndo()">&#8617; Annuler : '+escH(e.label.length>34?e.label.slice(0,33)+'…':e.label)+'</button>':'')+
+'<button class="btn-secondary btn-sm" onclick="showPlayersManager()">&#128101; Joueurs</button></div>';
+}
+
+/* ===== JOUEURS : absent / forfait / ajout tardif ===== */
+function isOut(pid){const p=T.players.find(x=>x.id===pid);return!!(p&&p.out);}
+function autoForfeitIfOut(m){
+const o1=isOut(m.p1),o2=isOut(m.p2);
+if(!o1&&!o2)return;
+m.forfeit=o1?m.p1:m.p2;
+if(o1&&!o2){m.score1=0;m.score2=1;}
+else if(o2&&!o1){m.score1=1;m.score2=0;}
+else{m.score1=0;m.score2=0;}
+m.totalPts1=m.score1;m.totalPts2=m.score2;
+m.status='done';m.table=null;
+}
+function showPlayersManager(){
+if(!T)return;
+const row=p=>'<div style="display:flex;align-items:center;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px"><span style="flex:1;font-weight:600">'+pnameHtml(p)+'</span>'+
+(p.out?'':'<button class="btn-danger btn-sm" onclick="askWithdraw(\''+p.id+'\')">Retirer</button>')+'</div>';
+let html='';
+if(T.pools.length){
+T.pools.forEach(pool=>{
+html+='<div class="section-title" style="font-size:.95em;margin:12px 0 6px">'+escH(pool.name)+'</div>';
+pool.playerIds.forEach(id=>{const p=T.players.find(x=>x.id===id);if(p)html+=row(p);});
+});
+const gone=T.players.filter(p=>p.out==='absent');
+if(gone.length){
+html+='<div class="section-title" style="font-size:.95em;margin:12px 0 6px">Retir&eacute;s (absents)</div>';
+gone.forEach(p=>{html+=row(p);});
+}
+}else{
+T.players.forEach(p=>{html+=row(p);});
+}
+const finalsExist=T.mode!==3&&T.matches.some(m=>m.phase==='final');
+const bracketStarted=T.mode===3&&T.matches.some(m=>m.phase==='bracket'&&m.status==='done'&&!m.forfeit);
+if(finalsExist||bracketStarted){
+html+='<p class="info-box" style="margin-top:14px">Ajout impossible : '+(finalsExist?'les finales sont déjà générées.':'le tableau est déjà commencé.')+' Vous pouvez encore retirer un joueur.</p>';
+}else{
+html+='<div class="section-title" style="font-size:.95em;margin:16px 0 6px">&#10133; Ajouter un joueur</div>'+
+'<div class="form-group"><input type="text" id="lp-name" placeholder="NOM Prénom" autocomplete="off"></div>'+
+'<div style="display:flex"><div class="form-group" style="flex:1;margin-right:8px"><label>Niveau</label><select id="lp-level">'+[0,1,2,3,4,5].map(l=>'<option value="'+l+'">'+(l?l:'Aucun')+'</option>').join('')+'</select></div>'+
+(T.pools.length?'<div class="form-group" style="flex:1"><label>Poule</label><select id="lp-pool">'+T.pools.map(p=>'<option value="'+p.id+'">'+escH(p.name)+'</option>').join('')+'</select></div>':'')+
+'</div><button class="btn-primary" onclick="addLatePlayer()">Ajouter</button>';
+if(T.mode===3)html+='<p style="font-size:.8em;color:var(--txt2);margin-top:6px">Le tableau est r&eacute;g&eacute;n&eacute;r&eacute; (aucun match encore jou&eacute;).</p>';
+else html+='<p style="font-size:.8em;color:var(--txt2);margin-top:6px">Le joueur rencontre tous les joueurs de la poule choisie.</p>';
+}
+showModal('&#128101; Joueurs du tournoi',html);
+}
+function askWithdraw(pid){
+const p=T.players.find(x=>x.id===pid);if(!p)return;
+const finalsExist=T.matches.some(m=>m.phase==='final');
+const played=T.matches.filter(m=>(m.p1===pid||m.p2===pid)&&m.status==='done'&&m.phase==='pool').length;
+let html='<p style="margin-bottom:12px"><strong>'+escH(p.name)+'</strong></p>';
+if(T.mode===3){
+html+='<button class="btn-danger" style="width:100%;margin-bottom:8px" onclick="withdrawPlayer(\''+pid+'\',\'forfait\')">Forfait : l\'adversaire est qualifi&eacute;</button>';
+}else{
+html+='<button class="btn-danger" style="width:100%;margin-bottom:6px" onclick="withdrawPlayer(\''+pid+'\',\'forfait\')">Forfait</button>'+
+'<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Ses matchs d&eacute;j&agrave; jou&eacute;s restent compt&eacute;s, les autres sont annul&eacute;s. Il reste affich&eacute; en bas du classement.</p>';
+if(!finalsExist){
+html+='<button class="btn-danger" style="width:100%;margin-bottom:6px" onclick="withdrawPlayer(\''+pid+'\',\'absent\')">Absent</button>'+
+'<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Retir&eacute; de la poule, <b>tous</b> ses matchs sont annul&eacute;s'+(played?' ('+played+' déjà joué(s) : leur résultat est supprimé)':'')+'. Les autres joueurs ne sont pas pénalisés.</p>';
+}
+}
+html+='<div class="modal-actions"><button class="btn-secondary" onclick="showPlayersManager()">Retour</button></div>';
+showModal('Retirer un joueur',html);
+}
+function withdrawPlayer(pid,kind){
+const p=T.players.find(x=>x.id===pid);if(!p||p.out)return;
+if(T.mode===3)kind='forfait';
+const mine=T.matches.filter(m=>m.p1===pid||m.p2===pid);
+pushUndo((kind==='absent'?'Absent : ':'Forfait : ')+p.name,mine.map(m=>m.id));
+T.matches.forEach(m=>{if(m.refereeId===pid&&m.status!=='done'){m.refereeId='';m.referee='';}});
+const drop=new Set();
+for(const m of mine){
+if(kind==='absent'&&m.phase==='pool'){drop.add(m.id);continue;}
+if(m.status==='done')continue;
+if(m.phase==='bracket'&&m.consolationRound===undefined){autoForfeitIfOutWith(m,pid);}
+else drop.add(m.id);
+}
+if(kind==='absent')T.pools.forEach(pl=>{pl.playerIds=pl.playerIds.filter(id=>id!==pid);});
+T.matches=T.matches.filter(m=>!drop.has(m.id));
+drop.forEach(id=>{clearMatchDrafts(id);detachMatchTimerTick(id);});
+p.out=kind;
+if(T.mode===3)assignBracketTables();
+save();closeModal();
+gotoPhaseScreen();
+toast(p.name+' : '+(kind==='absent'?'absent':'forfait'));
+}
+// le joueur pid vient d'être retiré : son adversaire gagne le match
+function autoForfeitIfOutWith(m,pid){
+m.forfeit=pid;
+if(m.p1===pid){m.score1=0;m.score2=1;}else{m.score1=1;m.score2=0;}
+m.totalPts1=m.score1;m.totalPts2=m.score2;
+m.status='done';m.table=null;
+}
+function addLatePlayer(){
+const name=(document.getElementById('lp-name').value||'').trim().toUpperCase();
+if(!name){toast('Entrez un nom');return;}
+const level=+document.getElementById('lp-level').value||0;
+if(T.mode===3){
+if(T.matches.some(m=>m.phase==='bracket'&&m.status==='done'&&!m.forfeit)){toast('Tableau déjà commencé : ajout impossible',5000);return;}
+pushUndo('Joueur ajouté : '+name,[]);
+T.players.push({id:uid(),name,level});
+generateBracket();
+}else{
+if(T.matches.some(m=>m.phase==='final')){toast('Finales déjà générées : ajout impossible',5000);return;}
+const sel=document.getElementById('lp-pool');
+const pool=T.pools.find(x=>sel&&x.id===sel.value)||T.pools[0];
+if(!pool)return;
+pushUndo('Joueur ajouté : '+name,[]);
+const np={id:uid(),name,level};
+T.players.push(np);
+const pm=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool');
+const round=pm.reduce((a,m)=>Math.max(a,m.round||0),0)+1;
+let num=pm.reduce((a,m)=>Math.max(a,m.matchNum||0),0);
+pool.playerIds.filter(id=>!isOut(id)).forEach(oid=>{
+T.matches.push({id:uid(),poolId:pool.id,phase:'pool',p1:oid,p2:np.id,score1:null,score2:null,referee:'',table:null,status:'pending',round,matchNum:++num});
+});
+pool.playerIds.push(np.id);
+assignPoolTablesToMatches();
+}
+curBracketTab=0;
+save();closeModal();
+gotoPhaseScreen();
+toast(name+' ajouté');
+}
+
+/* ===== SAUVEGARDE / TRANSFERT (JSON) ===== */
+const BACKUP_APP='MatchManagerEPS';
+function backupFileName(t){
+const safe=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40);
+const date=new Date().toLocaleDateString('fr-FR').replace(/\//g,'-');
+return 'MatchManagerEPS_sauvegarde_'+(t?(safe(t.classe)||safe(t.name)||'Tournoi'):'complete')+'_'+date+'.json';
+}
+function buildBackup(idx){
+const list=idx<0?state.tournaments:[state.tournaments[idx]].filter(Boolean);
+const mids=new Set();
+list.forEach(t=>t.matches.forEach(m=>mids.add(m.id)));
+const drafts={};
+Object.keys(state.drafts).forEach(k=>{if(mids.has(k.slice(k.indexOf('-')+1)))drafts[k]=state.drafts[k];});
+return JSON.stringify({app:BACKUP_APP,format:1,version:APP_VERSION,exportedAt:new Date().toISOString(),
+tournaments:list,savedLists:idx<0?state.savedLists:[],drafts});
+}
+function saveTextFile(name,text,mime){
+if(typeof AndroidDownload!=='undefined'&&AndroidDownload.saveFile){
+try{AndroidDownload.saveFile(btoa(unescape(encodeURIComponent(text))),name,mime);return;}catch(e){}
+}
+const url=URL.createObjectURL(new Blob([text],{type:mime}));
+const a=document.createElement('a');
+a.href=url;a.download=name;
+document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+toast('Fichier téléchargé ✓');
+}
+function copyTextToClipboard(text){
+const ta=document.createElement('textarea');
+ta.value=text;ta.setAttribute('readonly','');
+ta.style.cssText='position:fixed;top:0;left:0;opacity:0';
+document.body.appendChild(ta);ta.focus();ta.select();
+let ok=false;
+try{ok=document.execCommand('copy');}catch(e){}
+ta.remove();
+if(!ok&&navigator.clipboard&&navigator.clipboard.writeText){
+navigator.clipboard.writeText(text).then(()=>toast('Copié ✓'),()=>toast('Copie impossible : utilisez le fichier'));
+return;
+}
+toast(ok?'Copié ✓ : collez-le dans un message ou sur l\'autre tablette':'Copie impossible : utilisez le fichier',4000);
+}
+function exportBackup(idx,how){
+const text=buildBackup(idx);
+if(how==='copy')copyTextToClipboard(text);
+else saveTextFile(backupFileName(idx<0?null:state.tournaments[idx]),text,'application/json');
+}
+function showBackupModal(){
+let html='<p style="font-size:.85em;color:var(--txt2);margin-bottom:10px">Pour déplacer un tournoi vers une autre tablette ou en garder une copie : enregistrez un fichier, ou copiez le texte et collez-le sur l\'autre appareil.</p>';
+if(!state.tournaments.length)html+='<p class="info-box">Aucun tournoi &agrave; exporter.</p>';
+state.tournaments.forEach((t,i)=>{
+html+='<div class="card" style="margin-bottom:8px;padding:10px"><div style="font-weight:600;margin-bottom:6px">'+escH(t.name)+' <span style="color:var(--txt2);font-weight:400;font-size:.85em">'+escH(t.classe||'')+'</span></div>'+
+'<button class="btn-secondary btn-sm" onclick="exportBackup('+i+',\'file\')">&#128190; Fichier</button> '+
+'<button class="btn-secondary btn-sm" onclick="exportBackup('+i+',\'copy\')">&#128203; Copier</button></div>';
+});
+if(state.tournaments.length>1){
+html+='<button class="btn-secondary" style="width:100%;margin-bottom:6px" onclick="exportBackup(-1,\'file\')">&#128190; Tout exporter (fichier)</button>';
+}
+html+='<div class="section-title" style="font-size:.95em;margin:16px 0 6px">&#128229; Importer</div>'+
+'<input type="file" id="bk-file" accept=".json,.txt,application/json" onchange="importBackupFile(this)" style="margin-bottom:8px">'+
+'<textarea id="bk-paste" placeholder="ou collez ici le texte copié" style="min-height:70px"></textarea>'+
+'<button class="btn-primary" style="margin-top:8px" onclick="importBackupText(document.getElementById(\'bk-paste\').value)">Importer le texte</button>'+
+'<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Fermer</button></div>';
+showModal('&#128190; Sauvegarde / transfert',html);
+}
+function importBackupFile(input){
+const f=input.files&&input.files[0];if(!f)return;
+if(f.size>8*1024*1024){toast('Fichier trop volumineux');return;}
+const r=new FileReader();
+r.onload=e=>importBackupText(String(e.target.result||''));
+r.onerror=()=>toast('Lecture du fichier impossible');
+r.readAsText(f);
+input.value='';
+}
+// Nettoyage d'un tournoi importé : identifiants simples (ils servent dans des attributs HTML)
+// et textes sans caractères HTML.
+const SAFE_ID=/^[A-Za-z0-9_-]{1,60}$/;
+function sanitizeImportedTournament(t){
+if(!t||typeof t!=='object')return null;
+const ok=v=>typeof v==='string'&&SAFE_ID.test(v);
+const okOpt=v=>v===null||v===undefined||v===''||ok(v);
+const clean=s=>String(s==null?'':s).replace(/[<>"'`&\\]/g,'').slice(0,80);
+if(!ok(t.id)||!Array.isArray(t.players)||!Array.isArray(t.matches))return null;
+if(t.players.length>500||t.matches.length>5000)return null;
+if(!Array.isArray(t.pools))t.pools=[];
+if(!Array.isArray(t.finals))t.finals=[];
+for(const p of t.players){if(!p||!ok(p.id))return null;p.name=clean(p.name);p.level=Math.max(0,Math.min(5,+p.level||0));if(p.out&&p.out!=='absent')p.out='forfait';}
+for(const pl of t.pools){if(!pl||!ok(pl.id)||!Array.isArray(pl.playerIds)||!pl.playerIds.every(ok))return null;pl.name=clean(pl.name);}
+for(const f of t.finals){if(!f||!ok(f.id)||!Array.isArray(f.playerIds)||!f.playerIds.every(ok))return null;f.name=clean(f.name);}
+for(const m of t.matches){
+if(!m||!ok(m.id)||!ok(m.p1)||!ok(m.p2)||!okOpt(m.poolId)||!okOpt(m.refereeId))return null;
+m.referee=clean(m.referee);
+}
+const b=t.bracket;
+if(b){
+if(!Array.isArray(b.rounds)||!Array.isArray(b.slots)||!Array.isArray(b.consolation))return null;
+if(!b.slots.every(v=>v===null||ok(v)))return null;
+for(const rd of b.rounds){
+if(!Array.isArray(rd))return null;
+for(const e of rd){if(e===null)continue;if(typeof e==='string'){if(!ok(e))return null;}else if(typeof e==='object'){if(!ok(e.bye))return null;}else return null;}
+}
+for(const c of b.consolation){if(!c||!Array.isArray(c.losers)||!c.losers.every(ok))return null;}
+if(b.petiteFinale&&!ok(b.petiteFinale))return null;
+if(Array.isArray(b.seedInfo))b.seedInfo.forEach(si=>{if(si){si.name=clean(si.name);if(si.id&&!ok(si.id))si.id='';}});
+}
+t.name=clean(t.name)||'Tournoi';t.classe=clean(t.classe);t.date=clean(t.date);
+t.mode=[1,2,3].includes(t.mode)?t.mode:1;
+if(!t.settings||typeof t.settings!=='object')t.settings={};
+migrateSettings(t.settings);
+return t;
+}
+function importBackupText(text){
+let d=null;
+try{d=JSON.parse(String(text).trim());}catch(e){}
+if(!d||d.app!==BACKUP_APP||!Array.isArray(d.tournaments)){toast('Ce texte n\'est pas une sauvegarde Match Manager EPS',5000);return;}
+let added=0,skipped=0;
+const existing=new Set(state.tournaments.map(t=>t.id));
+for(const raw of d.tournaments){
+const t=sanitizeImportedTournament(raw);
+if(!t){skipped++;continue;}
+if(existing.has(t.id)){t.id=uid();t.name=(t.name+' (importé)').slice(0,90);}
+existing.add(t.id);
+state.tournaments.push(t);
+t.matches.forEach(m=>{
+Object.keys(d.drafts||{}).forEach(k=>{if(k.endsWith('-'+m.id)&&!state.drafts[k]&&/^[0-9.\-]*$|^(true|false)$/.test(String(d.drafts[k])))state.drafts[k]=d.drafts[k];});
+});
+added++;
+}
+if(Array.isArray(d.savedLists)){
+d.savedLists.forEach(l=>{
+if(!l||typeof l.name!=='string'||!Array.isArray(l.players))return;
+if(state.savedLists.some(x=>x.name===l.name))return;
+state.savedLists.push({name:String(l.name).replace(/[<>"'`&\\]/g,'').slice(0,80),
+players:l.players.filter(p=>p&&typeof p.name==='string').slice(0,500).map(p=>({name:String(p.name).replace(/[<>"'`&\\]/g,'').slice(0,80).toUpperCase(),level:Math.max(0,Math.min(5,+p.level||0))}))});
+});
+}
+save();
+closeModal();
+renderHome();
+toast(added?(added+' tournoi(s) importé(s)'+(skipped?' — '+skipped+' ignoré(s) (données invalides)':'')):'Aucun tournoi importé'+(skipped?' (données invalides)':''),4500);
+}
+
+/* ===== MODE TABLETTE ÉLÈVE (un match, gros boutons) ===== */
+let liveMid=null,liveReturn='scr-matches';
+function liveMatch(){return T&&liveMid?T.matches.find(x=>x.id===liveMid):null;}
+function openLive(mid,ev){
+if(ev)ev.stopPropagation();
+const m=T.matches.find(x=>x.id===mid);
+if(!m||m.status==='done')return;
+const a=document.querySelector('.screen.active');
+if(a&&a.id!=='scr-live')liveReturn=a.id;
+liveMid=mid;
+if(m.status==='pending'){m.status='playing';save();}
+showScreen('scr-live');
+}
+function closeLive(){
+liveMid=null;
+showScreen(liveReturn||'scr-matches');
+}
+function liveFallback(key,m){
+const k=key.slice(0,key.indexOf('-'));
+if(k==='s1')return m.score1;
+if(k==='s2')return m.score2;
+const mm=/^s([123])([ab])$/.exec(k);
+if(mm&&m.sets&&m.sets[+mm[1]-1])return mm[2]==='a'?m.sets[+mm[1]-1].s1:m.sets[+mm[1]-1].s2;
+return '';
+}
+function liveVal(key,m){
+const fb=liveFallback(key,m);
+const v=draftValue(key,fb===null||fb===undefined?'':fb);
+return v===''?'':String(v);
+}
+function liveAdj(key,d){
+const m=liveMatch();if(!m||m.status==='done')return;
+const cur=parseInt(liveVal(key,m),10)||0;
+state.drafts[key]=String(Math.max(0,Math.min(99,cur+d)));
+clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(save,400);
+renderLive();
+}
+function liveSetBonus(on){
+const m=liveMatch();if(!m)return;
+state.drafts['refbonus-'+m.id]=!!on;
+clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(save,400);
+}
+function liveSetRef(val){
+const m=liveMatch();if(!m)return;
+m.refereeId=val||'';
+const rp=T.players.find(p=>p.id===val);
+m.referee=rp?rp.name:'';
+save();
+}
+function liveSideHtml(name,key,m,col){
+const v=liveVal(key,m);
+return '<div class="live-side"><div class="live-name">'+name+'</div><div class="live-score">'+(v===''?'0':escH(v))+'</div>'+
+'<button class="live-btn plus" onclick="liveAdj(\''+key+'\',1)">+</button>'+
+'<button class="live-btn" onclick="liveAdj(\''+key+'\',-1)">&minus;</button></div>';
+}
+function liveTimerHtml(m){
+const t=getOrInitMatchTimer(m);
+const remaining=t.running&&t.endsAt?Math.max(0,Math.round((t.endsAt-Date.now())/1000)):t.secondsLeft;
+const over=remaining<=0;
+const all=t.period>=T.settings.nbPeriods&&over;
+let c='';
+if(t.running)c='<button class="btn-secondary" onclick="pauseMatchTimer(\''+m.id+'\',event)">&#9208; Pause</button>';
+else if(over)c=all?'<span class="mtimer-end">Fin du temps r&eacute;glementaire</span>':'<button class="btn-secondary" onclick="advanceMatchPeriod(\''+m.id+'\',event)">P&eacute;riode suivante &rarr;</button>';
+else c='<button class="btn-secondary" onclick="startMatchTimer(\''+m.id+'\',event)">&#9654; D&eacute;marrer</button>';
+return '<div class="live-timer"><span class="mtimer-period">P&eacute;riode '+t.period+'/'+T.settings.nbPeriods+'</span><span class="live-time"'+(over?' style="color:var(--err-txt)"':'')+'>'+fmtMatchTime(remaining)+'</span>'+c+'</div>';
+}
+function findNextMatch(m){
+return T.matches.find(x=>x.id!==m.id&&x.status!=='done'&&x.phase===m.phase&&x.poolId===m.poolId&&x.consolationRound===m.consolationRound&&x.bracketRound===m.bracketRound&&!x.forfeit);
+}
+function renderLive(){
+const el=document.getElementById('live-content');if(!el)return;
+const m=liveMatch();
+if(!m){el.innerHTML='';return;}
+const p1=T.players.find(p=>p.id===m.p1),p2=T.players.find(p=>p.id===m.p2);
+const n1=escH(p1?p1.name:'?'),n2=escH(p2?p2.name:'?');
+document.getElementById('live-title').textContent='Match '+(m.matchNum||'')+(m.table?' — Table '+m.table:'');
+const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
+if(m.status==='done'){
+const next=findNextMatch(m);
+let detail='';
+if(m.sets&&m.sets.length)detail='<div class="live-info">'+m.sets.map(s=>s.s1+'-'+s.s2).join(' &nbsp;/&nbsp; ')+'</div>';
+el.innerHTML='<div class="live-ok"><div style="font-size:3.5em">&#9989;</div><div class="big">'+n1+' &nbsp;'+m.score1+' &ndash; '+m.score2+'&nbsp; '+n2+'</div>'+detail+
+'<p style="color:var(--txt2)">R&eacute;sultat enregistr&eacute;</p></div>'+
+'<div class="live-actions">'+(next?'<button class="btn-primary" onclick="openLive(\''+next.id+'\')">Match suivant &rarr;</button><div style="height:10px"></div>':'')+
+'<button class="btn-secondary" style="width:100%;height:56px" onclick="closeLive()">Retour &agrave; la liste</button></div>';
+return;
+}
+let html='<div class="live-info">'+(m.round?'Tour '+m.round+' &bull; ':'')+(isBo3?'2 manches gagnantes':(T.settings.matchFamily==='time'?'Match au temps':'Match au score'))+'</div>';
+if(T.settings.matchFamily==='time')html+=liveTimerHtml(m);
+if(!isBo3){
+html+='<div class="live-sides">'+liveSideHtml(n1,'s1-'+m.id,m)+liveSideHtml(n2,'s2-'+m.id,m)+'</div>';
+}else{
+const num=(k)=>parseInt(liveVal(k,m),10)||0;
+const has=(k)=>liveVal(k,m)!=='';
+let w1=0,w2=0;
+[1,2].forEach(i=>{if(has('s'+i+'a-'+m.id)||has('s'+i+'b-'+m.id)){const a=num('s'+i+'a-'+m.id),b=num('s'+i+'b-'+m.id);if(a>b)w1++;else if(b>a)w2++;}});
+const show3=w1===1&&w2===1;
+html+='<div class="live-sides"><div class="live-side"><div class="live-name">'+n1+'</div></div><div class="live-side"><div class="live-name">'+n2+'</div></div></div>';
+[1,2,3].forEach(i=>{
+if(i===3&&!show3)return;
+const ka='s'+i+'a-'+m.id,kb='s'+i+'b-'+m.id;
+const va=liveVal(ka,m),vb=liveVal(kb,m);
+html+='<div class="live-set-label">Manche '+i+'</div><div class="live-sides">'+
+'<div class="live-side"><div class="live-num">'+(va===''?'0':escH(va))+'</div><button class="live-btn plus" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+ka+'\',1)">+</button><button class="live-btn" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+ka+'\',-1)">&minus;</button></div>'+
+'<div class="live-side"><div class="live-num">'+(vb===''?'0':escH(vb))+'</div><button class="live-btn plus" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+kb+'\',1)">+</button><button class="live-btn" style="height:60px;font-size:2.2em" onclick="liveAdj(\''+kb+'\',-1)">&minus;</button></div></div>';
+});
+}
+const cands=getRefereeCandidates(m);
+html+='<div class="live-actions"><div style="display:flex;align-items:center;margin-bottom:12px"><select id="live-ref" style="flex:1;margin-right:10px" onchange="liveSetRef(this.value)"><option value="">&#9999; Arbitre</option>'+
+cands.map(p=>'<option value="'+p.id+'"'+(m.refereeId===p.id?' selected':'')+'>'+escH(p.name)+'</option>').join('')+'</select>'+
+'<label class="ref-bonus-label"><input type="checkbox" '+(draftValue('refbonus-'+m.id,m.refBonus)?'checked':'')+' onchange="liveSetBonus(this.checked)">+1 pt arb.</label></div>'+
+'<button class="btn-primary" onclick="liveAskValidate()">&#10003; Valider le score</button></div>';
+el.innerHTML=html;
+}
+function liveSummary(m){
+const p1=T.players.find(p=>p.id===m.p1),p2=T.players.find(p=>p.id===m.p2);
+const n1=escH(p1?p1.name:'?'),n2=escH(p2?p2.name:'?');
+const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
+if(!isBo3){
+return '<div style="font-size:1.5em;text-align:center;font-weight:700">'+n1+' <span style="color:var(--pri-lt)">'+(parseInt(liveVal('s1-'+m.id,m),10)||0)+' &ndash; '+(parseInt(liveVal('s2-'+m.id,m),10)||0)+'</span> '+n2+'</div>';
+}
+let h='<div style="text-align:center;font-weight:700;margin-bottom:6px">'+n1+' &nbsp;/&nbsp; '+n2+'</div>';
+[1,2,3].forEach(i=>{
+const a=liveVal('s'+i+'a-'+m.id,m),b=liveVal('s'+i+'b-'+m.id,m);
+if(a===''&&b==='')return;
+h+='<div style="text-align:center;font-size:1.3em">Manche '+i+' : <b>'+(parseInt(a,10)||0)+' &ndash; '+(parseInt(b,10)||0)+'</b></div>';
+});
+return h;
+}
+function liveAskValidate(){
+const m=liveMatch();if(!m)return;
+showModal('Confirmer le score',liveSummary(m)+
+'<div class="modal-actions" style="justify-content:space-between"><button class="btn-secondary" style="min-height:56px" onclick="closeModal()">Corriger</button><button class="btn-primary" style="width:auto;min-height:56px" onclick="liveValidate()">&#10003; Valider</button></div>');
+}
+function liveValidate(){
+closeModal();
+const m=liveMatch();if(!m)return;
+// la liste (masquée) lit ses propres champs : on les aligne sur les brouillons de l'écran tablette
+Object.keys(state.drafts).forEach(k=>{
+if(!k.endsWith('-'+m.id))return;
+const el=document.getElementById(k);
+if(!el)return;
+if(el.type==='checkbox')el.checked=!!state.drafts[k];else el.value=state.drafts[k];
+});
+validateMatch(m.id);
+renderLive();
+}
+
 /* ===== MODAL UTIL ===== */
 function showModal(title,html){
 const mc=document.getElementById('modal-container');
@@ -3047,6 +3650,7 @@ window.__androidBack=function(){
 const mc=document.getElementById('modal-container');
 if(mc&&mc.children.length){closeModal();return 'handled';}
 const active=document.querySelector('.screen.active');
+if(active&&active.id==='scr-live'){closeLive();return 'handled';}
 if(active&&active.id!=='scr-home'){save();showScreen('scr-home');return 'handled';}
 const now=Date.now();
 if(now-lastBackAt<2000)return 'quit';
@@ -3073,6 +3677,7 @@ document.addEventListener('click',requestAppFullscreen,{once:true});
 
 /* ===== INIT ===== */
 load();
+loadUndo();
 applyLightMode(localStorage.getItem(LIGHT_MODE_KEY)==='1');
 renderHome();
 if(loadProblem)showLoadProblem();
