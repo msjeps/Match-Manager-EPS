@@ -2,6 +2,10 @@ plugins {
     id 'com.android.application'
 }
 
+def keystoreProps = new Properties()
+def keystoreFile = rootProject.file('keystore.properties')
+if (keystoreFile.exists()) { keystoreFile.withInputStream { keystoreProps.load(it) } }
+
 android {
     namespace 'com.teneps.app'
     compileSdk 34
@@ -14,8 +18,20 @@ android {
         versionName "1.9.1"
     }
 
+    signingConfigs {
+        release {
+            if (keystoreFile.exists()) {
+                storeFile file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -29,6 +45,14 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 }
+
+// Source unique : index.html à la racine du dépôt, recopié dans les assets à chaque build
+// (android/app/src/main/assets/index.html est généré, non versionné).
+tasks.register('syncWebApp', Copy) {
+    from "${rootDir}/../index.html"
+    into "${projectDir}/src/main/assets"
+}
+preBuild.dependsOn 'syncWebApp'
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'

@@ -12,7 +12,7 @@ WebView plein écran qui charge l'application web depuis `app/src/main/assets/in
 
 | Fichier | Rôle |
 |---|---|
-| `app/src/main/assets/index.html` | **Copie** de `../index.html` : à resynchroniser avant chaque build |
+| `app/src/main/assets/index.html` | **Généré** (non versionné) : copie de `../index.html` faite par la tâche Gradle `syncWebApp` à chaque build |
 | `app/src/main/assets/icon_192.png`, `logo-outils-eps.png` | Images référencées par la page |
 | `app/src/main/java/com/teneps/app/MainActivity.java` | Activité unique : WebView, interfaces `AndroidDownload` et `AndroidPrint`, Retour, écran allumé, sélecteur de fichier |
 | `app/src/main/AndroidManifest.xml` | `allowBackup="false"`, pas d'INTERNET, `WRITE_EXTERNAL_STORAGE` limité à l'API 28 |
@@ -31,11 +31,12 @@ Exclus par `.gitignore` : `build/`, `.gradle/`, `local.properties`, clés de sig
 
 ## Construire l'APK de test (signée en debug)
 
+Avant de construire : `npm test` à la racine du projet (vérifie aussi que `versionName` égale `APP_VERSION` et que les assets sont identiques à `index.html`).
+
 ```bash
 cd android
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 export ANDROID_HOME="$HOME/Library/Android/sdk"
-cp ../index.html app/src/main/assets/index.html
 ./gradlew assembleDebug --offline
 cp app/build/outputs/apk/debug/app-debug.apk ../MatchManagerEPS.apk
 ```
@@ -50,8 +51,15 @@ unzip -p app/build/outputs/apk/debug/app-debug.apk assets/index.html | grep -c "
 
 ## Signature
 
-L'APK diffusée est signée avec la clé debug de la machine de build : une mise à jour par-dessus l'ancienne fonctionne depuis ce Mac. Passer à une clé de release imposerait de **désinstaller l'ancienne APK sur toutes les tablettes**. Décision en attente, voir [../TODO.md](../TODO.md). Une clé de release ne doit jamais être versionnée.
+Depuis le 2026-10-11, l'APK diffusée est signée avec une **clé de release** (`~/Documents/MatchManagerEPS-cle-de-signature/matchmanager-release.jks`, alias `matchmanager`, copie dans 1Password). `android/keystore.properties` (non versionné) en donne le chemin et les mots de passe ; `build.gradle` signe le build `release` avec. Les APK signées avec l'ancienne clé debug doivent être **désinstallées** avant d'installer celle-ci. Ne jamais versionner la clé.
+
+Build de diffusion :
+```bash
+./gradlew assembleRelease --offline -x lintVitalAnalyzeRelease -x lintVitalReportRelease -x lintVitalRelease
+cp app/build/outputs/apk/release/app-release.apk ../MatchManagerEPS.apk
+```
+(les `-x lintVital...` ne servent que hors ligne, le lint n'étant pas en cache)
 
 ## À valider sur la tablette avant diffusion
 
-Écran qui ne s'éteint pas, barres système masquées, bouton Retour, enregistrement du XLSX et du JSON dans Téléchargements, sélecteur de fichier (CSV de joueurs, sauvegarde JSON).
+Écran qui ne s'éteint pas, barres système masquées, bouton Retour (ferme aussi les boîtes de dialogue), enregistrement du XLSX et du JSON dans Téléchargements, sélecteur de fichier (CSV de joueurs, sauvegarde JSON), impression / PDF des classements et du tableau (fenêtre d'impression Android, « Enregistrer au format PDF »).

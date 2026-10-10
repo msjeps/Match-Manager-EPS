@@ -10,7 +10,7 @@ Node 20 ou plus, aucune dépendance. Les tests tournent sans navigateur, sans r�
 
 `harness.js` lit le `<script>` de `index.html` et l'exécute dans un contexte `vm` avec un DOM factice. Les fonctions de l'application (`calcPoolRanking`, `generateBracket`, `downloadCSV`, `buildBackup`...) sont donc testées **telles qu'elles sont livrées** : rien n'est recopié ni extrait dans un autre fichier. `T` et `state`, déclarés avec `let`, sont accessibles par `app.T` et `app.state`.
 
-- `HTML=chemin node --test tests/*.test.js` : tester un autre fichier (par exemple `MatchManagerEPS.html`).
+- `HTML=chemin node --test tests/*.test.js` : tester un autre fichier (par exemple une copie de travail).
 - Le DOM factice absorbe tous les appels : un test ne vérifie pas le rendu.
 
 ## Ce qui est couvert
@@ -25,6 +25,7 @@ Node 20 ou plus, aucune dépendance. Les tests tournent sans navigateur, sans r�
 | Robustesse | `load()` sur données illisibles, annuler |
 | Mot de passe | empreinte, pas de mot de passe par défaut en clair dans le code |
 | Palmarès | classes sans casse, forfaits exclus, podium si tournoi terminé |
+| Re-rendu ciblé | `matchSig`, `rankingsSig`, `bracketShapeSig` : stables sans changement, différentes après un résultat ou un tour généré |
 | Livraison | `index.html` = assets APK, `versionName` Gradle = `APP_VERSION` |
 
 ## Ce qui n'est pas couvert

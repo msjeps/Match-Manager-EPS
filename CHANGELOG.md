@@ -18,7 +18,7 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 ## 1.9 - 2026-10-11 (APK versionCode 10, cache v26)
 
 ### Outils (sans effet sur l'application)
-- **Tests Node** (`npm test`, dossier `tests/`) : 22 tests de la logique de calcul sans navigateur, voir [tests/README.md](tests/README.md).
+- **Tests Node** (`npm test`, dossier `tests/`) : 19 tests de la logique de calcul sans navigateur (22 depuis la 1.9.1), voir [tests/README.md](tests/README.md).
 
 ### Ajouts
 - **Palmarès par classe** (écran d'accueil) : cumul des résultats de tous les tournois d'une même classe (écriture de la classe sans tenir compte de la casse ni des espaces). Par joueur (rapproché par nom) : tournois, victoires, défaites, % de victoires, différence de points, points de classement cumulés, premières places, podiums. Tri par points, % de victoires ou podiums ; tournois décochables (copies, essais) ; impression / PDF.
@@ -30,7 +30,7 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ### Changements
 - **Plus aucune boîte native** (`confirm()`, `alert()`, `prompt()`) : suppression de tournoi, de liste, de tous les joueurs, de toutes les données, réinitialisation du mot de passe, modification d'un résultat qui supprime les finales ou les tours suivants, saisie du n° de table. Boîtes aux couleurs de l'app, boutons de 44 px, Retour Android les ferme.
-- **Mise à jour ciblée des matchs** : démarrer un match, choisir un arbitre, régler la table, valider un résultat ou lancer depuis la file d'attente ne remplace plus que la carte concernée (plus la liste entière), avec mise à jour des listes d'arbitres, de l'avancement et de la file d'attente. Le défilement n'est plus perdu et la tablette travaille moins. Le tableau (mode 3) reste recalculé en entier.
+- **Mise à jour ciblée des matchs** : démarrer un match, choisir un arbitre, régler la table, valider un résultat ou lancer depuis la file d'attente ne remplace plus que la carte concernée (plus la liste entière), avec mise à jour des listes d'arbitres, de l'avancement et de la file d'attente. Le défilement n'est plus perdu et la tablette travaille moins. Le tableau (mode 3) restait recalculé en entier (ciblé depuis la 1.9.1).
 
 ---
 

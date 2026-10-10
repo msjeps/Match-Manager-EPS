@@ -2,8 +2,12 @@
 
 ## À faire
 
-### Avant de diffuser la v1.5 / v1.6 (validation sur la tablette Lenovo, Android 10)
+### Avant de diffuser les v1.5 à v1.9.1 (validation sur la tablette Lenovo, Android 10)
 - [ ] v1.6 : file d'attente lisible et « Lancer ce match » utilisable au doigt ; Imprimer / PDF ouvre le gestionnaire d'impression et produit un PDF correct (classements, arbre en paysage).
+- [ ] v1.7 : l'export XLSX d'un tournoi en 2 manches gagnantes s'ouvre dans Excel avec les colonnes Set 1 à Set 3 et Total pts.
+- [ ] v1.8 : boîtes de dialogue (suppression, modification d'un résultat, n° de table, mot de passe) lisibles et utilisables au doigt ; bouton Retour les ferme.
+- [ ] v1.9 : palmarès par classe avec de vrais tournois (homonymes, classes écrites différemment, tournoi en cours).
+- [ ] v1.9.1 : fluidité en tableau de 16 joueurs (validation d'un résultat, passage de tour), défilement conservé.
 - [ ] Écran qui ne s'éteint plus pendant une saisie ; barres système masquées (mode immersif) et qui reviennent au balayage.
 - [ ] Bouton Retour : ferme la fenêtre ouverte, puis accueil, puis quitte au deuxième appui.
 - [ ] Import d'un fichier via le sélecteur Android : CSV de joueurs et sauvegarde JSON.
@@ -15,20 +19,27 @@
 
 ### Publication
 - [ ] Uploader `MatchManagerEPS.apk` sur WordPress. Le bouton « Version APK » de `outils-eps.fr/application/match-manager-eps/` pointe toujours vers `https://outils-eps.fr/wp-content/uploads/apk/ten-eps.apk` (ancienne build) ; renommer le fichier côté WordPress en `match-manager.apk` à ce moment.
-- [ ] Mettre à jour le **guide professeur** PDF (`Guide_Professeur_MatchManagerEPS.pdf`) : absents / forfaits, annuler, mode tablette élève, sauvegarde et transfert, départage. Sans tiret cadratin. Le mot de passe par défaut n'y change pas.
+- [ ] Mettre à jour le **guide professeur** PDF (`Guide_Professeur_MatchManagerEPS.pdf`) : absents / forfaits, annuler, mode tablette élève, sauvegarde et transfert, départage, file d'attente, impression / PDF, palmarès par classe, détail des sets dans l'export XLSX. Sans tiret cadratin. Le mot de passe par défaut n'y change pas.
 
 ### Décisions en attente
-- [ ] **Clé de signature de release** : l'APK est signée en debug. Passer à une clé de release impose de désinstaller l'ancienne APK sur toutes les tablettes (à combiner avec une vraie distribution, clé sauvegardée dans 1Password).
+- [ ] **Sauvegarder la clé de release dans 1Password** (`~/Documents/MatchManagerEPS-cle-de-signature/` : `.jks` + `LISEZ-MOI.txt` avec le mot de passe), puis supprimer le `LISEZ-MOI.txt` du disque. Avant d'installer la nouvelle APK : exporter les sauvegardes JSON des tablettes et **désinstaller l'ancienne** (signée debug).
 - [ ] Le dépôt GitHub est public : `MEMORY.md` et `TODO.md` y sont publiés. Vérifier qu'ils ne contiennent rien de sensible avant chaque push.
 
-### Idées retenues de l'audit, non réalisées
-- [ ] Réduire à un seul fichier source HTML (aujourd'hui trois copies : `MatchManagerEPS.html`, `index.html`, `android/app/src/main/assets/index.html`).
+### Rappels avant chaque livraison
+- [ ] `npm test` passe (22 tests).
+- [ ] Rien à recopier : `index.html` est la source unique, Gradle la copie dans les assets de l'APK au build.
+- [ ] `APP_VERSION`, `versionName` et `versionCode` (`android/app/build.gradle`), `CACHE_NAME` (`sw.js`) bumpés ; APK reconstruite.
+- [ ] Documentation : CHANGELOG, FONCTIONNALITES, MEMORY, TODO, aide intégrée. Aucun tiret cadratin.
 
 ## Fait récemment
 
+- [x] Clé de release créée et APK signée en release (2026-10-11, v1.9.1, aucun changement de l'app) : `signingConfigs.release` lue depuis `android/keystore.properties` (non versionné), APK `MatchManagerEPS.apk` reconstruite. Voir `android/README.md`.
+
+- [x] Source HTML unique (2026-10-11, aucun changement de l'app) : `index.html` seul, `MatchManagerEPS.html` supprimé, assets de l'APK générés par la tâche Gradle `syncWebApp` (plus versionnés, `android/.gitignore`), test d'identité des copies remplacé par un contrôle de la tâche. 22 tests ; `assembleDebug` vérifié.
+
 - [x] v1.9.1 (2026-10-11, versionCode 11, `CACHE_NAME` v27) : re-rendu ciblé du tableau (cartes à signature, rendu complet seulement si un tour est généré) et des classements (pas de recalcul ni de QR si rien n'a changé). 22 tests. Vérifié dans le navigateur ; à valider sur la tablette (fluidité en tableau de 16).
 
-- [x] Tests Node de la logique (2026-10-11, aucun changement de l'app, version 1.9 inchangée) : `npm test` (ou `node --test tests/*.test.js`), 19 tests sans dépendance : round-robin, statistiques et classement de poule (départage direct, forfait), tableau (byes, progression, vainqueur), export XLSX (CRC du ZIP, 2 onglets, détail des sets), sauvegarde / import assaini, `load()` données illisibles, annuler, mot de passe, palmarès, cohérence des versions et des copies. Non couvert : rendu et interactions (écrans, boîtes, chronomètre), APK. Voir `tests/README.md`.
+- [x] Tests Node de la logique (2026-10-11, aucun changement de l'app) : `npm test` (ou `node --test tests/*.test.js`), 19 tests au départ (22 depuis la 1.9.1), sans dépendance : round-robin, statistiques et classement de poule (départage direct, forfait), tableau (byes, progression, vainqueur), export XLSX (CRC du ZIP, 2 onglets, détail des sets), sauvegarde / import assaini, `load()` données illisibles, annuler, mot de passe, palmarès, cohérence des versions et des copies. Non couvert : rendu et interactions (écrans, boîtes, chronomètre), APK. Voir `tests/README.md`.
 
 - [x] v1.9 (2026-10-11, versionCode 10, `CACHE_NAME` v26) : palmarès cumulé par classe (accueil). Vérifié dans le navigateur sur 3 tournois de test ; à valider sur la tablette avec de vrais tournois (homonymes, classes écrites différemment).
 

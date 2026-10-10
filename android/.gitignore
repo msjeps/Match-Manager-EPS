@@ -23,3 +23,6 @@ keystore.properties
 *.dex
 
 .DS_Store
+
+# Généré par la tâche Gradle syncWebApp depuis ../index.html
+app/src/main/assets/index.html

@@ -11,8 +11,11 @@ Application PWA de gestion de tournois pour les cours d'EPS (collège & lycée) 
 - Formats de match configurables : au score (1 ou 2 manches gagnantes, 11/15/21/25 points) ou au temps (périodes chronométrées, match nul autorisé)
 - Classements automatiques avec départage par confrontation directe
 - Absents, forfaits et joueurs ajoutés en cours de tournoi
+- File d'attente : tables libres, prochain match libre, table et arbitre suggérés, « Lancer ce match »
 - Mode tablette élève (un match, gros boutons) et bouton Annuler à plusieurs niveaux
-- Export XLSX, QR code des résultats (lisible par [SCAN EPS](https://msjeps.github.io/scaneps/)), sauvegarde et transfert de tournoi en JSON
+- Impression / PDF A4 noir et blanc : classements, arbre du tableau, matchs et scores
+- Palmarès par classe : cumul des tournois d'une classe (victoires, % victoires, points, podiums)
+- Export XLSX (détail des sets et totaux en 2 manches gagnantes), QR code des résultats (lisible par [SCAN EPS](https://msjeps.github.io/scaneps/)), sauvegarde et transfert de tournoi en JSON
 - Sauvegarde automatique continue (localStorage), résiste aux rotations d'écran et sorties d'app, 100 % hors ligne
 
 Tests : `npm test` (Node 20 ou plus, aucune dépendance), voir [tests/README.md](tests/README.md).
@@ -29,10 +32,11 @@ Version actuelle : **1.9.1**. Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md)
 | [MEMORY.md](MEMORY.md) | Journal des décisions et de leur raison |
 | [CLAUDE.md](CLAUDE.md) | Architecture, structure de données, conventions de code |
 | [android/README.md](android/README.md) | Wrapper APK : contenu, build, signature |
+| [tests/README.md](tests/README.md) | Tests Node de la logique (`npm test`) |
 
 ## Déploiement
 
-Le fichier suivi par git est `index.html` (voir [CLAUDE.md](CLAUDE.md) pour le détail de l'architecture et des conventions du projet). Le fichier de développement local est `MatchManagerEPS.html` - penser à recopier son contenu vers `index.html` avant chaque commit.
+Le fichier suivi par git est `index.html` (voir [CLAUDE.md](CLAUDE.md) pour le détail de l'architecture et des conventions du projet). C'est la source unique : on l'édite directement, l'APK le recopie automatiquement à chaque build.
 
 Démo en ligne : https://apps.outils-eps.fr/Match-Manager-EPS/
 

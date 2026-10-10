@@ -294,10 +294,10 @@ test('version affichée et version Android alignées', () => {
   assert.ok(gradle.includes('versionName "' + app.version + '"'), 'versionName Gradle = APP_VERSION (' + app.version + ')');
 });
 
-test('copies de l\'application identiques (index.html et assets de l\'APK)', () => {
-  const a = fs.readFileSync(path.join(__dirname, '..', 'index.html'));
-  const b = fs.readFileSync(path.join(__dirname, '..', 'android', 'app', 'src', 'main', 'assets', 'index.html'));
-  assert.ok(a.equals(b), 'index.html et android/app/src/main/assets/index.html diffèrent : recopier avant le build');
+test('APK : les assets sont recopiés depuis index.html par Gradle (source unique)', () => {
+  const gradle = fs.readFileSync(path.join(__dirname, '..', 'android', 'app', 'build.gradle'), 'utf8');
+  assert.ok(/syncWebApp/.test(gradle) && gradle.includes('/../index.html'), 'tâche syncWebApp absente de build.gradle');
+  assert.ok(/preBuild\.dependsOn\s+'syncWebApp'/.test(gradle), 'syncWebApp doit précéder preBuild');
 });
 
 // ----- re-rendu ciblé : empreintes -----

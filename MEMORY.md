@@ -4,9 +4,9 @@ Journal de contexte et de décisions du projet, pour reprendre le travail sans p
 
 ## Conventions du projet
 
-- **Fichier de dev** : `MatchManagerEPS.html` (celui qu'on édite, testé dans le navigateur). **Fichier de déploiement** : `index.html` (celui suivi par git et servi par GitHub Pages). Les deux ne sont pas synchronisés automatiquement - copier le contenu avant chaque commit.
+- **Source unique** (depuis le 2026-10-11) : `index.html` est le seul fichier HTML, on l'édite directement (suivi par git, servi par GitHub Pages, lu par les tests). `MatchManagerEPS.html` n'existe plus ; `android/app/src/main/assets/index.html` est généré par la tâche Gradle `syncWebApp` (non versionné). Pourquoi : trois copies à resynchroniser à la main, avec un test d'identité qui ne servait qu'à rattraper l'oubli.
 - **Dépôt distant** : github.com/msjeps/Match-Manager-EPS (renommé depuis msjeps/TEN-EPS le 2026-08-02, GitHub redirige l'ancienne URL), déployé sur https://apps.outils-eps.fr/TEN-EPS/ via GitHub Pages (branche `main`, racine `/`) - **URL technique pas encore reconfigurée**, voir `TODO.md`.
-- **Fichiers suivis par git** (depuis le 2026-10-10) : `index.html`, `sw.js`, `manifest.json`, icônes et logo, `README.md`, `CHANGELOG.md`, `FONCTIONNALITES.md`, `MEMORY.md`, `TODO.md`, le PDF du guide professeur et `android/` (sources du wrapper, avec son propre `.gitignore`). Restent hors dépôt (`.gitignore`) : `CLAUDE.md`, `MatchManagerEPS.html` (fichier de dev), `MatchManagerEPS.apk`, `design_preview.html`, `.claude/`, `.DS_Store`.
+- **Fichiers suivis par git** (depuis le 2026-10-10) : `index.html`, `sw.js`, `manifest.json`, icônes et logo, `README.md`, `CHANGELOG.md`, `FONCTIONNALITES.md`, `MEMORY.md`, `TODO.md`, `package.json` et `tests/` (tests Node, `npm test`), le PDF du guide professeur et `android/` (sources du wrapper, avec son propre `.gitignore`). Restent hors dépôt (`.gitignore`) : `CLAUDE.md`, `MatchManagerEPS.html` (fichier de dev), `MatchManagerEPS.apk`, `design_preview.html`, `.claude/`, `.DS_Store`.
 - **App compagnon** : [SCAN EPS](file:///Users/nathalieprenois/AndroidStudioProjects/SCAN%20EPS) scanne le QR code des résultats généré par Match Manager EPS (préfixe technique inchangé `TENEPS|`, comparaison de chaîne exacte côté SCAN EPS). Compatibilité vérifiée pour les modes 1/2/3 le 2026-08-02.
 
 ## Décisions & historique
@@ -21,7 +21,7 @@ Entrées les plus récentes en premier à partir du 2026-10-10 ; les entrées du
 
 ### 2026-10-11 - Tests Node de la logique (sans modifier l'app)
 - **On charge l'application telle quelle plutôt que d'en extraire un fichier `logic.js`.** Découper le fichier unique aurait cassé le principe « un fichier HTML autonome », multiplié les fichiers à recopier (déjà trois copies) et à mettre en cache. `tests/harness.js` exécute le `<script>` d'`index.html` dans un contexte `vm` avec un DOM factice (mandataire qui absorbe tout appel) et un pont pour les `let` globaux `T` et `state`. Zéro duplication de code : ce qu'on teste est ce qui est livré.
-- **Les tests lisent `index.html`** (suivi par git, identique au fichier de dev), pas `MatchManagerEPS.html` (ignoré par git) ; `HTML=chemin` pour viser un autre fichier. Ils vérifient aussi que les copies `index.html` / assets de l'APK sont identiques et que `versionName` Gradle = `APP_VERSION`.
+- **Les tests lisent `index.html`** (suivi par git, identique au fichier de dev), pas `MatchManagerEPS.html` (ignoré par git) ; `HTML=chemin` pour viser un autre fichier. Ils vérifient aussi que `build.gradle` recopie `index.html` dans les assets (`syncWebApp`) et que `versionName` Gradle = `APP_VERSION`.
 - **Vérifié par mutation** : retirer le départage direct ou le barème « défaite au set décisif » fait échouer le test concerné. Piège d'écriture : les identifiants de test (`r1p0`) ne se comparent pas par `slice(2)` (NaN) ; utiliser le suffixe numérique.
 
 ### 2026-10-11 - v1.9 : palmarès par classe

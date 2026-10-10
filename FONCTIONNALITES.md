@@ -46,6 +46,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - **File d'attente** : carte au-dessus des matchs (poules, finales, tableau) avec tables libres / occupées, prochain match libre (joueurs ni en jeu ni arbitres, priorité à ceux qui ont le moins joué), table et arbitre suggérés, « Lancer ce match ».
 - **Mode tablette élève** (📱) : un match en grand, boutons + et -, confirmation, match suivant.
 - **Annuler** (↩) : retour à l'état exact d'avant la dernière action, 8 niveaux par tournoi.
+- **Mise à jour ciblée** : un changement sur un match ne remplace que les cartes dont l'affichage change (le défilement est conservé) ; le tableau n'est reconstruit en entier que lorsqu'un tour ou une consolante est généré.
 - **Modifier** un résultat : si des finales ou des tours suivants en dépendent, ils sont supprimés après confirmation puis recalculés.
 
 ## 6. Classements
@@ -54,6 +55,8 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Tri : points, puis **confrontation directe** (réglable, nouveaux tournois), puis différence de points, puis points marqués. Les forfaits sont classés en dernier.
 - Mode 2 : classement par groupe de finale (rang déterminé par les victoires en finale), puis bloc **« Hors finales »** pour les non-qualifiés.
 - Mode 3 : vainqueur, finaliste, 3ᵉ et 4ᵉ (petite finale), consolantes, autres joueurs.
+- L'écran Classements ne recalcule ni le classement ni le QR code tant que rien n'a changé.
+- **Palmarès par classe** (accueil) : voir § 7.
 
 ## 7. Export et partage
 
@@ -66,7 +69,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 
 ## 8. Écrans et réglages
 
-- Accueil : liste des tournois, version affichée, pied de page outils-eps.fr.
+- Accueil : liste des tournois, palmarès par classe, sauvegarde / transfert, version affichée, pied de page outils-eps.fr.
 - **Paramètres** (libre) : mode clair / sombre, accès à la configuration avancée, aide.
 - **Configuration avancée** (mot de passe professeur) : format par défaut, points, départage, bonus arbitre, mot de passe personnalisé, suppression de toutes les données.
 - Aide intégrée à jour des fonctions ci-dessus.
@@ -79,6 +82,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Écran maintenu allumé (Wake Lock + `FLAG_KEEP_SCREEN_ON` dans l'APK), plein écran / mode immersif.
 - Rotation libre sans perte d'état.
 - Toute donnée affichée est échappée (`escH`).
+- Aucune boîte native (`confirm`, `alert`, `prompt`) : boîtes de dialogue de l'application, boutons de 44 px, fermées par Retour Android.
 - Mot de passe professeur : empreinte SHA-256 salée, jamais en clair. Barrière contre la curiosité des élèves, pas une protection cryptographique.
 - APK : `allowBackup="false"`, navigation limitée aux fichiers locaux, nom de fichier assaini côté Java, bouton Retour sans sortie accidentelle.
 
@@ -86,8 +90,8 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 
 - Transfert de tournoi par QR code (capacité insuffisante).
 - Scan de QR par la caméra dans l'app (c'est le rôle de SCAN EPS).
-- Impression / PDF du tableau et des classements.
-- Palmarès cumulé sur l'année.
-- Plan de rotation des arbitres et des tables au-delà du filtre actuel.
+- Export XLSX du palmarès par classe (impression / PDF seulement).
+- Planning figé des matchs et des arbitres : la file d'attente suggère le prochain match, elle ne planifie pas à l'avance.
+- Palmarès par identifiant de joueur : les joueurs sont rapprochés par nom (deux homonymes d'une même classe seraient fusionnés).
 
 Voir [TODO.md](TODO.md) pour la liste des idées retenues.
