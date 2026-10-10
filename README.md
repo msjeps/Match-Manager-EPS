@@ -15,7 +15,7 @@ Application PWA de gestion de tournois pour les cours d'EPS (collège & lycée) 
 - Export XLSX, QR code des résultats (lisible par [SCAN EPS](https://msjeps.github.io/scaneps/)), sauvegarde et transfert de tournoi en JSON
 - Sauvegarde automatique continue (localStorage), résiste aux rotations d'écran et sorties d'app, 100 % hors ligne
 
-Version actuelle : **1.7**. Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md).
+Version actuelle : **1.8**. Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md).
 
 ## Documentation du projet
 

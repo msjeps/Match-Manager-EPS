@@ -10,7 +10,7 @@
 - [ ] Export XLSX et sauvegarde JSON présents dans Téléchargements (l'export XLSX s'ouvre dans Excel).
 - [ ] Copier puis coller une sauvegarde d'une tablette à l'autre (messagerie).
 - [ ] Mode tablette élève : taille des boutons au doigt, confirmation, match suivant ; chronomètre en match au temps.
-- [ ] Mot de passe professeur : un mot de passe personnalisé défini avec une version précédente fonctionne toujours (migration en empreinte) ; réinitialisation après 3 échecs (boîte `confirm()` native, jamais testée hors navigateur automatisé).
+- [ ] Mot de passe professeur : un mot de passe personnalisé défini avec une version précédente fonctionne toujours (migration en empreinte) ; réinitialisation après 3 échecs (boîte maison depuis la v1.8).
 - [ ] Mise à jour de l'APK par-dessus l'ancienne sans perdre les tournois existants.
 
 ### Publication
@@ -23,12 +23,13 @@
 
 ### Idées retenues de l'audit, non réalisées
 - [ ] Palmarès cumulé par classe sur l'année.
-- [ ] Remplacer les `confirm()` / `alert()` / `prompt()` natifs par la modale maison (jamais validés dans le WebView).
-- [ ] Re-rendu ciblé plutôt que `innerHTML` complet (allège le CPU des tablettes lentes).
+- [ ] Re-rendu ciblé du tableau (mode 3) et des classements : seuls les matchs de poule et de finale sont ciblés (v1.8).
 - [ ] Extraire la logique pure (classements, tableau, XLSX) pour la tester en Node sans navigateur.
 - [ ] Réduire à un seul fichier source HTML (aujourd'hui trois copies : `MatchManagerEPS.html`, `index.html`, `android/app/src/main/assets/index.html`).
 
 ## Fait récemment
+
+- [x] v1.8 (2026-10-11, versionCode 9, `CACHE_NAME` v25) : boîtes maison à la place des `confirm()` / `alert()` / `prompt()` natifs (12 sites) et mise à jour ciblée des cartes de match (poules et finales). Vérifié dans le navigateur ; à valider sur la tablette (boutons des boîtes, fluidité, défilement conservé).
 
 - [x] v1.7 (2026-10-11, versionCode 8, `CACHE_NAME` v24) : export XLSX en 2 manches gagnantes avec détail des sets et totaux de points par match. Vérifié dans le navigateur (contenu du fichier relu) ; à ouvrir dans Excel sur une vraie sortie.
 

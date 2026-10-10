@@ -6,6 +6,14 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 1.8 - 2026-10-11 (APK versionCode 9, cache v25)
+
+### Changements
+- **Plus aucune boîte native** (`confirm()`, `alert()`, `prompt()`) : suppression de tournoi, de liste, de tous les joueurs, de toutes les données, réinitialisation du mot de passe, modification d'un résultat qui supprime les finales ou les tours suivants, saisie du n° de table. Boîtes aux couleurs de l'app, boutons de 44 px, Retour Android les ferme.
+- **Mise à jour ciblée des matchs** : démarrer un match, choisir un arbitre, régler la table, valider un résultat ou lancer depuis la file d'attente ne remplace plus que la carte concernée (plus la liste entière), avec mise à jour des listes d'arbitres, de l'avancement et de la file d'attente. Le défilement n'est plus perdu et la tablette travaille moins. Le tableau (mode 3) reste recalculé en entier.
+
+---
+
 ## 1.7 - 2026-10-11 (APK versionCode 8, cache v24)
 
 ### Ajouts
