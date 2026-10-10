@@ -499,7 +499,7 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 </div>
 <div class="card">
 <h3>&#128273; Mot de passe personnalis&eacute; (optionnel)</h3>
-<p style="font-size:.85em;color:var(--txt2);margin:8px 0">Par d&eacute;faut, cet acc&egrave;s est prot&eacute;g&eacute; par <code>ADMINPROF</code> (voir le guide professeur). Vous pouvez d&eacute;finir ici un mot de passe qui vous est propre &mdash; une fois personnalis&eacute;, <code>ADMINPROF</code> ne fonctionne plus directement (pour emp&ecirc;cher un &eacute;l&egrave;ve qui le conna&icirc;trait de contourner votre mot de passe). En cas d'oubli, 3 tentatives incorrectes sur l'&eacute;cran de connexion font appara&icirc;tre un bouton pour r&eacute;initialiser au mot de passe par d&eacute;faut.</p>
+<p style="font-size:.85em;color:var(--txt2);margin:8px 0">Cet acc&egrave;s est prot&eacute;g&eacute; par le mot de passe par d&eacute;faut (voir le guide professeur). Vous pouvez d&eacute;finir ici un mot de passe qui vous est propre &mdash; une fois personnalis&eacute;, le mot de passe par d&eacute;faut ne fonctionne plus directement (pour emp&ecirc;cher un &eacute;l&egrave;ve qui le conna&icirc;trait de contourner votre mot de passe). En cas d'oubli, 3 tentatives incorrectes sur l'&eacute;cran de connexion font appara&icirc;tre un bouton pour r&eacute;initialiser au mot de passe par d&eacute;faut.</p>
 <div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="adm-nouveau-mdp" placeholder="Laisser vide pour ne rien changer" autocomplete="off"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap">
 <button type="button" class="btn-secondary" onclick="definirMdpAdmin()">&#128190; Enregistrer ce mot de passe</button>
@@ -524,7 +524,7 @@ qrcode.stringToBytes=qrcode.stringToBytesFuncs['UTF-8'];
 const QRGen={toCanvas:function(canvas,text,cellSize){cellSize=cellSize||6;try{var qr=qrcode(0,'L');qr.addData(text,'Byte');qr.make();var sz=qr.getModuleCount(),quiet=4,total=(sz+quiet*2)*cellSize;canvas.width=total;canvas.height=total;var ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,total,total);ctx.fillStyle='#000';for(var r=0;r<sz;r++)for(var c=0;c<sz;c++)if(qr.isDark(r,c))ctx.fillRect((c+quiet)*cellSize,(r+quiet)*cellSize,cellSize,cellSize);}catch(e){canvas.width=200;canvas.height=50;var ctx2=canvas.getContext('2d');ctx2.fillStyle='red';ctx2.font='14px sans-serif';ctx2.fillText('Donn\u00e9es trop longues pour QR',10,30);}}};
 
 /* ===== APP STATE ===== */
-let state={tournaments:[],savedLists:[],settings:{format:'set11',winPts:3,loseSets3Pts:2,losePts:1,refBonusEnabled:false,refBonusPts:1,tables:10,matchFamily:'score',winningSets:1,pointsPerSet:11,nbPeriods:2,periodDuration:20,drawPts:1}};
+let state={tournaments:[],savedLists:[],drafts:{},settings:{format:'set11',winPts:3,loseSets3Pts:2,losePts:1,refBonusEnabled:false,refBonusPts:1,tables:10,matchFamily:'score',winningSets:1,pointsPerSet:11,nbPeriods:2,periodDuration:20,drawPts:1}};
 let T=null; // current tournament
 let curPoolIdx=0;
 let curFinalIdx=0;
@@ -534,8 +534,9 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='1.1';
+const APP_VERSION='1.3';
 const LIGHT_MODE_KEY='mmeps_light_mode';
+const LS_BACKUP_KEY='teneps_data_illisible';
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
 function applyLightMode(on){
@@ -549,7 +550,15 @@ applyLightMode(on);
 localStorage.setItem(LIGHT_MODE_KEY,on?'1':'0');
 }
 function escH(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function save(){localStorage.setItem(LS_KEY,JSON.stringify(state))}
+let saveWarned=false;
+function save(){
+try{localStorage.setItem(LS_KEY,JSON.stringify(state));saveWarned=false;return true;}
+catch(e){
+// Quota plein ou stockage indisponible : on prévient une seule fois, sans bloquer la saisie
+if(!saveWarned){saveWarned=true;toast('⚠ Sauvegarde impossible (mémoire pleine ?). Exportez vos résultats.',6000);}
+return false;
+}
+}
 function migrateSettings(settings){
 if(settings.matchFamily)return;
 const fmt=settings.format||'set11';
@@ -561,7 +570,86 @@ if(settings.nbPeriods===undefined)settings.nbPeriods=2;
 if(settings.periodDuration===undefined)settings.periodDuration=20;
 if(settings.drawPts===undefined)settings.drawPts=1;
 }
-function load(){try{const d=JSON.parse(localStorage.getItem(LS_KEY));if(d){state=d;migrateSettings(state.settings);state.tournaments.forEach(t=>migrateSettings(t.settings));}}catch(e){}}
+let loadProblem=false;
+// Charge l'état sauvegardé. Si les données sont illisibles ou incomplètes, une copie brute est
+// conservée sous LS_BACKUP_KEY AVANT que save() n'écrase LS_KEY avec un état vide.
+function load(){
+let raw=null;
+try{raw=localStorage.getItem(LS_KEY);}catch(e){return;}
+if(!raw)return;
+let d;
+try{d=JSON.parse(raw);}catch(e){d=undefined;}
+if(!d||typeof d!=='object'||!Array.isArray(d.tournaments)){
+try{localStorage.setItem(LS_BACKUP_KEY,raw);}catch(e){}
+loadProblem=true;
+return;
+}
+const valid=d.tournaments.filter(t=>t&&typeof t==='object'&&t.id&&Array.isArray(t.players)&&Array.isArray(t.matches));
+if(valid.length!==d.tournaments.length){
+try{localStorage.setItem(LS_BACKUP_KEY,raw);}catch(e){}
+loadProblem=true;
+}
+valid.forEach(t=>{
+if(!Array.isArray(t.pools))t.pools=[];
+if(!Array.isArray(t.finals))t.finals=[];
+if(!t.settings||typeof t.settings!=='object')t.settings={};
+migrateSettings(t.settings);
+});
+state.tournaments=valid;
+state.savedLists=Array.isArray(d.savedLists)?d.savedLists:[];
+if(d.settings&&typeof d.settings==='object'){
+migrateSettings(d.settings);
+state.settings=Object.assign({},state.settings,d.settings);
+}
+// Brouillons : on ne garde que ceux dont le match existe encore
+const ids=new Set();
+valid.forEach(t=>t.matches.forEach(m=>ids.add(m.id)));
+state.drafts={};
+if(d.drafts&&typeof d.drafts==='object'){
+Object.keys(d.drafts).forEach(k=>{if(ids.has(k.slice(k.indexOf('-')+1)))state.drafts[k]=d.drafts[k];});
+}
+}
+function showLoadProblem(){
+showModal('&#9888;&#65039; Donn&eacute;es illisibles',
+'<p style="margin-bottom:10px">Les donn&eacute;es enregistr&eacute;es sur cette tablette n\'ont pas pu &ecirc;tre relues enti&egrave;rement. Une copie brute a &eacute;t&eacute; conserv&eacute;e : <strong>n\'utilisez pas &laquo; Supprimer toutes les donn&eacute;es &raquo;</strong> et pr&eacute;venez l\'enseignante.</p>'+
+'<div class="modal-actions"><button class="btn-secondary" onclick="downloadUnreadableBackup()">&#128190; Enregistrer la copie</button><button class="btn-primary" style="width:auto" onclick="closeModal()">Compris</button></div>');
+}
+function downloadUnreadableBackup(){
+let raw='';
+try{raw=localStorage.getItem(LS_BACKUP_KEY)||'';}catch(e){}
+if(!raw){toast('Aucune copie disponible');return;}
+const name='MatchManagerEPS_sauvegarde_illisible_'+new Date().toLocaleDateString('fr-FR').replace(/\//g,'-')+'.json';
+if(typeof AndroidDownload!=='undefined'&&AndroidDownload.saveFile){
+try{AndroidDownload.saveFile(btoa(unescape(encodeURIComponent(raw))),name,'application/json');return;}catch(e){}
+}
+const url=URL.createObjectURL(new Blob([raw],{type:'application/json'}));
+const a=document.createElement('a');
+a.href=url;a.download=name;
+document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+
+/* ===== BROUILLONS DE SAISIE (scores tapés mais pas encore validés) ===== */
+// Les champs de score ne sont écrits dans le match qu'à « Valider ». Sans brouillon, tout
+// re-render de la liste (choix d'arbitre, tap sur une carte...) viderait les champs en cours.
+let draftSaveTimer=null;
+function draftValue(id,fallback){
+const v=state.drafts[id];
+if(typeof v==='boolean')return v;
+if(typeof v==='string'&&/^[0-9.\-]*$/.test(v))return v;
+return fallback;
+}
+function clearMatchDrafts(mid){
+Object.keys(state.drafts).forEach(k=>{if(k.endsWith('-'+mid))delete state.drafts[k];});
+}
+function onMatchFieldEdit(ev){
+const el=ev.target;
+if(!el||el.tagName!=='INPUT'||!el.id||el.disabled||!el.closest||!el.closest('.match-card'))return;
+state.drafts[el.id]=el.type==='checkbox'?el.checked:el.value;
+clearTimeout(draftSaveTimer);
+draftSaveTimer=setTimeout(save,400);
+}
+document.addEventListener('input',onMatchFieldEdit);
+document.addEventListener('change',onMatchFieldEdit);
 
 /* ===== NAVIGATION ===== */
 function showScreen(id){
@@ -585,7 +673,7 @@ function renderSettings(){
 document.getElementById('set-version').textContent='Match Manager EPS — Version '+APP_VERSION;
 }
 
-function toast(msg){const d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),2500)}
+function toast(msg,ms){const d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),ms||2500)}
 
 /* ===== HOME ===== */
 function renderHome(){
@@ -616,7 +704,10 @@ else if(T.phase==='bracket')showScreen('scr-bracket');
 else showScreen('scr-matches');
 }
 
-function delTournament(id){if(confirm('Supprimer ce tournoi ?')){state.tournaments=state.tournaments.filter(t=>t.id!==id);save();renderHome()}}
+function delTournament(id){if(confirm('Supprimer ce tournoi ?')){
+const dt=state.tournaments.find(t=>t.id===id);
+if(dt)dt.matches.forEach(m=>clearMatchDrafts(m.id));
+state.tournaments=state.tournaments.filter(t=>t.id!==id);save();renderHome()}}
 
 /* ===== CREATE ===== */
 let selModeVal=1;
@@ -958,6 +1049,15 @@ T.poolSizes[idx]=Math.max(2,val);save();updatePoolConfig();
 
 function createPools(){
 const nb=+document.getElementById('inp-nbpools').value;
+// Les tailles de poule doivent couvrir exactement tous les joueurs, sinon certains
+// seraient laissés hors poule (sans aucun match) ou des places resteraient vides.
+if(T.poolSizes&&T.poolSizes.length===nb){
+const placesTotal=T.poolSizes.reduce((a,b)=>a+b,0);
+if(placesTotal!==T.players.length){
+toast('Répartition incomplète : '+placesTotal+' place(s) pour '+T.players.length+' joueur(s). Ajustez la taille des poules.',5000);
+return;
+}
+}
 T.pools=[];
 for(let i=0;i<nb;i++){
 const quali=T.mode===2?(+document.getElementById('quali-'+i)?.value||2):0;
@@ -985,6 +1085,11 @@ const count=T.poolSizes[i]||0;
 for(let j=0;j<count&&idx<players.length;j++){
 T.pools[i].playerIds.push(players[idx].id);idx++;
 }}
+// Filet de sécurité : un joueur non placé va dans la poule la moins remplie
+for(;idx<players.length;idx++){
+const small=T.pools.reduce((a,b)=>b.playerIds.length<a.playerIds.length?b:a);
+small.playerIds.push(players[idx].id);
+}
 }else{
 for(let i=0;i<players.length;i++)T.pools[i%nb].playerIds.push(players[i].id);
 }
@@ -1033,6 +1138,8 @@ save();renderDistribution();toast('Joueur d\u00e9plac\u00e9');
 function validateDistribution(){
 const empty=T.pools.filter(p=>p.playerIds.length<2);
 if(empty.length){toast('Chaque poule doit avoir au moins 2 joueurs');return;}
+const placed=T.pools.reduce((n,p)=>n+p.playerIds.length,0);
+if(placed!==T.players.length){toast('Tous les joueurs doivent être dans une poule ('+placed+'/'+T.players.length+')',5000);return;}
 generateAllPoolMatches();
 T.phase='matches';save();
 showScreen('scr-matches');
@@ -1159,13 +1266,13 @@ const refVal=m.refereeId||'';
 const refSelectHtml='<select class="ref-input" id="ref-'+m.id+'" '+(isDone?'disabled':'')+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.85em"><option value="">&#9999; Arbitre</option>'+candidates.map(p=>'<option value="'+p.id+'"'+(refVal===p.id?' selected':'')+'>'+escH(p.name)+'</option>').join('')+'</select>';
 const actionsHtml=`<div class="match-actions">
 ${refSelectHtml}
-<label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${m.refBonus?'checked':''} ${isDone?'disabled':''}>+1 pt arb.</label>
+<label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${(isDone?m.refBonus:draftValue('refbonus-'+m.id,m.refBonus))?'checked':''} ${isDone?'disabled':''}>+1 pt arb.</label>
 ${isDone?'<button class="btn-secondary btn-sm" onclick="unlockMatch(\''+m.id+'\')">&#9998; Modifier</button>':
 '<button class="match-validate" onclick="validateMatch(\''+m.id+'\')">&#10003; Valider</button>'}
 </div>`;
 if(!isBo3){
-const s1=m.score1!==null?m.score1:'';
-const s2=m.score2!==null?m.score2:'';
+const s1=isDone?(m.score1!==null?m.score1:''):draftValue('s1-'+m.id,m.score1!==null?m.score1:'');
+const s2=isDone?(m.score2!==null?m.score2:''):draftValue('s2-'+m.id,m.score2!==null?m.score2:'');
 const w1=isDone&&m.score1>m.score2;
 const w2=isDone&&m.score2>m.score1;
 return`<div class="match-card ${m.status}" onclick="toggleMatchPlaying('${m.id}',event)">
@@ -1178,7 +1285,11 @@ return`<div class="match-card ${m.status}" onclick="toggleMatchPlaying('${m.id}'
 ${T.settings.matchFamily==='time'?renderMatchTimerWidget(m):''}
 ${actionsHtml}</div>`;
 }
-const sets=m.sets||[{s1:'',s2:''},{s1:'',s2:''},{s1:'',s2:''}];
+const savedSets=m.sets||[{s1:'',s2:''},{s1:'',s2:''},{s1:'',s2:''}];
+const sets=isDone?savedSets:[1,2,3].map(k=>{
+const ss=savedSets[k-1]||{s1:'',s2:''};
+return{s1:draftValue('s'+k+'a-'+m.id,ss.s1),s2:draftValue('s'+k+'b-'+m.id,ss.s2)};
+});
 let sw1=0,sw2=0;
 if(sets[0].s1!==''&&sets[0].s2!==''){if(+sets[0].s1>+sets[0].s2)sw1++;else if(+sets[0].s2>+sets[0].s1)sw2++;}
 if(sets[1].s1!==''&&sets[1].s2!==''){if(+sets[1].s1>+sets[1].s2)sw1++;else if(+sets[1].s2>+sets[1].s1)sw2++;}
@@ -1251,6 +1362,7 @@ const refPlayer=T.players.find(p=>p.id===ref);
 m.referee=refPlayer?refPlayer.name:'';
 m.status='done';
 m.refBonus=refBonusEl?refBonusEl.checked:false;
+clearMatchDrafts(mid);
 if(m.timer&&m.timer.running){
 m.timer.secondsLeft=Math.max(0,Math.round((m.timer.endsAt-Date.now())/1000));
 m.timer.running=false;m.timer.endsAt=null;
@@ -1265,9 +1377,44 @@ else if(m.phase==='final')renderFinals();
 else if(m.phase==='bracket')renderBracket();
 }
 
+// Matchs bracket qui découlent des résultats du tour r : tours suivants, petite finale et
+// consolantes issues des perdants des tours >= r.
+function bracketDependentMatches(r){
+const dropIdx=new Set();
+T.bracket.consolation.forEach((c,i)=>{if(c.round>=r)dropIdx.add(i);});
+return T.matches.filter(x=>x.phase==='bracket'&&(
+x.consolationRound===undefined?(x.bracketRound>r||x.isPetiteFinale):dropIdx.has(x.consolationRound)));
+}
+
 function unlockMatch(mid){
 const m=T.matches.find(x=>x.id===mid);if(!m)return;
-m.status='pending';save();
+// Rouvrir un résultat dont d'autres matchs dépendent : on prévient puis on retire ce qui en découle,
+// pour éviter des finales / tours suivants calculés avec l'ancien résultat.
+if(m.phase==='pool'&&T.mode===2&&((T.finals&&T.finals.length)||T.matches.some(x=>x.phase==='final'))){
+const played=T.matches.filter(x=>x.phase==='final'&&x.status==='done').length;
+if(played&&!confirm('Les finales ont déjà été générées ('+played+' match(s) joué(s)).\nModifier ce match supprimera les finales : elles seront recalculées à la fin des poules et leurs résultats seront perdus.\n\nContinuer ?'))return;
+T.matches.filter(x=>x.phase==='final').forEach(x=>clearMatchDrafts(x.id));
+T.matches=T.matches.filter(x=>x.phase!=='final');
+T.finals=[];
+if(T.phase==='finals')T.phase='matches';
+toast('Finales supprimées : elles seront recalculées');
+}else if(m.phase==='bracket'&&m.consolationRound===undefined&&!m.isPetiteFinale&&T.bracket&&m.bracketRound>=1&&T.bracket.rounds.length>m.bracketRound){
+const r=m.bracketRound;
+const dep=bracketDependentMatches(r);
+const played=dep.filter(x=>x.status==='done').length;
+if(played&&!confirm('Les tours suivants ont déjà été générés ('+played+' match(s) joué(s)).\nModifier ce match supprimera les tours suivants, la petite finale et les consolantes qui en découlent : leurs résultats seront perdus.\n\nContinuer ?'))return;
+const ids=new Set(dep.map(x=>x.id));
+dep.forEach(x=>{clearMatchDrafts(x.id);detachMatchTimerTick(x.id);});
+T.matches=T.matches.filter(x=>!ids.has(x.id));
+T.bracket.rounds.splice(r);
+T.bracket.consolation=T.bracket.consolation.filter(c=>c.round<r);
+delete T.bracket.petiteFinale;
+curBracketTab=0;
+toast('Tours suivants supprimés : ils seront recalculés');
+}
+m.status='pending';clearMatchDrafts(mid);
+if(m.phase==='bracket')assignBracketTables();
+save();
 if(m.phase==='pool')renderMatches();
 else if(m.phase==='final')renderFinals();
 else if(m.phase==='bracket')renderBracket();
@@ -1494,6 +1641,23 @@ if(refId&&stats[refId]){stats[refId].refBonus+=refBP;stats[refId].pts+=refBP;}
 return Object.values(stats).sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
 }
 
+// Mode 2 : joueurs qui ne sont dans aucune finale (non qualifiés, ou qualifié seul à son rang),
+// classés d'après leur seule phase de poule (+ bonus arbitre éventuel gagné en finale).
+function calcOutsideFinalsRanking(finalRefBonus){
+const inFinal=new Set();
+(T.finals||[]).forEach(g=>g.playerIds.forEach(id=>inFinal.add(id)));
+const rows=[];
+for(const pool of T.pools){
+for(const r of calcPoolRanking(pool.id)){
+if(inFinal.has(r.id))continue;
+const extra=(finalRefBonus&&finalRefBonus[r.id])||0;
+rows.push({...r,pts:r.pts+extra,refBonus:(r.refBonus||0)+extra,poolName:pool.name});
+}
+}
+rows.sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+return rows;
+}
+
 function renderRankings(){
 if(!T)return;
 const tabs=document.getElementById('rankings-tabs');
@@ -1572,7 +1736,8 @@ const maxQuali=Math.max(...T.pools.map(p=>p.quali||2));
 for(let rank=0;rank<maxQuali;rank++){
 const groupPlayers=[];
 for(let pi=0;pi<T.pools.length;pi++){
-if(rankings[pi][rank])groupPlayers.push(rankings[pi][rank].id);
+// Chaque poule n'envoie en finale que ses propres qualifiés (pool.quali), pas le maximum global
+if(rank<(T.pools[pi].quali||2)&&rankings[pi][rank])groupPlayers.push(rankings[pi][rank].id);
 }
 if(groupPlayers.length<2)continue;
 const groupId=uid();
@@ -1688,6 +1853,20 @@ for(const r of ranked){
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.totalPF-r.totalPA;
 html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${p?escH(p.name):'?'}</td><td><strong>${r.totalPts}</strong></td><td>${r.totalW}</td>${hasD?`<td>${r.totalD||0}</td>`:''}<td>${r.totalL}</td>${hasD3?`<td>${r.totalL3||0}</td>`:''}<td>${r.totalPF}</td><td>${r.totalPA}</td><td>${diff>=0?'+':''}${diff}</td>${anyArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+globalRank++;
+}
+html+='</tbody></table>';
+}
+// Joueurs hors finales : ils gardent un rang (à la suite des finalistes)
+const hors=calcOutsideFinalsRanking(finalRefBonus);
+if(hors.length){
+const hD3=hors.some(r=>r.l3>0),hD=hors.some(r=>r.d>0),hArb=hors.some(r=>r.refBonus>0);
+html+=`<h4 style="margin:16px 0 8px;color:var(--txt)">Hors finales (classement de poule)</h4>`;
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.75em">Poule</th><th>Pts</th><th>V</th>${hD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hD3?'<th title="Défaites 3 sets">D3</th>':''}<th>PF</th><th>PC</th><th>Diff</th>${hArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
+for(const r of hors){
+const p=T.players.find(x=>x.id===r.id);
+const diff=r.pf-r.pa;
+html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${p?escH(p.name):'?'}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 globalRank++;
 }
 html+='</tbody></table>';
@@ -2048,35 +2227,47 @@ const today=new Date().toLocaleDateString('fr-FR');
 // Info XLS
 const _p2=document.createElement('p');
 _p2.style.cssText='font-size:.75em;color:var(--txt2);margin-top:4px';
-_p2.textContent='XLSX : Onglet 1 = Matchs de poule | Onglet 2 = Classement final';
+_p2.textContent='XLSX : Onglet 1 = Matchs (poules, finales, tableau) | Onglet 2 = Classement final';
 container.appendChild(_p2);
 const _p3=document.createElement('p');
 _p3.style.cssText='font-size:.75em;color:var(--txt2)';
-_p3.textContent='Fichier : tournoi_'+T.classe+'_'+today.replace(/\//g,'-')+'.xlsx';
+_p3.textContent='Fichier : '+exportFileName();
 container.appendChild(_p3);
 }
 
 function buildQRData(){
 const hasRefBonus=T.settings.refBonusEnabled||state.settings.refBonusEnabled;
-let data='TENEPS|'+T.name+'|'+T.classe+'|'+T.date+'|M'+T.mode+'\n';
+const header='TENEPS|'+T.name+'|'+T.classe+'|'+T.date+'|M'+T.mode;
+// lignes de joueurs (type 'j') et en-têtes de poule (type 'h') - on coupe par ligne entière,
+// jamais au milieu d'un joueur, pour que SCAN EPS ne lise pas une ligne partielle.
+const lines=[];
 if(T.mode===3){
 const bracketRanking=getBracketFullRanking();
-if(bracketRanking.length){
-data+=bracketRanking.map((r,i)=>(i+1)+';'+r.name).join('\n');
-}else{
-data+=T.players.map((p,i)=>(i+1)+';'+p.name).join('\n');
-}
+const src=bracketRanking.length?bracketRanking:T.players;
+src.forEach((r,i)=>lines.push({t:'j',s:(i+1)+';'+r.name}));
 }else{
 for(const pool of T.pools){
 const rk=calcPoolRanking(pool.id);
-data+=pool.name+':\n';
-data+=rk.map((r,i)=>{
+lines.push({t:'h',s:pool.name+':'});
+rk.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
-return(i+1)+';'+(p?p.name:'?')+';'+r.pts+';'+r.w+';'+r.l+(hasRefBonus?';'+(r.refBonus||0):'');
-}).join('\n')+'\n';
+lines.push({t:'j',s:(i+1)+';'+(p?p.name:'?')+';'+r.pts+';'+r.w+';'+r.l+(hasRefBonus?';'+(r.refBonus||0):'')});
+});
 }
 }
-return data.substring(0,2000);
+const total=lines.filter(l=>l.t==='j').length;
+const MAX=2000;
+const full=[header,...lines.map(l=>l.s)].join('\n');
+if(full.length<=MAX)return full;
+// Trop long : on garde des lignes entières et on signale le reste ("...+N obs", comme VB EPS / LaserFit)
+const RESERVE=20;
+let out=header, kept=0;
+for(const l of lines){
+if(out.length+1+l.s.length>MAX-RESERVE)break;
+out+='\n'+l.s;
+if(l.t==='j')kept++;
+}
+return out+'\n...+'+(total-kept)+' obs';
 }
 
 // Retourne le classement complet du bracket sous la forme [{id, name}]
@@ -2115,6 +2306,16 @@ sorted.forEach(s=>{if(!ranking.find(r=>r.id===s.id)){const p=T.players.find(x=>x
 });
 for(const p of T.players){if(!ranking.find(r=>r.id===p.id))ranking.push({id:p.id,name:p.name});}
 return ranking;
+}
+
+// Nom d'export : MatchManagerEPS_Classe_Date.xlsx (sans accent ni caractère spécial : valable
+// sur Android, Windows et macOS). Sans classe, on retombe sur le nom du tournoi.
+function exportFileName(){
+const safe=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'')
+.replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40);
+const part=safe(T&&T.classe)||safe(T&&T.name)||'Tournoi';
+const date=new Date().toLocaleDateString('fr-FR').replace(/\//g,'-');
+return 'MatchManagerEPS_'+part+'_'+date+'.xlsx';
 }
 
 function downloadCSV(){
@@ -2188,22 +2389,42 @@ const tot=parts.reduce((s,p)=>s+p.length,0);const res=new Uint8Array(tot);let po
 for(const p of parts){res.set(p,pos);pos+=p.length;}return res;
 }
 
-// ======= ONGLET 1 : Matchs de poule =======
+// ======= ONGLET 1 : Matchs (poules, finales, tableau) =======
 const s1rows=[];
-const h1=[sh('Poule',true),sh('Match',true),sh('Joueur 1',true),sh('Score J1',true),sh('Score J2',true),sh('Joueur 2',true),sh('Arbitre',true)];
+const h1=[sh('Poule / Phase',true),sh('Match',true),sh('Joueur 1',true),sh('Score J1',true),sh('Score J2',true),sh('Joueur 2',true),sh('Arbitre',true)];
 if(hasRefBonus)h1.push(sh('Bonus Arb',true));
 s1rows.push(h1);
-const poolMatches=T.matches.filter(m=>m.phase==='pool');
+// Tous les matchs, groupés par phase : poules, finales (mode 2), tours du tableau / petite finale /
+// consolantes (mode 3). Un score est celui saisi (en manches gagnées pour un match en 2 sets gagnants).
+const matchGroups=[];
 for(const pool of T.pools){
-const pMatches=poolMatches.filter(m=>m.poolId===pool.id).sort((a,b)=>(a.matchNum||0)-(b.matchNum||0));
-for(const m of pMatches){
+matchGroups.push({label:pool.name,matches:T.matches.filter(m=>m.phase==='pool'&&m.poolId===pool.id)});
+}
+for(const f of (T.finals||[])){
+matchGroups.push({label:f.name,matches:T.matches.filter(m=>m.phase==='final'&&m.poolId===f.id)});
+}
+if(T.bracket){
+const roundNames=getBracketRoundNames();
+roundNames.forEach((n,i)=>{
+matchGroups.push({label:n,matches:T.matches.filter(m=>m.phase==='bracket'&&m.consolationRound===undefined&&!m.isPetiteFinale&&m.bracketRound===i+1)});
+});
+if(T.bracket.petiteFinale){
+matchGroups.push({label:'Petite finale',matches:T.matches.filter(m=>m.id===T.bracket.petiteFinale)});
+}
+T.bracket.consolation.forEach((c,ci)=>{
+matchGroups.push({label:'Consolante R'+c.round,matches:T.matches.filter(m=>m.phase==='bracket'&&m.consolationRound===ci)});
+});
+}
+for(const g of matchGroups){
+const gMatches=g.matches.slice().sort((a,b)=>(a.matchNum||0)-(b.matchNum||0));
+for(const m of gMatches){
 const pl1=T.players.find(x=>x.id===m.p1);
 const pl2=T.players.find(x=>x.id===m.p2);
 let refName='';
 if(m.refereeId){const rp=T.players.find(x=>x.id===m.refereeId);refName=rp?rp.name:(m.referee||'');}
 else refName=m.referee||'';
 const done=m.status==='done';
-const row=[sh(pool.name),nm(m.matchNum||0),sh(pl1?pl1.name:'?'),done?nm(m.score1):sh('-'),done?nm(m.score2):sh('-'),sh(pl2?pl2.name:'?'),sh(refName)];
+const row=[sh(g.label),nm(m.matchNum||0),sh(pl1?pl1.name:'?'),done?nm(m.score1):sh('-'),done?nm(m.score2):sh('-'),sh(pl2?pl2.name:'?'),sh(refName)];
 if(hasRefBonus)row.push(nm(m.refBonus&&done?refBP:0));
 s1rows.push(row);
 }
@@ -2289,13 +2510,36 @@ s2rows.push(row);globalRank++;
 }
 s2rows.push([]);
 }
+// Joueurs hors finales : ils gardent un rang (à la suite des finalistes)
+const hors=calcOutsideFinalsRanking(finalArb);
+if(hors.length){
+s2rows.push([sh('Hors finales (classement de poule)',true)]);
+const hD=hors.some(r=>r.d>0),hL3=hors.some(r=>r.l3>0);
+const hdr3=[sh('Rang',true),sh('Joueur',true),sh('Poule',true),sh('Points',true),sh('Victoires',true)];
+if(hD)hdr3.push(sh('Nuls',true));
+hdr3.push(sh('Défaites',true));
+if(hL3)hdr3.push(sh('Def.3sets',true));
+hdr3.push(sh('PF',true),sh('PC',true),sh('Différence',true));
+if(hasRefBonus)hdr3.push(sh('Bonus.Arb',true));
+s2rows.push(hdr3);
+for(const r of hors){
+const p=T.players.find(x=>x.id===r.id);
+const row=[nm(globalRank),sh(p?p.name:'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
+if(hD)row.push(nm(r.d||0));
+row.push(nm(r.l));
+if(hL3)row.push(nm(r.l3||0));
+row.push(nm(r.pf),nm(r.pa),nm(r.pf-r.pa));
+if(hasRefBonus)row.push(nm(r.refBonus||0));
+s2rows.push(row);globalRank++;
+}
+}
 }
 }
 
 // ======= Assemblage XLSX =======
 const CT='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>';
 const RELS='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
-const WB='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Matchs de poule" sheetId="1" r:id="rId1"/><sheet name="Classement final" sheetId="2" r:id="rId2"/></sheets></workbook>';
+const WB='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Matchs" sheetId="1" r:id="rId1"/><sheet name="Classement final" sheetId="2" r:id="rId2"/></sheets></workbook>';
 const WB_RELS='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
 const STY='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0"/></cellXfs></styleSheet>';
 const zipData=makeZip([
@@ -2307,10 +2551,21 @@ const zipData=makeZip([
 {name:'xl/worksheets/sheet1.xml',data:makeSheetXml(s1rows)},
 {name:'xl/worksheets/sheet2.xml',data:makeSheetXml(s2rows)},
 ]);
-const blob=new Blob([zipData],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+const xlsxName=exportFileName();
+const xlsxMime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+// APK Android : les blob: ne sont pas gérés par la WebView, on passe par l'interface Kotlin/Java
+if(typeof AndroidDownload!=='undefined'&&AndroidDownload.saveFile){
+try{
+let bin='';
+for(let i=0;i<zipData.length;i+=8192)bin+=String.fromCharCode.apply(null,zipData.subarray(i,i+8192));
+AndroidDownload.saveFile(btoa(bin),xlsxName,xlsxMime);
+return;
+}catch(e){console.warn('AndroidDownload failed, fallback to blob:',e);}
+}
+const blob=new Blob([zipData],{type:xlsxMime});
 const url=URL.createObjectURL(blob);
 const a=document.createElement('a');
-a.href=url;a.download='tournoi_'+T.classe+'_'+today+'.xlsx';
+a.href=url;a.download=xlsxName;
 document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 toast('XLSX t\u00e9l\u00e9charg\u00e9 ✓');
 }
@@ -2318,6 +2573,55 @@ toast('XLSX t\u00e9l\u00e9charg\u00e9 ✓');
 /* ===== ACCÈS PROF ===== */
 const ADMIN_PWD_KEY='mmeps_admin_pwd';
 let adminFailedAttempts=0;
+
+// Les mots de passe ne sont jamais stockés ni écrits en clair : empreinte SHA-256 salée.
+// C'est une barrière contre la curiosité des élèves (lecture du code source, du localStorage),
+// pas une protection cryptographique : l'empreinte du mot de passe par défaut reste dans le code.
+const ADMIN_PWD_SALT='mmeps-eps-v1|';
+const ADMIN_PWD_DEFAULT_HASH='b4e7aa165e0b080499c6f7f8e1eed993c630285f79b4a8b50292ab9b2ace184d';
+const ADMIN_PWD_PREFIX='sha256:';
+function sha256Hex(str){
+const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+const bytes=Array.from(new TextEncoder().encode(str));
+const bitLen=bytes.length*8;
+bytes.push(0x80);
+while(bytes.length%64!==56)bytes.push(0);
+for(let i=7;i>=0;i--)bytes.push(i>=4?0:(bitLen>>>(i*8))&0xff);
+const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+const rotr=(x,n)=>(x>>>n)|(x<<(32-n));
+for(let off=0;off<bytes.length;off+=64){
+const w=new Array(64);
+for(let i=0;i<16;i++)w[i]=(bytes[off+i*4]<<24)|(bytes[off+i*4+1]<<16)|(bytes[off+i*4+2]<<8)|bytes[off+i*4+3];
+for(let i=16;i<64;i++){
+const s0=rotr(w[i-15],7)^rotr(w[i-15],18)^(w[i-15]>>>3);
+const s1=rotr(w[i-2],17)^rotr(w[i-2],19)^(w[i-2]>>>10);
+w[i]=(w[i-16]+s0+w[i-7]+s1)|0;
+}
+let [a,b,c,d,e,f,g,h]=H;
+for(let i=0;i<64;i++){
+const S1=rotr(e,6)^rotr(e,11)^rotr(e,25);
+const ch=(e&f)^(~e&g);
+const t1=(h+S1+ch+K[i]+w[i])|0;
+const S0=rotr(a,2)^rotr(a,13)^rotr(a,22);
+const maj=(a&b)^(a&c)^(b&c);
+const t2=(S0+maj)|0;
+h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;
+}
+H[0]=(H[0]+a)|0;H[1]=(H[1]+b)|0;H[2]=(H[2]+c)|0;H[3]=(H[3]+d)|0;
+H[4]=(H[4]+e)|0;H[5]=(H[5]+f)|0;H[6]=(H[6]+g)|0;H[7]=(H[7]+h)|0;
+}
+return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
+}
+function hashAdminPwd(pwd){return sha256Hex(ADMIN_PWD_SALT+pwd);}
+// Compare un mot de passe saisi à celui stocké. Un ancien mot de passe personnalisé enregistré en
+// clair (versions <= 1.2) reste accepté une dernière fois, puis est converti en empreinte.
+function adminPasswordMatches(pwd){
+const stored=localStorage.getItem(ADMIN_PWD_KEY);
+if(!stored)return hashAdminPwd(pwd)===ADMIN_PWD_DEFAULT_HASH;
+if(stored.indexOf(ADMIN_PWD_PREFIX)===0)return ADMIN_PWD_PREFIX+hashAdminPwd(pwd)===stored;
+if(pwd===stored){localStorage.setItem(ADMIN_PWD_KEY,ADMIN_PWD_PREFIX+hashAdminPwd(pwd));return true;}
+return false;
+}
 
 function openAdminAccess(){
 adminFailedAttempts=0;
@@ -2337,7 +2641,7 @@ setTimeout(()=>{const el=document.getElementById('admin-pwd-input');if(el)el.foc
 function verifyAdminPassword(){
 const pwd=document.getElementById('admin-pwd-input').value;
 const custom=localStorage.getItem(ADMIN_PWD_KEY);
-const valid=custom?pwd===custom:pwd==='ADMINPROF';
+const valid=adminPasswordMatches(pwd);
 if(valid){
 closeModal();
 showScreen('scr-admin');
@@ -2351,34 +2655,34 @@ document.getElementById('admin-pwd-reset').style.display='block';
 }
 
 function resetAdminPasswordFromLogin(){
-if(!confirm('Réinitialiser le mot de passe personnalisé et revenir à ADMINPROF ?'))return;
+if(!confirm('Réinitialiser le mot de passe personnalisé et revenir au mot de passe par défaut (voir le guide professeur) ?'))return;
 localStorage.removeItem(ADMIN_PWD_KEY);
 adminFailedAttempts=0;
 document.getElementById('admin-pwd-error').style.display='none';
 document.getElementById('admin-pwd-reset').style.display='none';
 document.getElementById('admin-pwd-input').value='';
-alert('Mot de passe personnalisé supprimé. Vous pouvez maintenant vous connecter avec ADMINPROF.');
+alert('Mot de passe personnalisé supprimé. Vous pouvez maintenant vous connecter avec le mot de passe par défaut (voir le guide professeur).');
 }
 
 function definirMdpAdmin(){
 const nouveau=document.getElementById('adm-nouveau-mdp').value.trim();
 const message=document.getElementById('adm-mdp-message');
 if(!nouveau){alert('Saisissez un nouveau mot de passe, ou utilisez "Revenir au mot de passe par défaut" pour le supprimer.');return;}
-if(nouveau==='ADMINPROF'){alert('Ce mot de passe est déjà celui par défaut. Choisissez-en un autre pour renforcer la protection.');return;}
-localStorage.setItem(ADMIN_PWD_KEY,nouveau);
+if(hashAdminPwd(nouveau)===ADMIN_PWD_DEFAULT_HASH){alert('Ce mot de passe est déjà celui par défaut. Choisissez-en un autre pour renforcer la protection.');return;}
+localStorage.setItem(ADMIN_PWD_KEY,ADMIN_PWD_PREFIX+hashAdminPwd(nouveau));
 document.getElementById('adm-nouveau-mdp').value='';
-message.textContent='✅ Mot de passe personnalisé enregistré. ADMINPROF ne fonctionnera plus tant que ce mot de passe est actif.';
+message.textContent='✅ Mot de passe personnalisé enregistré. Le mot de passe par défaut ne fonctionnera plus tant que celui-ci est actif.';
 message.style.display='';
 setTimeout(()=>{message.style.display='none';},3500);
 }
 
 function supprimerMdpAdmin(){
 if(!localStorage.getItem(ADMIN_PWD_KEY)){alert("Aucun mot de passe personnalisé n'est actuellement défini.");return;}
-if(!confirm('Revenir au mot de passe par défaut (ADMINPROF) et supprimer le mot de passe personnalisé ?'))return;
+if(!confirm('Revenir au mot de passe par défaut (voir le guide professeur) et supprimer le mot de passe personnalisé ?'))return;
 localStorage.removeItem(ADMIN_PWD_KEY);
 document.getElementById('adm-nouveau-mdp').value='';
 const message=document.getElementById('adm-mdp-message');
-message.textContent='✅ Mot de passe personnalisé supprimé - ADMINPROF est de nouveau le seul mot de passe.';
+message.textContent='✅ Mot de passe personnalisé supprimé - le mot de passe par défaut est de nouveau le seul valable.';
 message.style.display='';
 setTimeout(()=>{message.style.display='none';},3500);
 }
@@ -2496,6 +2800,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 function resetAll(){
 if(confirm('Supprimer TOUTES les donn\u00e9es ? Cette action est irr\u00e9versible.')){
 localStorage.removeItem(LS_KEY);
+localStorage.removeItem(LS_BACKUP_KEY);
 location.reload();
 }
 }
@@ -2722,6 +3027,22 @@ mc.innerHTML='<div class="modal-overlay" onclick="closeModal()"><div class="moda
 }
 function closeModal(){document.getElementById('modal-container').innerHTML='';}
 
+/* ===== BOUTON RETOUR ANDROID (APK) ===== */
+// Appelé par MainActivity.onBackPressed() : une SPA n'a pas d'historique, sans cela le bouton
+// Retour fermerait l'application en pleine séance. Retourne 'quit' seulement pour un 2e appui rapproché.
+let lastBackAt=0;
+window.__androidBack=function(){
+const mc=document.getElementById('modal-container');
+if(mc&&mc.children.length){closeModal();return 'handled';}
+const active=document.querySelector('.screen.active');
+if(active&&active.id!=='scr-home'){save();showScreen('scr-home');return 'handled';}
+const now=Date.now();
+if(now-lastBackAt<2000)return 'quit';
+lastBackAt=now;
+toast('Appuyez encore sur Retour pour quitter');
+return 'handled';
+};
+
 /* ===== AUTO-SAVE ===== */
 window.addEventListener('beforeunload',()=>save());
 document.addEventListener('visibilitychange',()=>{
@@ -2742,6 +3063,7 @@ document.addEventListener('click',requestAppFullscreen,{once:true});
 load();
 applyLightMode(localStorage.getItem(LIGHT_MODE_KEY)==='1');
 renderHome();
+if(loadProblem)showLoadProblem();
 document.getElementById('home-version').textContent='Version '+APP_VERSION;
 ensureWakeLock();
 
