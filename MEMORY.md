@@ -13,6 +13,10 @@ Journal de contexte et de décisions du projet, pour reprendre le travail sans p
 
 Entrées les plus récentes en premier à partir du 2026-10-10 ; les entrées du 2026-08-02 ci-dessous sont dans l'ordre où elles ont été écrites.
 
+### 2026-10-11 - Guide professeur généré par script
+- **`generer-guide-professeur.py`** (racine, reportlab, polices Arial de macOS) produit `match-manager-eps.pdf` ; la version est lue dans `index.html`, donc il suffit de le relancer à chaque version. Avant, le PDF n'avait pas de source versionnée : impossible de le régénérer à l'identique. Le texte du script est à tenir à jour avec `FONCTIONNALITES.md`.
+- **Deux PDF dans le dossier** : `match-manager-eps.pdf` (nom attendu par WordPress, régénéré) et `Guide_Professeur_MatchManagerEPS.pdf` (suivi par git, 2 pages, plus ancien, non régénéré).
+
 ### 2026-10-11 - APK 2.2 signée et publication
 - **APK 2.2 reconstruite avec la clé de release existante** (`matchmanager-release.jks`, même clé que la 1.9.1 : mise à jour par-dessus sans désinstaller). Contrôlée : `versionCode 14`, `index.html` embarqué identique à celui du dépôt, empreinte du certificat consignée dans `android/README.md`.
 - **Dépôt poussé** (`1ecc4df..83314f4`) ; GitHub Pages servait déjà la 2.2 quelques minutes plus tard.
