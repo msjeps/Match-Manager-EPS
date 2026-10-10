@@ -23,10 +23,11 @@
 
 ### Idées retenues de l'audit, non réalisées
 - [ ] Re-rendu ciblé du tableau (mode 3) et des classements : seuls les matchs de poule et de finale sont ciblés (v1.8).
-- [ ] Extraire la logique pure (classements, tableau, XLSX) pour la tester en Node sans navigateur.
 - [ ] Réduire à un seul fichier source HTML (aujourd'hui trois copies : `MatchManagerEPS.html`, `index.html`, `android/app/src/main/assets/index.html`).
 
 ## Fait récemment
+
+- [x] Tests Node de la logique (2026-10-11, aucun changement de l'app, version 1.9 inchangée) : `npm test` (ou `node --test tests/*.test.js`), 19 tests sans dépendance : round-robin, statistiques et classement de poule (départage direct, forfait), tableau (byes, progression, vainqueur), export XLSX (CRC du ZIP, 2 onglets, détail des sets), sauvegarde / import assaini, `load()` données illisibles, annuler, mot de passe, palmarès, cohérence des versions et des copies. Non couvert : rendu et interactions (écrans, boîtes, chronomètre), APK. Voir `tests/README.md`.
 
 - [x] v1.9 (2026-10-11, versionCode 10, `CACHE_NAME` v26) : palmarès cumulé par classe (accueil). Vérifié dans le navigateur sur 3 tournois de test ; à valider sur la tablette avec de vrais tournois (homonymes, classes écrites différemment).
 
