@@ -1,6 +1,6 @@
 # Match Manager EPS
 
-Application PWA de gestion de tournois de Tennis de Table pour les cours d'EPS (collège & lycée).
+Application PWA de gestion de tournois pour les cours d'EPS (collège & lycée) : sports de raquette/filet au score (tennis de table, badminton, volley...) ou sports collectifs au temps.
 
 100% hors ligne, fichier HTML unique, pensée pour tablettes Android et iPad utilisées en gymnase sans connexion internet.
 
@@ -17,4 +17,6 @@ Application PWA de gestion de tournois de Tennis de Table pour les cours d'EPS (
 
 Le fichier suivi par git est `index.html` (voir [CLAUDE.md](CLAUDE.md) pour le détail de l'architecture et des conventions du projet). Le fichier de développement local est `MatchManagerEPS.html` — penser à recopier son contenu vers `index.html` avant chaque commit.
 
-Démo en ligne : https://apps.outils-eps.fr/TEN-EPS/ (URL technique inchangée pour l'instant — à reconfigurer côté hébergeur si besoin, voir TODO.md)
+Démo en ligne : https://apps.outils-eps.fr/Match-Manager-EPS/
+
+L'APK Android (sources dans `android/`) embarque une copie de `index.html` : voir TODO.md pour la resynchronisation et le build.
