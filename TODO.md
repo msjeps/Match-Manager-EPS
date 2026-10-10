@@ -9,6 +9,7 @@
 ## Rappel avant chaque commit
 
 - [ ] Recopier le contenu de `MatchManagerEPS.html` (fichier de dev) vers `index.html` (fichier suivi par git) — les deux ne se synchronisent pas automatiquement.
+- [ ] Si l'APK doit suivre : recopier `index.html` vers `android/app/src/main/assets/index.html`, bumper `versionCode`/`versionName` dans `android/app/build.gradle` (= `APP_VERSION`), rebuild (`JAVA_HOME` = JBR d'Android Studio, `ANDROID_HOME=~/Library/Android/sdk`). `android/` est versionné depuis le 2026-10-10 (`android/.gitignore` exclut build, clés, local.properties, APK).
 - [ ] Bumper `CACHE_NAME` dans `sw.js` si le HTML a changé, sinon les tablettes gardent la version en cache.
 - [ ] Bumper `APP_VERSION` dans `MatchManagerEPS.html` (affiché sous le titre à l'accueil + dans Paramètres) à chaque changement fonctionnel visible pour l'utilisatrice — pas pour un correctif interne invisible.
 
