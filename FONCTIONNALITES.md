@@ -1,4 +1,4 @@
-# Fonctionnalités - Match Manager EPS (version 2.0)
+# Fonctionnalités - Match Manager EPS (version 2.1)
 
 Catalogue de ce que l'application fait aujourd'hui. Pour l'historique : [CHANGELOG.md](CHANGELOG.md). Pour l'architecture et les conventions de code : [CLAUDE.md](CLAUDE.md). Pour les raisons des choix : [MEMORY.md](MEMORY.md).
 
@@ -69,7 +69,9 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 
 ## 8. Écrans et réglages
 
-- Accueil : liste des tournois, palmarès par classe, sauvegarde / transfert, version affichée, pied de page outils-eps.fr.
+- Accueil : liste des tournois (progression, « Reprendre » / « Voir le podium », liseré vert si terminé), palmarès par classe, sauvegarde / transfert, version affichée, pied de page outils-eps.fr.
+- Fin de tournoi : fenêtre « Tournoi terminé ! » avec podium (une fois par podium), carte Podium en haut des Classements, médailles 🥇🥈🥉 dans les classements.
+- Avatars : pastille à l'initiale, couleur de la poule du joueur, dans les cartes de match. Fondu de 150 ms entre écrans.
 - **Paramètres** (libre) : mode clair / sombre, accès à la configuration avancée, aide.
 - **Configuration avancée** (mot de passe professeur) : format par défaut, points, départage, bonus arbitre, mot de passe personnalisé, suppression de toutes les données.
 - Aide intégrée à jour des fonctions ci-dessus.

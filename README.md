@@ -20,7 +20,7 @@ Application PWA de gestion de tournois pour les cours d'EPS (collège & lycée) 
 
 Tests : `npm test` (Node 20 ou plus, aucune dépendance), voir [tests/README.md](tests/README.md).
 
-Version actuelle : **2.0**. Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md).
+Version actuelle : **2.1**. Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md).
 
 ## Documentation du projet
 

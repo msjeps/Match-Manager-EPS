@@ -6,6 +6,19 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.1 - 2026-10-11 (APK versionCode 13, cache v30)
+
+Deuxième lot de l'audit d'interface : les moments de plaisir.
+
+### Ajouts
+- **Podium de fin de tournoi** : à la validation du dernier match, une fenêtre « Tournoi terminé ! » affiche les 3 premiers sur trois marches (or, argent, bronze), avec « Voir les classements ». Affichée une seule fois par podium (`T.celebratedSig`) ; vibration courte. Le podium reste en carte en haut de l'écran Classements.
+- **Accueil** : chaque tournoi montre sa progression (matchs joués / total, barre), un bouton « Reprendre » (ou « Voir le podium » si terminé) ; un tournoi terminé a un liseré vert et le badge « Terminé ».
+- **Pastille d'avatar** (initiale sur la couleur de la poule du joueur) devant chaque nom dans les cartes de match. Sans poule (tableau) : couleur selon le rang d'inscription.
+- **Fondu de 150 ms** entre écrans.
+- Aide intégrée : paragraphe « Fin de tournoi ».
+
+---
+
 ## 2.0 - 2026-10-11 (APK versionCode 12, cache v29)
 
 Refonte visuelle : alignement sur la charte [DESIGN-SYSTEM-EPS.md](../DESIGN-SYSTEM-EPS.md) (style Biathlon VMA) et plus de plaisir d'usage. Palette bleu/or et logique de l'app inchangées. Le numéro passe au format `X.Y` de la charte.

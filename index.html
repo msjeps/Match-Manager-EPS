@@ -17,7 +17,8 @@ body.light-mode{--bg:#EEF2FA;--surf:#FFFFFF;--surf2:#F1F4FB;--txt:#1A2540;--txt2
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
 .screen{display:none;min-height:100vh;padding-bottom:20px}
-.screen.active{display:block}
+.screen.active{display:block;animation:screenIn .15s ease-out}
+@keyframes screenIn{from{opacity:0}to{opacity:1}}
 .top-bar{background:linear-gradient(135deg,var(--chrome1),var(--chrome2));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.4);border-bottom:2px solid var(--pri)}
 .top-bar h1{font-size:1.1em;flex:1}
 .top-bar .logo{font-size:1.3em;font-weight:700;flex:1;display:flex;align-items:center;gap:10px}
@@ -223,6 +224,15 @@ body.light-mode .badge-out{color:#C62828}
 .live-btn{display:block;width:100%;height:76px;margin-top:8px;border-radius:var(--rad);border:3px solid var(--brd);background:var(--surf2);color:var(--txt);font-size:2.8em;font-weight:800;cursor:pointer}
 .live-btn.plus{background:var(--ok);border-color:var(--ok);color:#fff}
 .live-btn:active{opacity:.7}
+.avatar{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-size:.8em;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
+.card.done{border-left-color:var(--ok)}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:12px 0 4px}
+.pstep{flex:1;max-width:200px;text-align:center}
+.pstep-name{font-weight:800;margin-bottom:6px;word-break:break-word}
+.pstep-block{border-radius:12px 12px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:10px;font-size:2em;color:#1A2540}
+.pstep-1 .pstep-block{height:120px;background:#F3C146}
+.pstep-2 .pstep-block{height:90px;background:#C9D3E6}
+.pstep-3 .pstep-block{height:70px;background:#CD7F32}
 .live-score.lead,.live-num.lead{color:var(--ok-txt)}
 .live-side.lead{border-color:var(--ok)}
 @keyframes liveBump{from{transform:scale(1.25)}to{transform:scale(1)}}
@@ -427,6 +437,7 @@ body.light-mode .badge-out{color:#C62828}
 <button class="btn-icon" onclick="showScreen('scr-export')">&#128228;</button>
 </div>
 <div class="content">
+<div id="podium-card"></div>
 <div id="rankings-tabs" class="tab-bar"></div>
 <div id="rankings-content"></div>
 <div class="card" style="margin-top:16px">
@@ -609,7 +620,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.0';
+const APP_VERSION='2.1';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const LS_BACKUP_KEY='teneps_data_illisible';
 
@@ -749,6 +760,45 @@ function renderSettings(){
 document.getElementById('set-version').textContent='Match Manager EPS - Version '+APP_VERSION;
 }
 
+// Pastille d'avatar : couleur de la poule du joueur (repli : rang d'inscription), texte lisible
+function avatarHtml(p){
+if(!p)return '';
+let idx=T.pools.findIndex(po=>po.playerIds.indexOf(p.id)>=0);
+if(idx<0)idx=Math.max(0,T.players.findIndex(x=>x.id===p.id));
+const c=POOL_COLORS[idx%POOL_COLORS.length][0];
+const lum=(parseInt(c.substr(1,2),16)*299+parseInt(c.substr(3,2),16)*587+parseInt(c.substr(5,2),16)*114)/1000;
+return '<span class="avatar" style="background:'+c+';color:'+(lum>150?'#1A2540':'#fff')+'">'+escH((p.name||'?').charAt(0).toUpperCase())+'</span>';
+}
+// Podium (3 premiers du classement général) d'un tournoi terminé : ord = tournamentOrder()
+function podiumHtml(ord){
+const top=ord.ids.slice(0,3).map(id=>T.players.find(p=>p.id===id)).filter(Boolean);
+if(!top.length)return '';
+const meds=['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'];
+const order=top.length>=3?[1,0,2]:top.length===2?[1,0]:[0];
+return '<div class="podium">'+order.map(i=>'<div class="pstep pstep-'+(i+1)+'"><div class="pstep-name">'+escH(top[i].name)+'</div><div class="pstep-block">'+meds[i]+'</div></div>').join('')+'</div>';
+}
+function podiumCardHtml(){
+const ord=tournamentOrder();
+if(!ord.finished||!ord.ids.length)return '';
+return '<div class="card done"><h3 style="margin-bottom:4px;color:var(--pri-lt)">&#127942; Podium</h3>'+podiumHtml(ord)+'</div>';
+}
+// Fin de tournoi : modale de félicitations, une fois par podium (T.celebratedSig)
+function maybeCelebrate(){
+let ord;
+try{ord=tournamentOrder();}catch(e){return;}
+if(!ord.finished||!ord.ids.length)return;
+const sig=ord.ids.slice(0,3).join('|');
+if(T.celebratedSig===sig)return;
+T.celebratedSig=sig;save();
+if(navigator.vibrate)navigator.vibrate([100,60,100,60,200]);
+showModal('&#127881; Tournoi termin&eacute; !','<p style="text-align:center;color:var(--txt2)">'+escH(T.name)+'</p>'+podiumHtml(ord)+
+'<div class="modal-actions" style="justify-content:center"><button class="btn-secondary" onclick="closeModal()">Fermer</button>'+
+'<button class="btn-primary" style="width:auto" onclick="closeModal();showScreen(\'scr-rankings\')">Voir les classements</button></div>');
+}
+function openResults(id){
+T=state.tournaments.find(t=>t.id===id);
+if(T)showScreen('scr-rankings');
+}
 function pnameHtml(p){return p?escH(p.name)+(p.out?'<span class="badge-out">'+(p.out==='absent'?'Absent':'Forfait')+'</span>':''):'?';}
 function toast(msg,ms){const d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),ms||2500)}
 
@@ -759,15 +809,23 @@ if(!state.tournaments.length){el.innerHTML='<div class="empty-state"><div class=
 el.innerHTML=state.tournaments.map(t=>{
 const modeNames={1:'Poules de niveau',2:'Poules + Finales',3:'Tableau \u00e9limination'};
 const phaseNames={players:'Inscription',pools:'Configuration',matches:'Matchs en cours',finals:'Finales',bracket:'Bracket',done:'Termin\u00e9'};
-return`<div class="card" style="cursor:pointer" onclick="openTournament('${t.id}')">
+let fin=false;
+try{fin=withTournament(t,()=>tournamentOrder().finished);}catch(e){}
+const total=t.matches.length,nbDone=t.matches.filter(m=>m.status==='done').length;
+const pct=total?Math.round(100*nbDone/total):0;
+const prog=total?`<div style="display:flex;justify-content:space-between;font-size:.8em;color:var(--txt2);margin-top:10px"><span>${nbDone}/${total} matchs</span><span>${pct}%</span></div>
+<div class="progress-bar" style="margin:4px 0 0"><div class="progress-fill" style="width:${pct}%"></div></div>`:'';
+const go=fin?`<button class="btn-primary btn-sm" style="width:auto;margin-top:12px" onclick="event.stopPropagation();openResults('${t.id}')">&#127941; Voir le podium</button>`
+:`<button class="btn-primary btn-sm" style="width:auto;margin-top:12px" onclick="event.stopPropagation();openTournament('${t.id}')">&#9654; Reprendre</button>`;
+return`<div class="card${fin?' done':''}" style="cursor:pointer" onclick="openTournament('${t.id}')">
 <div style="display:flex;justify-content:space-between;align-items:start">
 <div><h3 style="color:var(--pri-lt)">&#127942; ${escH(t.name)}</h3>
 <p style="font-size:.85em;color:var(--txt2)">&#128197; ${escH(t.date)} - ${escH(t.classe||'')}</p>
 <p style="font-size:.85em">${t.players.length} joueurs &bull; Mode ${t.mode}</p>
 <span class="badge badge-orange">${modeNames[t.mode]}</span>
-<span class="badge badge-blue">${phaseNames[t.phase]||t.phase}</span></div>
+${fin?'<span class="badge badge-green">&#127941; Termin&eacute;</span>':'<span class="badge badge-blue">'+(phaseNames[t.phase]||t.phase)+'</span>'}</div>
 <button class="btn-danger btn-sm" onclick="event.stopPropagation();delTournament('${t.id}')">&#128465;</button>
-</div></div>`}).join('');
+</div>${prog}${go}</div>`}).join('');
 }
 
 function openTournament(id){
@@ -1387,9 +1445,9 @@ return`<div class="match-card ${m.status}" id="mc-${m.id}" data-sig="${matchSig(
 <div class="match-header"><span class="match-num">Match ${m.matchNum||''}</span>${tableBadge}
 <span class="match-status ${m.status}">${statusLabel}</span></div>
 ${m.forfeit?forfeitNote(m):''}
-<div class="match-row"><span class="pname"${w1?' style="color:var(--ok-txt);font-weight:700"':''}>${escH(p1.name)}</span>
+<div class="match-row"><span class="pname"${w1?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p1)}${escH(p1.name)}</span>
 <input type="number" id="s1-${m.id}" value="${s1}" min="0" max="99" class="${w1?'winner':w2?'loser':''}" ${isDone?'disabled':''}></div>
-<div class="match-row"><span class="pname"${w2?' style="color:var(--ok-txt);font-weight:700"':''}>${escH(p2.name)}</span>
+<div class="match-row"><span class="pname"${w2?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p2)}${escH(p2.name)}</span>
 <input type="number" id="s2-${m.id}" value="${s2}" min="0" max="99" class="${w2?'winner':w1?'loser':''}" ${isDone?'disabled':''}></div>
 ${T.settings.matchFamily==='time'?renderMatchTimerWidget(m):''}
 ${actionsHtml}</div>`;
@@ -1412,11 +1470,11 @@ return`<div class="match-card ${m.status}" id="mc-${m.id}" data-sig="${matchSig(
 ${m.forfeit?forfeitNote(m):''}
 <div class="set-scores">
 <div class="set-header"><div class="pname-col"></div><div class="set-col">S1</div><div class="set-col">S2</div><div class="set-col set3-${m.id}" style="${s3d}">S3</div></div>
-<div class="set-row"><div class="pname-col"${isW1?' style="color:var(--ok-txt);font-weight:700"':''}>${escH(p1.name)}</div>
+<div class="set-row"><div class="pname-col"${isW1?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p1)}${escH(p1.name)}</div>
 <div class="set-col"><input type="number" id="s1a-${m.id}" value="${sets[0].s1}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
 <div class="set-col"><input type="number" id="s2a-${m.id}" value="${sets[1].s1}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
 <div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3a-${m.id}" value="${sets[2]?sets[2].s1:''}" min="0" max="99" ${isDone?'disabled':''}></div></div>
-<div class="set-row"><div class="pname-col"${isW2?' style="color:var(--ok-txt);font-weight:700"':''}>${escH(p2.name)}</div>
+<div class="set-row"><div class="pname-col"${isW2?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p2)}${escH(p2.name)}</div>
 <div class="set-col"><input type="number" id="s1b-${m.id}" value="${sets[0].s2}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
 <div class="set-col"><input type="number" id="s2b-${m.id}" value="${sets[1].s2}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
 <div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3b-${m.id}" value="${sets[2]?sets[2].s2:''}" min="0" max="99" ${isDone?'disabled':''}></div></div>
@@ -1485,6 +1543,7 @@ if(navigator.vibrate)navigator.vibrate(50);
 // Lib\u00e9rer la table et r\u00e9attribuer en mode bracket
 if(m.phase==='bracket'){const freedTable=m.table;m.table=null;assignBracketTables();save();}
 refreshAfterChange(m);
+maybeCelebrate();
 }
 
 // Matchs bracket qui découlent des résultats du tour r : tours suivants, petite finale et
@@ -1819,6 +1878,7 @@ if(!T)return;
 const sig=rankingsSig();
 if(sig===rankingsSigLast&&document.getElementById('rankings-content').innerHTML)return;
 rankingsSigLast=sig;
+document.getElementById('podium-card').innerHTML=podiumCardHtml();
 const tabs=document.getElementById('rankings-tabs');
 const content=document.getElementById('rankings-content');
 renderQRCode('qr-container-rankings');
@@ -3031,6 +3091,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <p>Le bouton <b>&#128424; Imprimer / PDF</b> (barre d'outils des matchs et &eacute;cran Classements) pr&eacute;pare une feuille A4 en noir et blanc : classements, tableau du tournoi, liste des matchs et scores. Choisissez une imprimante ou &laquo; Enregistrer au format PDF &raquo; pour l'afficher au gymnase.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Palmar&egrave;s par classe</h3>
 <p>Sur l'&eacute;cran d'accueil, <b>&#127941; Palmar&egrave;s par classe</b> additionne les r&eacute;sultats de tous les tournois d'une m&ecirc;me classe (joueurs rapproch&eacute;s par nom) : tournois jou&eacute;s, victoires, d&eacute;faites, % de victoires, diff&eacute;rence de points, points de classement, premi&egrave;res places et podiums. Triez par points, % de victoires ou podiums, d&eacute;cochez un tournoi (copie, essai) pour l'exclure, puis imprimez ou enregistrez en PDF.</p>
+<p><b>&#127942; Fin de tournoi</b> : quand le dernier match est valid&eacute;, une fen&ecirc;tre affiche le <b>podium</b> (une seule fois par podium). Il reste visible en haut de l'&eacute;cran Classements et, sur l'accueil, le tournoi passe en vert avec le bouton &laquo; Voir le podium &raquo;. Les m&eacute;dailles &#129351;&#129352;&#129353; apparaissent dans les classements d&egrave;s qu'un match est jou&eacute;.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Annuler</h3>
 <p>Le bouton <b>&#8617; Annuler</b> remet le tournoi exactement dans l'&eacute;tat d'avant la derni&egrave;re action (r&eacute;sultat valid&eacute;, modification, joueur retir&eacute;...), tours et finales g&eacute;n&eacute;r&eacute;s ensuite compris. On peut annuler plusieurs actions de suite.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Mode tablette &eacute;l&egrave;ve</h3>
