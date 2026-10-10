@@ -229,6 +229,7 @@ body.light-mode .badge-out{color:#C62828}
 <h2 style="margin-bottom:16px">Mes Tournois</h2>
 <div id="tournament-list"></div>
 <button class="btn-primary" onclick="showScreen('scr-create')" style="margin-top:16px">+ Nouveau tournoi</button>
+<button class="btn-secondary" onclick="showPalmares()" style="margin-top:10px;width:100%">&#127941; Palmar&egrave;s par classe</button>
 <button class="btn-secondary" onclick="showBackupModal()" style="margin-top:10px;width:100%">&#128190; Sauvegarde / transfert de tournoi</button>
 <div class="pied-page">
 <img src="logo-outils-eps.png" alt="Logo outils-eps.fr" class="pied-page-logo">
@@ -588,7 +589,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='1.8';
+const APP_VERSION='1.9';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const LS_BACKUP_KEY='teneps_data_illisible';
 
@@ -2967,6 +2968,8 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <p>Au-dessus des matchs, la carte <b>&#9201; File d'attente</b> montre les tables libres (vert) ou occup&eacute;es (jaune), puis propose le <b>prochain match libre</b> : celui dont aucun joueur n'est en jeu ni en train d'arbitrer, en priorit&eacute; les joueurs qui ont le moins jou&eacute;. Elle sugg&egrave;re aussi une table et un arbitre (un joueur qui n'a plus de match &agrave; jouer, ou qui a le moins arbitr&eacute;). <b>&#9654; Lancer ce match</b> met le match en cours et applique la table et l'arbitre propos&eacute;s.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Imprimer ou PDF</h3>
 <p>Le bouton <b>&#128424; Imprimer / PDF</b> (barre d'outils des matchs et &eacute;cran Classements) pr&eacute;pare une feuille A4 en noir et blanc : classements, tableau du tournoi, liste des matchs et scores. Choisissez une imprimante ou &laquo; Enregistrer au format PDF &raquo; pour l'afficher au gymnase.</p>
+<h3 style="color:var(--pri-lt);margin:12px 0 6px">Palmar&egrave;s par classe</h3>
+<p>Sur l'&eacute;cran d'accueil, <b>&#127941; Palmar&egrave;s par classe</b> additionne les r&eacute;sultats de tous les tournois d'une m&ecirc;me classe (joueurs rapproch&eacute;s par nom) : tournois jou&eacute;s, victoires, d&eacute;faites, % de victoires, diff&eacute;rence de points, points de classement, premi&egrave;res places et podiums. Triez par points, % de victoires ou podiums, d&eacute;cochez un tournoi (copie, essai) pour l'exclure, puis imprimez ou enregistrez en PDF.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Annuler</h3>
 <p>Le bouton <b>&#8617; Annuler</b> remet le tournoi exactement dans l'&eacute;tat d'avant la derni&egrave;re action (r&eacute;sultat valid&eacute;, modification, joueur retir&eacute;...), tours et finales g&eacute;n&eacute;r&eacute;s ensuite compris. On peut annuler plusieurs actions de suite.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Mode tablette &eacute;l&egrave;ve</h3>
@@ -3926,6 +3929,19 @@ h+='<tr><td>'+(m.matchNum||i+1)+'</td><td class="pname"'+(w1?' style="font-weigh
 });
 return h+'</tbody></table>';
 }
+// Feuille de style commune des documents imprimés (noir et blanc)
+function printCss(landscape){
+return '@page{size:A4 '+(landscape?'landscape':'portrait')+';margin:10mm}'+
+':root{--pri-lt:#B45309;--txt:#000;--txt2:#555;--brd:#999;--ok-txt:#2E7D32;--err-txt:#C62828;--accent-txt:#00695C;--surf2:#fff}'+
+'*{box-sizing:border-box}body{font-family:sans-serif;color:#000;background:#fff;margin:0;padding:0;font-size:11pt}'+
+'h1{font-size:20pt;margin:0 0 2mm}h2{font-size:15pt;margin:0 0 4mm;padding-bottom:1mm;border-bottom:2px solid #000}h3,h4{margin:5mm 0 2mm;font-size:12pt;color:#000}'+
+'.sub{color:#444;margin:0 0 5mm}.pg+.pg{page-break-before:always}'+
+'table{width:100%;border-collapse:collapse;margin-bottom:4mm;page-break-inside:auto}tr{page-break-inside:avoid}'+
+'th{background:#e8e8e8;color:#000;border:1px solid #777;padding:2mm;text-align:center;font-size:10pt}'+
+'td{border:1px solid #aaa;padding:1.6mm 2mm;text-align:center}td.pname{text-align:left}td.rank{font-weight:700}'+
+'.badge-out{margin-left:6px;font-size:.75em;border:1px solid #777;border-radius:8px;padding:0 5px}'+
+'.pied{margin-top:6mm;font-size:9pt;color:#555}';
+}
 function buildPrintDoc(opt){
 const el=document.createElement('div');
 const sections=[];
@@ -3957,16 +3973,7 @@ h+=printMatchTable('Petite finale',T.matches.filter(m=>m.phase==='bracket'&&m.is
 sections.push(h);
 }
 const modeNames={1:'Poules de niveau',2:'Poules + finales',3:'Tableau élimination'};
-const css='@page{size:A4 '+(opt.landscape?'landscape':'portrait')+';margin:10mm}'+
-':root{--pri-lt:#B45309;--txt:#000;--txt2:#555;--brd:#999;--ok-txt:#2E7D32;--err-txt:#C62828;--accent-txt:#00695C;--surf2:#fff}'+
-'*{box-sizing:border-box}body{font-family:sans-serif;color:#000;background:#fff;margin:0;padding:0;font-size:11pt}'+
-'h1{font-size:20pt;margin:0 0 2mm}h2{font-size:15pt;margin:0 0 4mm;padding-bottom:1mm;border-bottom:2px solid #000}h3,h4{margin:5mm 0 2mm;font-size:12pt;color:#000}'+
-'.sub{color:#444;margin:0 0 5mm}.pg+.pg{page-break-before:always}'+
-'table{width:100%;border-collapse:collapse;margin-bottom:4mm;page-break-inside:auto}tr{page-break-inside:avoid}'+
-'th{background:#e8e8e8;color:#000;border:1px solid #777;padding:2mm;text-align:center;font-size:10pt}'+
-'td{border:1px solid #aaa;padding:1.6mm 2mm;text-align:center}td.pname{text-align:left}td.rank{font-weight:700}'+
-'.badge-out{margin-left:6px;font-size:.75em;border:1px solid #777;border-radius:8px;padding:0 5px}'+
-'.pied{margin-top:6mm;font-size:9pt;color:#555}';
+const css=printCss(opt.landscape);
 const today=new Date().toLocaleDateString('fr-FR');
 return '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>'+escH(exportFileName().replace(/\.xlsx$/,''))+'</title><style>'+css+'</style></head><body>'+
 sections.map((s,i)=>'<div class="pg">'+(i===0?'<h1>'+escH(T.name)+'</h1><p class="sub">'+escH([T.classe,T.date,modeNames[T.mode]].filter(Boolean).join(' - '))+'</p>':'')+s+'</div>').join('')+
@@ -3996,6 +4003,142 @@ setTimeout(()=>{
 try{f.contentWindow.focus();f.contentWindow.print();}catch(e){toast('Impression impossible sur cet appareil');}
 setTimeout(()=>f.remove(),60000);
 },300);
+}
+
+/* ===== PALMARÈS CUMULÉ PAR CLASSE (tous les tournois d'une même classe) ===== */
+// Les joueurs sont rapprochés par nom (majuscules, déjà imposées à la saisie). Les calculs d'un
+// tournoi réutilisent les fonctions existantes, qui lisent le tournoi courant `T` : on le substitue
+// le temps du calcul.
+let palmCls=null,palmSort='pts';
+const palmExcluded={};   // tournois décochés (copies importées, essais) : valable pour la session
+function withTournament(t,fn){
+const prev=T;T=t;
+try{return fn();}finally{T=prev;}
+}
+// Ordre du classement général du tournoi T (le même que celui affiché / exporté) + tournoi terminé ?
+function tournamentOrder(){
+const allDone=T.matches.length>0&&T.matches.every(m=>m.status==='done');
+const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
+const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
+const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
+const drawPts=T.settings.drawPts!==undefined?T.settings.drawPts:1;
+if(T.mode===3){
+const last=T.bracket&&T.bracket.rounds&&T.bracket.rounds[T.bracket.rounds.length-1];
+return {ids:getBracketFullRanking().map(e=>e.id),finished:!!(allDone&&last&&last.length===1)};
+}
+if(T.mode===1){
+const all=[];
+for(const pool of T.pools)for(const r of calcPoolRanking(pool.id))all.push(r);
+all.sort((a,b)=>(a.out?1:0)-(b.out?1:0)||b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+return {ids:all.filter(r=>!r.out).map(r=>r.id),finished:allDone};
+}
+// mode 2 : groupes de finale (rang de finale, puis points cumulés), puis joueurs hors finales
+if(!T.finals||!T.finals.length)return {ids:[],finished:false};
+const refEnabled=T.settings.refBonusEnabled||state.settings.refBonusEnabled;
+const refBP=T.settings.refBonusPts!==undefined?T.settings.refBonusPts:(state.settings.refBonusPts||1);
+const poolSt={};
+for(const pool of T.pools)for(const r of calcPoolRanking(pool.id))poolSt[r.id]=r;
+const finalArb={};
+if(refEnabled)T.matches.filter(m=>m.phase==='final'&&m.status==='done'&&m.refBonus&&m.refereeId).forEach(m=>{finalArb[m.refereeId]=(finalArb[m.refereeId]||0)+refBP;});
+const ids=[];
+for(const group of T.finals){
+const ms=T.matches.filter(m=>m.poolId===group.id&&m.phase==='final'&&m.status==='done');
+const fSt=statsFromMatches(ms,group.playerIds,{wPts,l3Pts,lPts,drawPts});
+const rows=Object.values(fSt).map(fs=>{
+const ps=poolSt[fs.id]||{w:0,pts:0,pf:0,pa:0};
+return {id:fs.id,fw:fs.w,pts:ps.pts+fs.pts+(finalArb[fs.id]||0),diff:(ps.pf+fs.pf)-(ps.pa+fs.pa),pf:ps.pf+fs.pf};
+});
+rows.sort((a,b)=>b.fw-a.fw||b.pts-a.pts||b.diff-a.diff||b.pf-a.pf);
+rows.forEach(r=>ids.push(r.id));
+}
+calcOutsideFinalsRanking(finalArb).forEach(r=>{if(!ids.includes(r.id))ids.push(r.id);});
+return {ids,finished:allDone};
+}
+function palmaresData(){
+const classes={};
+state.tournaments.forEach(t=>{
+const label=(t.classe||'').trim()||'Sans classe';
+const key=label.replace(/\s+/g,'').toUpperCase();
+const c=classes[key]||(classes[key]={key,label,tournaments:[],players:{}});
+withTournament(t,()=>{
+const ord=tournamentOrder();
+c.tournaments.push({id:t.id,name:t.name,date:t.date,finished:ord.finished,excluded:!!palmExcluded[t.id]});
+if(palmExcluded[t.id])return;
+const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
+const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
+const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
+const drawPts=T.settings.drawPts!==undefined?T.settings.drawPts:1;
+const refEnabled=T.settings.refBonusEnabled||state.settings.refBonusEnabled;
+const refBP=T.settings.refBonusPts!==undefined?T.settings.refBonusPts:(state.settings.refBonusPts||1);
+// matchs gagnés ou perdus par forfait : non comptés (scores fictifs)
+const done=T.matches.filter(m=>m.status==='done'&&!m.forfeit);
+const st=statsFromMatches(done,T.players.map(p=>p.id),{wPts,l3Pts,lPts,drawPts});
+if(refEnabled)done.filter(m=>m.refBonus&&m.refereeId&&st[m.refereeId]).forEach(m=>{st[m.refereeId].pts+=refBP;});
+T.players.forEach(p=>{
+const s=st[p.id];
+if(!s||!s.played)return;
+const k=p.name.trim().toUpperCase();
+const e=c.players[k]||(c.players[k]={name:p.name.trim(),tn:0,j:0,w:0,l:0,d:0,pf:0,pa:0,pts:0,first:0,podium:0});
+e.tn++;e.j+=s.played;e.w+=s.w;e.l+=s.l;e.d+=s.d;e.pf+=s.pf;e.pa+=s.pa;e.pts+=s.pts;
+if(ord.finished){
+const idx=ord.ids.indexOf(p.id);
+if(idx===0)e.first++;
+if(idx>=0&&idx<3)e.podium++;
+}
+});
+});
+});
+return Object.values(classes).sort((a,b)=>a.label.localeCompare(b.label,'fr'));
+}
+function palmaresRows(c){
+const rows=Object.values(c.players).map(e=>({...e,pct:e.j?Math.round(100*e.w/e.j):0,diff:e.pf-e.pa}));
+const cmp={
+pts:(a,b)=>b.pts-a.pts||b.pct-a.pct||b.diff-a.diff,
+pct:(a,b)=>b.pct-a.pct||b.j-a.j||b.diff-a.diff,
+podium:(a,b)=>b.first-a.first||b.podium-a.podium||b.pts-a.pts
+}[palmSort]||((a,b)=>b.pts-a.pts);
+rows.sort((a,b)=>cmp(a,b)||a.name.localeCompare(b.name,'fr'));
+return rows;
+}
+function palmaresTableHtml(c,rows){
+let h='<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th title="Tournois jou&eacute;s">Tn</th><th title="Victoires">V</th><th title="D&eacute;faites">D</th><th title="Pourcentage de victoires">%V</th><th title="Points marqu&eacute;s moins encaiss&eacute;s">Diff</th><th title="Points de classement cumul&eacute;s">Pts</th><th title="Premi&egrave;res places">&#129351;</th><th title="Podiums (places 1 &agrave; 3)">Pod.</th></tr></thead><tbody>';
+rows.forEach((r,i)=>{
+h+='<tr><td class="rank">'+(i+1)+'</td><td class="pname">'+escH(r.name)+'</td><td>'+r.tn+'</td><td>'+r.w+'</td><td>'+(r.l+r.d)+'</td><td>'+r.pct+'%</td><td>'+(r.diff>=0?'+':'')+r.diff+'</td><td><strong>'+r.pts+'</strong></td><td>'+r.first+'</td><td>'+r.podium+'</td></tr>';
+});
+return h+'</tbody></table>';
+}
+function showPalmares(){
+const data=palmaresData();
+if(!data.length){toast('Aucun tournoi');return;}
+let c=data.find(x=>x.key===palmCls)||data[0];
+palmCls=c.key;
+let html='<div style="display:flex;flex-wrap:wrap;margin:0 -3px 6px">'+data.map(x=>
+'<button class="tab-btn'+(x.key===c.key?' active':'')+'" style="margin:3px;flex:0 0 auto" onclick="palmCls=\''+escH(x.key).replace(/'/g,"\\'")+'\';showPalmares()">'+escH(x.label)+' ('+x.tournaments.length+')</button>').join('')+'</div>';
+html+='<div style="display:flex;flex-wrap:wrap;align-items:center;margin:0 -3px 8px;font-size:.85em"><span style="margin:0 6px;color:var(--txt2)">Trier par :</span>'+
+[['pts','Points'],['pct','% victoires'],['podium','Podiums']].map(o=>'<button class="tab-btn'+(palmSort===o[0]?' active':'')+'" style="margin:3px;flex:0 0 auto" onclick="palmSort=\''+o[0]+'\';showPalmares()">'+o[1]+'</button>').join('')+'</div>';
+const rows=palmaresRows(c);
+html+='<div style="overflow:auto;max-height:50vh;-webkit-overflow-scrolling:touch">'+(rows.length?palmaresTableHtml(c,rows):'<p class="empty-state">Aucun match jou&eacute; dans les tournois coch&eacute;s.</p>')+'</div>';
+html+='<div style="margin-top:12px;font-weight:600">Tournois pris en compte</div>'+c.tournaments.map(t=>
+'<label style="display:flex;align-items:center;gap:10px;padding:8px 2px;font-size:.9em"><input type="checkbox" style="width:22px;height:22px" '+(t.excluded?'':'checked')+' onchange="togglePalmaresTournament(\''+t.id+'\')"><span>'+escH(t.name)+' <span style="color:var(--txt2)">'+escH(t.date||'')+' - '+(t.finished?'termin&eacute;':'en cours')+'</span></span></label>').join('');
+html+='<p style="font-size:.78em;color:var(--txt2);margin-top:8px">Les joueurs sont rapproch&eacute;s par nom. <b>Pts</b> : points de classement de chaque tournoi (leur bar&egrave;me) additionn&eacute;s. <b>Diff</b> : points marqu&eacute;s moins encaiss&eacute;s. <b>Podiums</b> : places 1 &agrave; 3 du classement g&eacute;n&eacute;ral d\'un tournoi termin&eacute;. Les matchs gagn&eacute;s ou perdus par forfait ne sont pas compt&eacute;s. D&eacute;cochez un tournoi pour l\'exclure (copie, essai) : valable jusqu\'&agrave; la fermeture de l\'application.</p>';
+html+='<button class="btn-secondary" style="width:100%;margin-top:8px" onclick="printPalmares()">&#128424; Imprimer / PDF</button>';
+showModal('&#127941; Palmar&egrave;s par classe',html);
+}
+function togglePalmaresTournament(id){
+if(palmExcluded[id])delete palmExcluded[id];else palmExcluded[id]=true;
+showPalmares();
+}
+function printPalmares(){
+const c=palmaresData().find(x=>x.key===palmCls);
+if(!c)return;
+const rows=palmaresRows(c);
+const today=new Date().toLocaleDateString('fr-FR');
+const inc=c.tournaments.filter(t=>!t.excluded);
+const html='<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Palmares_'+escH(c.label.replace(/[^A-Za-z0-9]+/g,'_'))+'</title><style>'+printCss(false)+'</style></head><body>'+
+'<h1>Palmar&egrave;s - '+escH(c.label)+'</h1><p class="sub">'+inc.length+' tournoi(s) : '+escH(inc.map(t=>t.name).join(', '))+'</p>'+
+palmaresTableHtml(c,rows)+
+'<p class="pied">Pts : points de classement cumul&eacute;s. Diff : points marqu&eacute;s moins encaiss&eacute;s. Pod. : places 1 &agrave; 3 d\'un tournoi termin&eacute;. Match Manager EPS - imprim&eacute; le '+today+'</p></body></html>';
+printHtml(html,'Palmares_'+c.label.replace(/[^A-Za-z0-9]+/g,'_'),false);
 }
 
 /* ===== BOUTON RETOUR ANDROID (APK) ===== */

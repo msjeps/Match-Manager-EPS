@@ -13,6 +13,11 @@ Journal de contexte et de décisions du projet, pour reprendre le travail sans p
 
 Entrées les plus récentes en premier à partir du 2026-10-10 ; les entrées du 2026-08-02 ci-dessous sont dans l'ordre où elles ont été écrites.
 
+### 2026-10-11 - v1.9 : palmarès par classe
+- **Rapprochement par nom, pas par identifiant** : un joueur n'a pas d'identifiant commun d'un tournoi à l'autre (les listes sont recopiées). Deux élèves homonymes d'une même classe seraient fusionnés : limite assumée, à signaler. La classe est comparée sans casse ni espaces (`3eB` = ` 3EB `).
+- **Podium = rang du classement général du tournoi, tournoi terminé seulement.** `tournamentOrder()` reproduit l'ordre déjà affiché / exporté (mode 1 : tous joueurs par points ; mode 2 : groupes de finale puis hors finales ; mode 3 : `getBracketFullRanking`). Les fonctions existantes lisent la globale `T` : `withTournament(t,fn)` la substitue le temps du calcul. Points cumulés = barème propre à chaque tournoi (somme brute), donc un joueur présent à plus de tournois marque plus : d'où le tri alternatif par % de victoires. Les forfaits sont exclus (scores fictifs 1-0).
+- Exclusion de tournois : en mémoire seulement (`palmExcluded`), volontairement non persistée.
+
 ### 2026-10-11 - v1.8 : boîtes maison et mise à jour ciblée
 - **`confirm()` devient un rappel, pas un `await`.** Une boîte maison n'est pas bloquante : les fonctions concernées sont découpées (`unlockMatch(mid,confirmed)` se rappelle elle-même avec `confirmed=true`). Un seul rappel à la fois (`modalCb`), remis à zéro à l'annulation ; `askConfirm` / `askNotice` / `askNumber`. Tout nouveau `confirm()`, `alert()` ou `prompt()` est à proscrire.
 - **Mise à jour ciblée : `refreshAfterChange(m)`.** Remplace `#mc-<id>` seul, puis `refreshRefSelects()` (les listes d'arbitres des autres cartes dépendent des joueurs en jeu), `renderMatchesHeader()` / `renderFinalsProgress()` et la file d'attente. Volontairement **pas** pour le tableau (un résultat peut générer le tour suivant) ni pour `unlockMatch` (supprime des matchs) : rendu complet. Piège rencontré en test : le service worker du navigateur de développement servait l'ancienne page ; désenregistrer le worker et vider les caches avant de vérifier.

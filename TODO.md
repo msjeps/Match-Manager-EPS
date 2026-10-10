@@ -22,12 +22,13 @@
 - [ ] Le dépôt GitHub est public : `MEMORY.md` et `TODO.md` y sont publiés. Vérifier qu'ils ne contiennent rien de sensible avant chaque push.
 
 ### Idées retenues de l'audit, non réalisées
-- [ ] Palmarès cumulé par classe sur l'année.
 - [ ] Re-rendu ciblé du tableau (mode 3) et des classements : seuls les matchs de poule et de finale sont ciblés (v1.8).
 - [ ] Extraire la logique pure (classements, tableau, XLSX) pour la tester en Node sans navigateur.
 - [ ] Réduire à un seul fichier source HTML (aujourd'hui trois copies : `MatchManagerEPS.html`, `index.html`, `android/app/src/main/assets/index.html`).
 
 ## Fait récemment
+
+- [x] v1.9 (2026-10-11, versionCode 10, `CACHE_NAME` v26) : palmarès cumulé par classe (accueil). Vérifié dans le navigateur sur 3 tournois de test ; à valider sur la tablette avec de vrais tournois (homonymes, classes écrites différemment).
 
 - [x] v1.8 (2026-10-11, versionCode 9, `CACHE_NAME` v25) : boîtes maison à la place des `confirm()` / `alert()` / `prompt()` natifs (12 sites) et mise à jour ciblée des cartes de match (poules et finales). Vérifié dans le navigateur ; à valider sur la tablette (boutons des boîtes, fluidité, défilement conservé).
 
