@@ -23,13 +23,14 @@
 
 ### Idées retenues de l'audit, non réalisées
 - [ ] Palmarès cumulé par classe sur l'année.
-- [ ] Détail des manches (sets) dans l'export XLSX en 2 manches gagnantes (aujourd'hui : manches gagnées uniquement).
 - [ ] Remplacer les `confirm()` / `alert()` / `prompt()` natifs par la modale maison (jamais validés dans le WebView).
 - [ ] Re-rendu ciblé plutôt que `innerHTML` complet (allège le CPU des tablettes lentes).
 - [ ] Extraire la logique pure (classements, tableau, XLSX) pour la tester en Node sans navigateur.
 - [ ] Réduire à un seul fichier source HTML (aujourd'hui trois copies : `MatchManagerEPS.html`, `index.html`, `android/app/src/main/assets/index.html`).
 
 ## Fait récemment
+
+- [x] v1.7 (2026-10-11, versionCode 8, `CACHE_NAME` v24) : export XLSX en 2 manches gagnantes avec détail des sets et totaux de points par match. Vérifié dans le navigateur (contenu du fichier relu) ; à ouvrir dans Excel sur une vraie sortie.
 
 - [x] v1.6 (2026-10-10, versionCode 7, `CACHE_NAME` v23) : file d'attente (prochain match libre, tables, arbitre suggéré, « Lancer ce match ») et impression / PDF (classements, arbre, matchs). Vérifié dans le navigateur ; l'APK compile. **À valider sur la tablette** : fenêtre d'impression Android et « Enregistrer au format PDF », taille des boutons de la file d'attente.
 

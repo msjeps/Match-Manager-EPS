@@ -588,7 +588,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='1.6';
+const APP_VERSION='1.7';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const LS_BACKUP_KEY='teneps_data_illisible';
 
@@ -2519,7 +2519,11 @@ for(const p of parts){res.set(p,pos);pos+=p.length;}return res;
 
 // ======= ONGLET 1 : Matchs (poules, finales, tableau) =======
 const s1rows=[];
-const h1=[sh('Poule / Phase',true),sh('Match',true),sh('Joueur 1',true),sh('Score J1',true),sh('Score J2',true),sh('Joueur 2',true),sh('Arbitre',true)];
+// 2 manches gagnantes : Score = manches gagnées, puis détail de chaque set et totaux de points
+const isBo3x=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
+const h1=[sh('Poule / Phase',true),sh('Match',true),sh('Joueur 1',true),sh(isBo3x?'Manches J1':'Score J1',true),sh(isBo3x?'Manches J2':'Score J2',true),sh('Joueur 2',true)];
+if(isBo3x)h1.push(sh('Set 1 J1',true),sh('Set 1 J2',true),sh('Set 2 J1',true),sh('Set 2 J2',true),sh('Set 3 J1',true),sh('Set 3 J2',true),sh('Total pts J1',true),sh('Total pts J2',true));
+h1.push(sh('Arbitre',true));
 if(hasRefBonus)h1.push(sh('Bonus Arb',true));
 s1rows.push(h1);
 // Tous les matchs, groupés par phase : poules, finales (mode 2), tours du tableau / petite finale /
@@ -2552,7 +2556,22 @@ let refName='';
 if(m.refereeId){const rp=T.players.find(x=>x.id===m.refereeId);refName=rp?rp.name:(m.referee||'');}
 else refName=m.referee||'';
 const done=m.status==='done';
-const row=[sh(g.label),nm(m.matchNum||0),sh(pl1?pl1.name:'?'),done?nm(m.score1):sh('-'),done?nm(m.score2):sh('-'),sh(pl2?pl2.name:'?'),sh(refName)];
+const row=[sh(g.label),nm(m.matchNum||0),sh(pl1?pl1.name:'?'),done?nm(m.score1):sh('-'),done?nm(m.score2):sh('-'),sh(pl2?pl2.name:'?')];
+if(isBo3x){
+// détail des sets et totaux : cellules vides pour un match non joué, un forfait ou un set 3 non disputé
+const hasSets=done&&!m.forfeit&&m.sets&&m.sets.length;
+for(let si=0;si<3;si++){
+const st=hasSets?m.sets[si]:null;
+row.push(st?nm(st.s1):null,st?nm(st.s2):null);
+}
+let t1=null,t2=null;
+if(hasSets){
+t1=m.totalPts1!==undefined&&m.totalPts1!==null?m.totalPts1:m.sets.reduce((a,x)=>a+(+x.s1||0),0);
+t2=m.totalPts2!==undefined&&m.totalPts2!==null?m.totalPts2:m.sets.reduce((a,x)=>a+(+x.s2||0),0);
+}
+row.push(hasSets?nm(t1,true):null,hasSets?nm(t2,true):null);
+}
+row.push(sh(refName));
 if(hasRefBonus)row.push(nm(m.refBonus&&done?refBP:0));
 s1rows.push(row);
 }
@@ -2909,7 +2928,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">7. Classements et export</h3>
 <p>Les classements sont calcul\u00e9s automatiquement (points, diff\u00e9rence, points marqu\u00e9s). Vous pouvez :</p>
 <ul style="margin:4px 0 4px 20px">
-<li>Exporter en <b>XLSX</b> (Excel) : onglet &laquo; Matchs &raquo; (poules, finales, tableau) et onglet &laquo; Classement final &raquo;.</li>
+<li>Exporter en <b>XLSX</b> (Excel) : onglet &laquo; Matchs &raquo; (poules, finales, tableau ; en 2 manches gagnantes : manches gagn&eacute;es, d&eacute;tail des sets et total de points de chaque joueur) et onglet &laquo; Classement final &raquo;.</li>
 <li>G\u00e9n\u00e9rer un <b>QR code</b> avec les r\u00e9sultats.</li>
 </ul>
 

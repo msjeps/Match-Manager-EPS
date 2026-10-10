@@ -1,4 +1,4 @@
-# Fonctionnalités - Match Manager EPS (version 1.6)
+# Fonctionnalités - Match Manager EPS (version 1.7)
 
 Catalogue de ce que l'application fait aujourd'hui. Pour l'historique : [CHANGELOG.md](CHANGELOG.md). Pour l'architecture et les conventions de code : [CLAUDE.md](CLAUDE.md). Pour les raisons des choix : [MEMORY.md](MEMORY.md).
 
@@ -57,7 +57,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 
 ## 7. Export et partage
 
-- **XLSX** (fichier Excel fait main, sans dépendance) : onglet « Matchs » (poules, finales, tableau, arbitre, bonus) et onglet « Classement final ». Nom : `MatchManagerEPS_Classe_Date.xlsx`.
+- **XLSX** (fichier Excel fait main, sans dépendance) : onglet « Matchs » (poules, finales, tableau, arbitre, bonus ; en 2 manches gagnantes : manches gagnées, détail des 3 sets et total de points par joueur) et onglet « Classement final ». Nom : `MatchManagerEPS_Classe_Date.xlsx`.
 - **Impression / PDF** : A4 noir et blanc (classements, arbre du tableau en paysage, matchs et scores), au choix. APK : gestionnaire d'impression Android ; navigateur : `print()`.
 - **QR code des résultats** (préfixe `TENEPS|`, lu par l'app SCAN EPS) : coupé par ligne entière au-delà de 2000 caractères, avec `...+N obs`.
 - **Sauvegarde / transfert JSON** : un tournoi ou tous, en fichier ou par copier/coller, import avec contrôle des identifiants et des textes (id déjà présent : import en copie). Pas de transfert par QR : un tournoi dépasse la capacité d'un QR.

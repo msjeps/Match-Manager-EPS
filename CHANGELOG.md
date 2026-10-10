@@ -6,6 +6,13 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 1.7 - 2026-10-11 (APK versionCode 8, cache v24)
+
+### Ajouts
+- **Export XLSX, 2 manches gagnantes** : l'onglet « Matchs » contient, en plus des manches gagnées (colonnes « Manches J1 / J2 »), le score de chaque set (Set 1 à Set 3, J1 et J2) et le **total de points** de chaque joueur sur le match. Colonnes numériques, vides pour un match non joué, un forfait ou un set 3 non disputé. Les autres formats d'export sont inchangés.
+
+---
+
 ## 1.6 - 2026-10-10 (APK versionCode 7, cache v23)
 
 ### Ajouts
