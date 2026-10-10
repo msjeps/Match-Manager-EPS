@@ -4,12 +4,16 @@ import android.annotation.SuppressLint;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintManager;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.View;
@@ -96,6 +100,8 @@ public class MainActivity extends Activity {
 
         // Interface JS -> Java pour les téléchargements (XLSX des classements)
         webView.addJavascriptInterface(new DownloadInterface(), "AndroidDownload");
+        // Impression / PDF des classements et du tableau (gestionnaire d'impression Android)
+        webView.addJavascriptInterface(new PrintInterface(), "AndroidPrint");
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -184,6 +190,53 @@ public class MainActivity extends Activity {
                 }
             });
         }
+    }
+
+    /**
+     * Interface JavaScript d'impression. Le HTML est généré par l'application elle-même
+     * (données échappées) puis chargé dans un WebView caché sans JavaScript.
+     * Appelée via : AndroidPrint.printHtml(html, titre, paysage)
+     */
+    public class PrintInterface {
+        @JavascriptInterface
+        public void printHtml(final String html, String title, final boolean landscape) {
+            final String job = (title == null ? "Match Manager EPS" : title).replaceAll("[\\\\/:*?\"<>|]", "_");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    imprimer(html, job, landscape);
+                }
+            });
+        }
+    }
+
+    // WebView d'impression conservé jusqu'à la fin du travail d'impression
+    private WebView printView;
+
+    private void imprimer(String html, final String jobName, final boolean landscape) {
+        final WebView wv = new WebView(this);
+        wv.getSettings().setJavaScriptEnabled(false);
+        wv.setWebViewClient(new WebViewClient() {
+            private boolean lance = false;
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if (lance) return;
+                lance = true;
+                try {
+                    PrintManager pm = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+                    PrintDocumentAdapter adapter = view.createPrintDocumentAdapter(jobName);
+                    PrintAttributes.MediaSize size = landscape
+                        ? PrintAttributes.MediaSize.ISO_A4.asLandscape()
+                        : PrintAttributes.MediaSize.ISO_A4;
+                    pm.print(jobName, adapter, new PrintAttributes.Builder().setMediaSize(size).build());
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "❌ Impression impossible : " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        printView = wv;
+        wv.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
     }
 
     private void ecrire(byte[] data, String fileName, String mimeType) {
