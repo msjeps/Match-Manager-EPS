@@ -6,7 +6,7 @@ Journal de contexte et de décisions du projet, pour reprendre le travail sans p
 
 - **Source unique** (depuis le 2026-10-11) : `index.html` est le seul fichier HTML, on l'édite directement (suivi par git, servi par GitHub Pages, lu par les tests). `MatchManagerEPS.html` n'existe plus ; `android/app/src/main/assets/index.html` est généré par la tâche Gradle `syncWebApp` (non versionné). Pourquoi : trois copies à resynchroniser à la main, avec un test d'identité qui ne servait qu'à rattraper l'oubli.
 - **Dépôt distant** : github.com/msjeps/Match-Manager-EPS (renommé depuis msjeps/TEN-EPS le 2026-08-02, GitHub redirige l'ancienne URL), déployé sur https://apps.outils-eps.fr/Match-Manager-EPS/ via GitHub Pages (branche `main`, racine `/`) ; l'ancienne adresse `.../TEN-EPS/` renvoie 404 (vérifié le 2026-10-11, la page en ligne était déjà en v2.2).
-- **Fichiers suivis par git** (depuis le 2026-10-10) : `index.html`, `sw.js`, `manifest.json`, icônes et logo, `README.md`, `CHANGELOG.md`, `FONCTIONNALITES.md`, `MEMORY.md`, `TODO.md`, `package.json` et `tests/` (tests Node, `npm test`), le PDF du guide professeur et `android/` (sources du wrapper, avec son propre `.gitignore`). Restent hors dépôt (`.gitignore`) : `CLAUDE.md`, `MatchManagerEPS.html` (fichier de dev), `MatchManagerEPS.apk`, `design_preview.html`, `.claude/`, `.DS_Store`.
+- **Fichiers suivis par git** (depuis le 2026-10-10) : `index.html`, `sw.js`, `manifest.json`, icônes et logo, `README.md`, `CHANGELOG.md`, `FONCTIONNALITES.md`, `MEMORY.md`, `TODO.md`, `package.json` et `tests/` (tests Node, `npm test`), le PDF du guide professeur (`match-manager-eps.pdf`) et `android/` (sources du wrapper, avec son propre `.gitignore`). Restent hors dépôt (`.gitignore`) : `CLAUDE.md`, `MatchManagerEPS.html` (fichier de dev), `MatchManagerEPS.apk`, `design_preview.html`, `.claude/`, `.DS_Store`.
 - **App compagnon** : [SCAN EPS](file:///Users/nathalieprenois/AndroidStudioProjects/SCAN%20EPS) scanne le QR code des résultats généré par Match Manager EPS (préfixe technique inchangé `TENEPS|`, comparaison de chaîne exacte côté SCAN EPS). Compatibilité vérifiée pour les modes 1/2/3 le 2026-08-02.
 
 ## Décisions & historique
@@ -15,7 +15,7 @@ Entrées les plus récentes en premier à partir du 2026-10-10 ; les entrées du
 
 ### 2026-10-11 - Guide professeur généré par script
 - **`generer-guide-professeur.py`** (racine, reportlab, polices Arial de macOS) produit `match-manager-eps.pdf` ; la version est lue dans `index.html`, donc il suffit de le relancer à chaque version. Avant, le PDF n'avait pas de source versionnée : impossible de le régénérer à l'identique. Le texte du script est à tenir à jour avec `FONCTIONNALITES.md`.
-- **Deux PDF dans le dossier** : `match-manager-eps.pdf` (nom attendu par WordPress, régénéré) et `Guide_Professeur_MatchManagerEPS.pdf` (suivi par git, 2 pages, plus ancien, non régénéré).
+- **Un seul PDF** : `match-manager-eps.pdf` (nom attendu par WordPress). L'ancien `Guide_Professeur_MatchManagerEPS.pdf` (2 pages, non régénérable) a été supprimé le 2026-10-11 ; il reste dans l'historique git.
 
 ### 2026-10-11 - APK 2.2 signée et publication
 - **APK 2.2 reconstruite avec la clé de release existante** (`matchmanager-release.jks`, même clé que la 1.9.1 : mise à jour par-dessus sans désinstaller). Contrôlée : `versionCode 14`, `index.html` embarqué identique à celui du dépôt, empreinte du certificat consignée dans `android/README.md`.
