@@ -71,6 +71,16 @@ def mot_de_passe():
     return t
 
 
+def lien_apk():
+    t = Table([[Paragraph('<b>Téléchargement de l\'APK</b> (Wi-Fi, <b>avant le cours</b>) :<br/>'
+                          '<font name="FM" size="8.5">https://github.com/msjeps/Match-Manager-EPS/releases/latest/download/MatchManagerEPS.apk</font><br/>'
+                          'Nom du fichier : <b>MatchManagerEPS.apk</b>', corps)]], colWidths=[170 * mm])
+    t.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, -1), ORANGE_BG), ('BOX', (0, 0), (-1, -1), 1, ORANGE),
+                           ('LEFTPADDING', (0, 0), (-1, -1), 10), ('TOPPADDING', (0, 0), (-1, -1), 6),
+                           ('BOTTOMPADDING', (0, 0), (-1, -1), 6)]))
+    return t
+
+
 def contenu():
     s = []
     s.append(P('Guide professeur', titre))
@@ -96,11 +106,12 @@ def contenu():
     s.append(B("<b>iPhone / iPad</b> : ouvrez le lien avec Safari (obligatoire), appuyez sur le bouton Partager, puis "
                "« Sur l'écran d'accueil »."))
     s.append(B("<b>Ordinateur (PC/Mac)</b> : n'importe quel navigateur, pour préparer un tournoi ou faire un test rapide."))
-    s.append(B("<b>APK Android</b> : téléchargez le fichier puis ouvrez-le depuis vos téléchargements (autorisez "
+    s.append(B("<b>APK Android</b> : téléchargez le fichier (voir l'encadré ci-dessous) puis ouvrez-le depuis vos téléchargements (autorisez "
                "« Installer des applications inconnues » pour votre navigateur si demandé, uniquement pour cette "
                "installation). Depuis la version 1.9.1, une nouvelle APK s'installe par-dessus la précédente sans "
                "perdre les tournois. Pour une APK plus ancienne, <b>exportez d'abord vos sauvegardes</b> (voir plus "
                "bas) puis désinstallez-la."))
+    s.append(lien_apk())
     s.append(P("Une fois lancée, l'application fonctionne sans connexion, écran maintenu allumé pendant la saisie, "
                "plein écran automatique. Le numéro de version s'affiche sous le titre de l'accueil. Un mode clair "
                "(Paramètres, carte Affichage) est disponible ; l'application est sombre par défaut."))

@@ -21,8 +21,8 @@
 - [ ] Mise à jour de l'APK par-dessus l'ancienne sans perdre les tournois existants.
 
 ### Publication
-- [ ] Uploader `MatchManagerEPS.apk` (**2.2**, `versionCode 14`, signée release, reconstruite le 2026-10-11) sur WordPress. Le bouton « Version APK » de `outils-eps.fr/application/match-manager-eps/` pointe toujours vers `https://outils-eps.fr/wp-content/uploads/apk/ten-eps.apk` (ancienne build) ; renommer le fichier côté WordPress en `match-manager.apk` à ce moment.
-- [ ] Uploader le **guide professeur** `match-manager-eps.pdf` (régénéré le 2026-10-11 en v2.2 avec `python3 generer-guide-professeur.py` : podium, médailles, sons, accueil) sur WordPress, à la place de `https://outils-eps.fr/wp-content/uploads/guides/match-manager-eps.pdf`. Le mot de passe par défaut n'y change pas.
+- [x] APK publiée en Release GitHub `v2.3` (2026-10-24) : `https://github.com/msjeps/Match-Manager-EPS/releases/latest/download/MatchManagerEPS.apk`. Le bouton « Version APK » de `outils-eps.fr/application/match-manager-eps/` pointe toujours vers l'ancienne `ten-eps.apk` sur WordPress : le rediriger vers ce lien (ou le retirer).
+- [ ] Uploader le **guide professeur** `match-manager-eps.pdf` (régénéré le 2026-10-24 en v2.3, avec l'encadré du lien de l'APK, via `python3 generer-guide-professeur.py` : podium, médailles, sons, accueil) sur WordPress, à la place de `https://outils-eps.fr/wp-content/uploads/guides/match-manager-eps.pdf`. Le mot de passe par défaut n'y change pas.
 
 ### Décisions en attente
 - [ ] **Sauvegarder la clé de release dans 1Password** (`~/Documents/MatchManagerEPS-cle-de-signature/` : `.jks` + `LISEZ-MOI.txt` avec le mot de passe), puis supprimer le `LISEZ-MOI.txt` du disque. Avant d'installer la nouvelle APK : exporter les sauvegardes JSON des tablettes et **désinstaller l'ancienne** (signée debug).

@@ -6,6 +6,19 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.3 - 2026-10-24 (APK versionCode 16, cache v34)
+
+Publication de l'APK sur GitHub Releases.
+
+### Ajout
+- **Lien de téléchargement de l'APK** dans l'aide intégrée (section « Installation sur tablette », en texte brut à recopier : le WebView de l'APK bloque la navigation externe) et dans le guide professeur PDF (encadré dédié, avec le nom du fichier `MatchManagerEPS.apk` et la mention « Wi-Fi, avant le cours »). Adresse : `https://github.com/msjeps/Match-Manager-EPS/releases/latest/download/MatchManagerEPS.apk`.
+
+### Livraison
+- **APK 2.2 corrigée (`versionCode 15`)** : l'APK 2.2 du 2026-10-11 (`versionCode 14`) ne contenait pas les deux correctifs de sécurité du 2026-10-24 (XSS `onclick`, injection de formule XLSX), ajoutés ensuite au dépôt. Elle a été reconstruite, publiée en Release `v2.2` le 2026-10-24, puis remplacée par la 2.3.
+- **APK 2.3 (`versionCode 16`)** signée avec la clé de release habituelle (certificat SHA-256 `0c5ec6…`, identique aux versions précédentes : mise à jour par-dessus sans perte des tournois). Publiée en Release `v2.3`.
+
+---
+
 ## 2.2 - 2026-10-11 (APK versionCode 14, cache v31 à v33)
 
 Troisième lot de l'audit d'interface (l'alignement sur la charte avait été fait en 2.0).

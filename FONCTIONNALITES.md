@@ -1,4 +1,4 @@
-# Fonctionnalités - Match Manager EPS (version 2.2)
+# Fonctionnalités - Match Manager EPS (version 2.3)
 
 Catalogue de ce que l'application fait aujourd'hui. Pour l'historique : [CHANGELOG.md](CHANGELOG.md). Pour l'architecture et les conventions de code : [CLAUDE.md](CLAUDE.md). Pour les raisons des choix : [MEMORY.md](MEMORY.md).
 

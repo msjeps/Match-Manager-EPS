@@ -24,6 +24,11 @@ Un audit de sécurité portant sur plusieurs apps de la flotte a trouvé un rés
 - **`generer-guide-professeur.py`** (racine, reportlab, polices Arial de macOS) produit `match-manager-eps.pdf` ; la version est lue dans `index.html`, donc il suffit de le relancer à chaque version. Avant, le PDF n'avait pas de source versionnée : impossible de le régénérer à l'identique. Le texte du script est à tenir à jour avec `FONCTIONNALITES.md`.
 - **Un seul PDF** : `match-manager-eps.pdf` (nom attendu par WordPress). L'ancien `Guide_Professeur_MatchManagerEPS.pdf` (2 pages, non régénérable) a été supprimé le 2026-10-11 ; il reste dans l'historique git.
 
+### 2026-10-24 - Publication de l'APK en Release GitHub (v2.2 puis v2.3)
+- **L'APK 2.2 du 2026-10-11 était périmée** : construite avant les deux correctifs de sécurité du 2026-10-24, elle aurait distribué les failles. Vérifié en comparant son `assets/index.html` à celui du dépôt (absence de `escJs` et `risqueFormule`). Règle : avant toute Release, comparer l'`index.html` embarqué à celui du dépôt.
+- **Clé de release** : déplacée dans le dossier de travail de l'app sous `Documents/APPLI EPS/APPLI EPS/MatchManagerEPS/` ; `android/keystore.properties` (non versionné) mis à jour, certificat vérifié identique (`0c5ec6…`). Copie de l'ancienne APK et de la clé dans `MatchManagerEPS-backup/`.
+- **Release `v2.2`** (versionCode 15) puis **`v2.3`** (versionCode 16) : la 2.3 ajoute le lien de téléchargement dans l'aide et le PDF, ce qui change `index.html` donc l'APK. Nom de fichier constant `MatchManagerEPS.apk` pour que le lien « latest » ne change jamais.
+
 ### 2026-10-11 - APK 2.2 signée et publication
 - **APK 2.2 reconstruite avec la clé de release existante** (`matchmanager-release.jks`, même clé que la 1.9.1 : mise à jour par-dessus sans désinstaller). Contrôlée : `versionCode 14`, `index.html` embarqué identique à celui du dépôt, empreinte du certificat consignée dans `android/README.md`.
 - **Dépôt poussé** (`1ecc4df..83314f4`) ; GitHub Pages servait déjà la 2.2 quelques minutes plus tard.
