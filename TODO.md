@@ -27,7 +27,7 @@
 ### Décisions en attente
 - [ ] **Sauvegarder la clé de release dans 1Password** (`~/Documents/MatchManagerEPS-cle-de-signature/` : `.jks` + `LISEZ-MOI.txt` avec le mot de passe), puis supprimer le `LISEZ-MOI.txt` du disque. Avant d'installer la nouvelle APK : exporter les sauvegardes JSON des tablettes et **désinstaller l'ancienne** (signée debug).
 - [ ] Le dépôt GitHub est public : `MEMORY.md` et `TODO.md` y sont publiés. Vérifier qu'ils ne contiennent rien de sensible avant chaque push.
-- [ ] **Piste non confirmée de l'audit du 2026-10-24** (`security-audit-reports/Match-Manager-EPS/NEEDS-VALIDATION.md`) : l'export XLSX n'échappe que `& < >` dans les noms de joueur/arbitre (`escX()`), pas un `=`/`+`/`-`/`@` en tête de nom (type d'injection de formule). La cellule est explicitement typée `t="inlineStr"` (texte brut au sens OOXML), donc un lecteur strictement conforme à la norme ne devrait rien évaluer ; l'audit n'a pas pu l'observer dans un vrai tableur (OpenOffice en mode headless a planté sur la machine de test). À vérifier en ouvrant un export contenant un nom de joueur du type `=1+1` dans Excel/LibreOffice/Google Sheets réel - demander aussi à Nathalie quel tableur elle utilise réellement pour ouvrir ces fichiers.
+- [ ] **Injection de formule XLSX** (piste de l'audit du 2026-10-24) : corrigée par précaution le 2026-10-24 (style `quotePrefix` sur les textes commençant par `=`, `+`, `-`, `@`), sans attendre la confirmation en tableur réel. Reste à vérifier : exporter un tournoi avec un joueur nommé `=1+1` et l'ouvrir dans le tableur réel de Nathalie (Excel, LibreOffice, Google Sheets) ; la cellule doit afficher `=1+1` en texte. Lui demander quel tableur elle utilise.
 
 ### Rappels avant chaque livraison
 - [ ] `npm test` passe (22 tests).

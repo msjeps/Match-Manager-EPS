@@ -206,6 +206,31 @@ test('export XLSX en 2 manches gagnantes : détail des sets et totaux', () => {
   assert.equal(r3.G, undefined, 'match non joué : détail vide');
 });
 
+test('export XLSX : un nom commençant par = + - @ est neutralisé (quotePrefix), valeur inchangée', () => {
+  const app = createApp();
+  const noms = ['=1+1', '+CMD', '-2+3', '@SUM(1,1)', ' =HYPERLINK("http://x","y")', 'ALICE'];
+  const t = tournament(app, { id: 'x4', names: noms });
+  play(t.matches[0], 11, 7);
+  app.T = t;
+  app.downloads.length = 0;
+  app.fn('downloadCSV')();
+  const zip = readStoredZip(app.downloads[0].parts[0]);
+  const styles = zip['xl/styles.xml'].data.toString();
+  assert.match(styles, /<cellXfs count="4">/);
+  assert.equal((styles.match(/quotePrefix="1"/g) || []).length, 2, 'styles 2 et 3 en quotePrefix');
+  for (const n of ['sheet1', 'sheet2']) {
+    const xml = zip['xl/worksheets/' + n + '.xml'].data.toString('utf8');
+    for (const c of xml.match(/<c [^>]*t="inlineStr"[^>]*>.*?<\/c>/g) || []) {
+      const txt = c.replace(/<[^>]+>/g, '');
+      const dangereux = /^[\s\u00a0]*[=+\-@]/.test(txt) && txt !== '-';
+      assert.equal(/ s="[23]"/.test(c), dangereux, 'style quotePrefix exactement sur les textes à risque : ' + c);
+    }
+  }
+  const x = exportXlsx(app, t);
+  const joueurs = x.matchs.slice(1).flatMap(r => [r.C, r.F]);
+  assert.ok(joueurs.includes('=1+1') && joueurs.includes('@SUM(1,1)'), 'valeur conservée sans apostrophe ajoutée');
+});
+
 test('export XLSX : mode 2, chaque joueur classé une fois', () => {
   const app = createApp();
   const t = tournament(app, { id: 'x3', mode: 2, names: ['A', 'B', 'C', 'D', 'E', 'F'], pools: [['x3p0', 'x3p1', 'x3p2'], ['x3p3', 'x3p4', 'x3p5']] });

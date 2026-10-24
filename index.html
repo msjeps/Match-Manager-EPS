@@ -2637,6 +2637,7 @@ const drawPts=T.settings.drawPts!==undefined?T.settings.drawPts:1;
 
 // ======= GÉNÉRATEUR XLSX OOXML (ZIP stocké) =======
 function escX(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function risqueFormule(t){return t!=='-'&&/^[\s ]*[=+\-@]/.test(t);}
 function colRef(n){let s='';while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26);}return s;}
 // sh(val,bold) = cellule texte ; nm(val,bold) = cellule numérique
 function sh(v,b){return{v,b:!!b};}
@@ -2651,9 +2652,12 @@ x+=`<row r="${rn}">`;
 row.forEach((cell,ci)=>{
 if(cell==null)return;
 const ref=colRef(ci+1)+rn;
-const s=cell.b?' s="1"':'';
-if(cell.n){const v=isNaN(Number(cell.v))?0:Number(cell.v);x+=`<c r="${ref}"${s}><v>${v}</v></c>`;}
-else{x+=`<c r="${ref}" t="inlineStr"${s}><is><t>${escX(String(cell.v))}</t></is></c>`;}
+if(cell.n){const v=isNaN(Number(cell.v))?0:Number(cell.v);x+=`<c r="${ref}"${cell.b?' s="1"':''}><v>${v}</v></c>`;}
+else{
+const txt=String(cell.v);
+// Injection de formule : un nom commençant par = + - @ (ou précédé d'un espace/tabulation) reçoit le style quotePrefix (texte forcé, comme une apostrophe saisie dans Excel), sans modifier la valeur
+const s=risqueFormule(txt)?(cell.b?' s="3"':' s="2"'):(cell.b?' s="1"':'');
+x+=`<c r="${ref}" t="inlineStr"${s}><is><t>${escX(txt)}</t></is></c>`;}
 });
 x+='</row>';
 }
@@ -2867,7 +2871,7 @@ const CT='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="h
 const RELS='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
 const WB='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Matchs" sheetId="1" r:id="rId1"/><sheet name="Classement final" sheetId="2" r:id="rId2"/></sheets></workbook>';
 const WB_RELS='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
-const STY='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0"/></cellXfs></styleSheet>';
+const STY='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0"/><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" quotePrefix="1" applyNumberFormat="1"/><xf numFmtId="49" fontId="1" fillId="0" borderId="0" xfId="0" quotePrefix="1" applyNumberFormat="1"/></cellXfs></styleSheet>';
 const zipData=makeZip([
 {name:'[Content_Types].xml',data:CT},
 {name:'_rels/.rels',data:RELS},

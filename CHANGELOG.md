@@ -6,7 +6,7 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
-## 2.2 - 2026-10-11 (APK versionCode 14, cache v31 à v32)
+## 2.2 - 2026-10-11 (APK versionCode 14, cache v31 à v33)
 
 Troisième lot de l'audit d'interface (l'alignement sur la charte avait été fait en 2.0).
 
@@ -15,6 +15,7 @@ Troisième lot de l'audit d'interface (l'alignement sur la charte avait été fa
 
 ### Corrections
 - **Résidu de la faille XSS stockée du 2026-08-02** (audit de sécurité du 2026-10-24) : `escH()` était bien appelé dans `showSaveListModal()` et `showPalmares()`, mais pour un nom de liste ou de classe réinjecté dans un attribut `onclick`, échapper l'apostrophe avant le HTML laissait passer un backslash déjà présent dans la donnée et terminait la chaîne JavaScript générée prématurément. Nouveau helper `escJs()` (backslash échappé avant l'apostrophe), appliqué `escH(escJs(x))` aux deux points de rendu, plus un test de régression (23 tests). `CACHE_NAME` → v32.
+- **Injection de formule dans l'export XLSX** (piste de l'audit du 2026-10-24) : un nom de joueur ou d'arbitre commençant par `=`, `+`, `-` ou `@` (ou précédé d'un espace) est désormais écrit avec un style `quotePrefix` (l'équivalent de l'apostrophe d'Excel : texte forcé, y compris si la cellule est modifiée puis validée). La valeur reste inchangée, aucun caractère n'est ajouté. Le tiret seul (match non joué) n'est pas concerné. Test de régression (24 tests). `CACHE_NAME` → v33.
 
 ### Livraison
 - APK 2.2 (`versionCode 14`) reconstruite et signée avec la clé de release (même clé que la 1.9.1). Dépôt poussé sur GitHub, version en ligne sur `apps.outils-eps.fr/Match-Manager-EPS/`.
