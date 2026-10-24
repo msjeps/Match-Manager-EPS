@@ -644,6 +644,8 @@ applyLightMode(on);
 localStorage.setItem(LIGHT_MODE_KEY,on?'1':'0');
 }
 function escH(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+/* Echappe pour insertion dans une chaine JS entre apostrophes (onclick inline) : backslash AVANT apostrophe, sinon un \' residuel casse la chaine (faille XSS corrigee 2026-10) */
+function escJs(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 let saveWarned=false;
 function save(){
 try{localStorage.setItem(LS_KEY,JSON.stringify(state));saveWarned=false;return true;}
@@ -1059,7 +1061,7 @@ if(!T||!T.players.length){toast('Aucun joueur \u00e0 sauvegarder');return;}
 let html='<div class="form-group"><label>Nom de la liste</label><input type="text" id="save-list-name" placeholder="ex: 6B - Groupe 1"></div>';
 if(state.savedLists.length){
 html+='<div class="section-title" style="font-size:.9em">Listes existantes</div>';
-html+=state.savedLists.map((l,i)=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid var(--brd)" onclick="document.getElementById(\'save-list-name\').value=\''+escH(l.name.replace(/'/g,"\\'"))+'\'"><span style="font-weight:500">'+escH(l.name)+'</span><span style="color:var(--txt2);font-size:.85em">'+l.players.length+' joueurs</span></div>').join('');
+html+=state.savedLists.map((l,i)=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid var(--brd)" onclick="document.getElementById(\'save-list-name\').value=\''+escH(escJs(l.name))+'\'"><span style="font-weight:500">'+escH(l.name)+'</span><span style="color:var(--txt2);font-size:.85em">'+l.players.length+' joueurs</span></div>').join('');
 html+='<p style="font-size:.8em;color:var(--txt2);margin-top:6px">Cliquez sur un nom pour le remplacer</p>';
 }
 html+='<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" style="width:auto" onclick="doSaveList()">Sauvegarder ('+T.players.length+' joueurs)</button></div>';
@@ -4307,7 +4309,7 @@ if(!data.length){toast('Aucun tournoi');return;}
 let c=data.find(x=>x.key===palmCls)||data[0];
 palmCls=c.key;
 let html='<div style="display:flex;flex-wrap:wrap;margin:0 -3px 6px">'+data.map(x=>
-'<button class="tab-btn'+(x.key===c.key?' active':'')+'" style="margin:3px;flex:0 0 auto" onclick="palmCls=\''+escH(x.key).replace(/'/g,"\\'")+'\';showPalmares()">'+escH(x.label)+' ('+x.tournaments.length+')</button>').join('')+'</div>';
+'<button class="tab-btn'+(x.key===c.key?' active':'')+'" style="margin:3px;flex:0 0 auto" onclick="palmCls=\''+escH(escJs(x.key))+'\';showPalmares()">'+escH(x.label)+' ('+x.tournaments.length+')</button>').join('')+'</div>';
 html+='<div style="display:flex;flex-wrap:wrap;align-items:center;margin:0 -3px 8px;font-size:.85em"><span style="margin:0 6px;color:var(--txt2)">Trier par :</span>'+
 [['pts','Points'],['pct','% victoires'],['podium','Podiums']].map(o=>'<button class="tab-btn'+(palmSort===o[0]?' active':'')+'" style="margin:3px;flex:0 0 auto" onclick="palmSort=\''+o[0]+'\';showPalmares()">'+o[1]+'</button>').join('')+'</div>';
 const rows=palmaresRows(c);

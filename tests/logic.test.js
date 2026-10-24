@@ -6,6 +6,7 @@ const assert = require('node:assert/strict');
 const zlib = require('node:zlib');
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 const { createApp, readStoredZip, sheetRows } = require('./harness');
 
 // ----- fabrique de tournois de test -----
@@ -43,6 +44,20 @@ test('escH échappe les caractères HTML', () => {
   const app = createApp();
   assert.equal(app.fn('escH')('<b>"A"&B</b>'), '&lt;b&gt;&quot;A&quot;&amp;B&lt;/b&gt;');
   assert.equal(app.fn('escH')(null), '');
+});
+
+test('escJs + escH neutralisent un backslash avant apostrophe dans un onclick (régression XSS 2026-10-24)', () => {
+  const app = createApp();
+  const escJs = app.fn('escJs');
+  const escH = app.fn('escH');
+  // Cas bénin (celui que l'ancien .replace(/'/g,...) visait) : toujours échappé correctement.
+  assert.equal(escJs("O'Brien"), "O\\'Brien");
+  // Payload qui cassait l'ancienne version : backslash juste avant l'apostrophe, puis du code.
+  const payload = "\\';window.__regress=1;//";
+  const attr = "document.getElementById('mmeps-test-el').value='" + escH(escJs(payload)) + "'";
+  vm.runInContext(attr, app.ctx);
+  assert.equal(typeof app.ctx.__regress, 'undefined', 'le payload ne doit exécuter aucun code injecté');
+  assert.equal(app.ctx.document.getElementById('mmeps-test-el').value, payload, 'la valeur doit être stockée telle quelle, comme texte');
 });
 
 test('round-robin : chaque paire une seule fois, pair et impair', () => {

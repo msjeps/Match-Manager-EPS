@@ -27,6 +27,7 @@
 ### Décisions en attente
 - [ ] **Sauvegarder la clé de release dans 1Password** (`~/Documents/MatchManagerEPS-cle-de-signature/` : `.jks` + `LISEZ-MOI.txt` avec le mot de passe), puis supprimer le `LISEZ-MOI.txt` du disque. Avant d'installer la nouvelle APK : exporter les sauvegardes JSON des tablettes et **désinstaller l'ancienne** (signée debug).
 - [ ] Le dépôt GitHub est public : `MEMORY.md` et `TODO.md` y sont publiés. Vérifier qu'ils ne contiennent rien de sensible avant chaque push.
+- [ ] **Piste non confirmée de l'audit du 2026-10-24** (`security-audit-reports/Match-Manager-EPS/NEEDS-VALIDATION.md`) : l'export XLSX n'échappe que `& < >` dans les noms de joueur/arbitre (`escX()`), pas un `=`/`+`/`-`/`@` en tête de nom (type d'injection de formule). La cellule est explicitement typée `t="inlineStr"` (texte brut au sens OOXML), donc un lecteur strictement conforme à la norme ne devrait rien évaluer ; l'audit n'a pas pu l'observer dans un vrai tableur (OpenOffice en mode headless a planté sur la machine de test). À vérifier en ouvrant un export contenant un nom de joueur du type `=1+1` dans Excel/LibreOffice/Google Sheets réel - demander aussi à Nathalie quel tableur elle utilise réellement pour ouvrir ces fichiers.
 
 ### Rappels avant chaque livraison
 - [ ] `npm test` passe (22 tests).
@@ -35,6 +36,8 @@
 - [ ] Documentation : CHANGELOG, FONCTIONNALITES, MEMORY, TODO, aide intégrée. Aucun tiret cadratin.
 
 ## Fait récemment
+
+- [x] Audit de sécurité externe (2026-10-24, `CACHE_NAME` v32, `APP_VERSION` inchangée - correctif interne) : résidu de la faille XSS stockée du 2026-08-02 - `escH()` était bien appelé dans `showSaveListModal()`/`showPalmares()`, mais pour un texte réinjecté dans un attribut `onclick`, échapper l'apostrophe avant le HTML laissait passer un backslash déjà présent dans la donnée (nom de liste/classe) et terminait la chaîne JS prématurément. Nouveau helper `escJs()` (backslash avant apostrophe), appliqué `escH(escJs(x))` aux deux sinks, plus un nouveau test de régression. 23/23 tests passent (22 existants + 1 nouveau). **Non commité/poussé** (en attente d'accord). Détails : `MEMORY.md`, `security-audit-reports/Match-Manager-EPS/`, leçon générale dans `../LECONS-TECHNIQUES.md`.
 
 - [x] APK 2.2 reconstruite et signée en release (2026-10-11, `versionCode 14`, certificat vérifié avec `apksigner`) ; dépôt poussé sur GitHub (`83314f4`) ; la page en ligne `apps.outils-eps.fr/Match-Manager-EPS/` sert la 2.2.
 

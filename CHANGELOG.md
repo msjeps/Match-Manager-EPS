@@ -6,12 +6,15 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
-## 2.2 - 2026-10-11 (APK versionCode 14, cache v31)
+## 2.2 - 2026-10-11 (APK versionCode 14, cache v31 à v32)
 
 Troisième lot de l'audit d'interface (l'alignement sur la charte avait été fait en 2.0).
 
 ### Ajout
 - **Sons optionnels** (Paramètres, carte « 🔊 Sons », désactivé par défaut, réglage local `mmeps_sound`) : un « ding » à deux notes à chaque résultat validé, une courte mélodie à la place à la fin du tournoi. La sonnerie du chronomètre reste indépendante et toujours active.
+
+### Corrections
+- **Résidu de la faille XSS stockée du 2026-08-02** (audit de sécurité du 2026-10-24) : `escH()` était bien appelé dans `showSaveListModal()` et `showPalmares()`, mais pour un nom de liste ou de classe réinjecté dans un attribut `onclick`, échapper l'apostrophe avant le HTML laissait passer un backslash déjà présent dans la donnée et terminait la chaîne JavaScript générée prématurément. Nouveau helper `escJs()` (backslash échappé avant l'apostrophe), appliqué `escH(escJs(x))` aux deux points de rendu, plus un test de régression (23 tests). `CACHE_NAME` → v32.
 
 ### Livraison
 - APK 2.2 (`versionCode 14`) reconstruite et signée avec la clé de release (même clé que la 1.9.1). Dépôt poussé sur GitHub, version en ligne sur `apps.outils-eps.fr/Match-Manager-EPS/`.

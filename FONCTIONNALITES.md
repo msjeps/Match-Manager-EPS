@@ -87,7 +87,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Mémoire pleine : avertissement unique, la saisie n'est pas bloquée.
 - Écran maintenu allumé (Wake Lock + `FLAG_KEEP_SCREEN_ON` dans l'APK), plein écran / mode immersif.
 - Rotation libre sans perte d'état.
-- Toute donnée affichée est échappée (`escH`).
+- Toute donnée affichée est échappée (`escH`), y compris dans les attributs `onclick` générés (`escH(escJs(x))` : le backslash est échappé avant l'apostrophe).
 - Aucune boîte native (`confirm`, `alert`, `prompt`) : boîtes de dialogue de l'application, boutons de 44 px, fermées par Retour Android.
 - Mot de passe professeur : empreinte SHA-256 salée, jamais en clair. Barrière contre la curiosité des élèves, pas une protection cryptographique.
 - APK : `allowBackup="false"`, navigation limitée aux fichiers locaux, nom de fichier assaini côté Java, bouton Retour sans sortie accidentelle.
