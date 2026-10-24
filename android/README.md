@@ -51,9 +51,9 @@ unzip -p app/build/outputs/apk/debug/app-debug.apk assets/index.html | grep -c "
 
 ## Signature
 
-Depuis le 2026-10-11, l'APK diffusée est signée avec une **clé de release** (`~/Documents/MatchManagerEPS-cle-de-signature/matchmanager-release.jks`, alias `matchmanager`, copie dans 1Password). `android/keystore.properties` (non versionné) en donne le chemin et les mots de passe ; `build.gradle` signe le build `release` avec. Les APK signées avec l'ancienne clé debug doivent être **désinstallées** avant d'installer celle-ci. Ne jamais versionner la clé.
+Depuis le 2026-10-11, l'APK diffusée est signée avec une **clé de release** (fichier `.jks` hors dépôt, alias `matchmanager`, copies de sécurité hors dépôt). `android/keystore.properties` (non versionné) en donne le chemin et les mots de passe ; `build.gradle` signe le build `release` avec. Les APK signées avec l'ancienne clé debug doivent être **désinstallées** avant d'installer celle-ci. Ne jamais versionner la clé.
 
-Empreinte SHA-256 du certificat (à comparer avec `apksigner verify --print-certs`) : `0c5ec62a9549faa23aaa2c186191d1cc744da7394ec3566abf87822e7f799309`. Dernière APK diffusée : **2.2** (`versionCode 14`), reconstruite le 2026-10-11.
+Empreinte SHA-256 du certificat (à comparer avec `apksigner verify --print-certs`) : `0c5ec62a9549faa23aaa2c186191d1cc744da7394ec3566abf87822e7f799309`. Dernière APK diffusée : **2.3** (`versionCode 16`), reconstruite et publiée le 2026-10-24 (SHA-256 du fichier `110b80b9185167c4a41c8ac03335a029554f993ed1033217d62bebfa2daef658`).
 
 Build de diffusion :
 ```bash
@@ -61,6 +61,19 @@ Build de diffusion :
 cp app/build/outputs/apk/release/app-release.apk ../MatchManagerEPS.apk
 ```
 (les `-x lintVital...` ne servent que hors ligne, le lint n'étant pas en cache)
+
+## Publication (Release GitHub)
+
+L'APK n'est jamais versionnée (`*.apk` dans `.gitignore`) : elle est hébergée par une Release du dépôt public `msjeps/Match-Manager-EPS`. Lien stable, utilisé dans l'aide intégrée et le guide PDF : `https://github.com/msjeps/Match-Manager-EPS/releases/latest/download/MatchManagerEPS.apk`. **Garder le nom de fichier `MatchManagerEPS.apk`** d'une version à l'autre, sinon le lien « latest » casse.
+
+Procédure :
+1. `npm test`, puis `assembleRelease` (voir ci-dessus).
+2. Contrôler l'APK : `apksigner verify --print-certs` (SHA-256 `0c5ec6...`), `aapt2 dump badging` (`versionCode` incrémenté, `versionName` = `APP_VERSION`), et comparer son `assets/index.html` à celui du dépôt (`unzip -p app-release.apk assets/index.html | cmp - ../index.html`).
+3. Copier l'APK sous le nom `MatchManagerEPS.apk` dans le dossier de travail, en gardant une copie de l'ancienne.
+4. Après confirmation (dépôt public) : `git push`, puis `gh release create vX.Y MatchManagerEPS.apk --repo msjeps/Match-Manager-EPS --target main --latest --title "Match Manager EPS X.Y" --notes "..."`.
+5. Vérifier le lien « latest » : `curl -sIL <lien> | grep -i content-length` doit donner la taille de l'APK.
+
+Releases publiées : `v2.2` (versionCode 15, correctifs de sécurité du 2026-10-24) et `v2.3` (versionCode 16, lien de téléchargement dans l'aide et le PDF).
 
 ## À valider sur la tablette avant diffusion
 
