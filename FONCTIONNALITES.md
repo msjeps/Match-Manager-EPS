@@ -1,6 +1,6 @@
 # Fonctionnalités - Match Manager EPS (version 2.3)
 
-Catalogue de ce que l'application fait aujourd'hui. Pour l'historique : [CHANGELOG.md](CHANGELOG.md). Pour l'architecture et les conventions de code : [CLAUDE.md](CLAUDE.md). Pour les raisons des choix : [MEMORY.md](MEMORY.md).
+Catalogue de ce que l'application fait aujourd'hui. Pour l'historique : [CHANGELOG.md](CHANGELOG.md). Pour l'architecture et les conventions de code : [CLAUDE.md](CLAUDE.md).
 
 Contexte : tablettes Android (Lenovo TB-X606F, WebView figé) et iPad, 100 % hors ligne, données élèves uniquement sur l'appareil.
 
@@ -100,4 +100,4 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Planning figé des matchs et des arbitres : la file d'attente suggère le prochain match, elle ne planifie pas à l'avance.
 - Palmarès par identifiant de joueur : les joueurs sont rapprochés par nom (deux homonymes d'une même classe seraient fusionnés).
 
-Voir [TODO.md](TODO.md) pour la liste des idées retenues.
+Les idées retenues sont suivies hors dépôt.

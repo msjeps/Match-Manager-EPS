@@ -15,3 +15,7 @@ design_preview.html
 keystore.properties
 local.properties
 google-services.json
+
+# Notes de travail locales (non publiées)
+TODO.md
+MEMORY.md

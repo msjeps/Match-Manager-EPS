@@ -31,8 +31,6 @@ Version actuelle : **2.3** (APK `versionCode 16`, publiée en Release GitHub, [t
 |---|---|
 | [FONCTIONNALITES.md](FONCTIONNALITES.md) | Catalogue des fonctions de l'application |
 | [CHANGELOG.md](CHANGELOG.md) | Historique des versions (ajouts, corrections, modifications) |
-| [TODO.md](TODO.md) | Tâches ouvertes, validations à faire sur tablette, rappels avant commit |
-| [MEMORY.md](MEMORY.md) | Journal des décisions et de leur raison |
 | [CLAUDE.md](CLAUDE.md) | Architecture, structure de données, conventions de code |
 | [android/README.md](android/README.md) | Wrapper APK : contenu, build, signature |
 | [tests/README.md](tests/README.md) | Tests Node de la logique (`npm test`) |
@@ -43,4 +41,4 @@ Le fichier suivi par git est `index.html` (voir [CLAUDE.md](CLAUDE.md) pour le d
 
 Démo en ligne : https://apps.outils-eps.fr/Match-Manager-EPS/
 
-L'APK Android (sources dans `android/`) embarque une copie de `index.html` : voir TODO.md pour la resynchronisation et le build.
+L'APK Android (sources dans `android/`) embarque une copie de `index.html` : voir `android/README.md` pour la resynchronisation et le build.

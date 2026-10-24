@@ -1,6 +1,6 @@
 # Journal des modifications - Match Manager EPS
 
-Une entrée par version affichée à l'utilisatrice (`APP_VERSION`). Les correctifs internes invisibles sont rattachés à la version en cours. Le détail des décisions et de leur raison est dans [MEMORY.md](MEMORY.md), les tâches ouvertes dans [TODO.md](TODO.md), le catalogue complet des fonctions dans [FONCTIONNALITES.md](FONCTIONNALITES.md).
+Une entrée par version affichée à l'utilisatrice (`APP_VERSION`). Les correctifs internes invisibles sont rattachés à la version en cours. Le catalogue complet des fonctions dans [FONCTIONNALITES.md](FONCTIONNALITES.md).
 
 Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du service worker (`sw.js`).
 
