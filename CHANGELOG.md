@@ -6,6 +6,10 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.3 (correctif icone) - 2026-11-04 (APK versionCode 17, cache inchange)
+
+L'icone du lanceur Android affichait encore l'ancienne icone « TEN EPS » (raquettes) : les `mipmap-*/ic_launcher.png` de l'APK ont ete regeneres depuis `icon_512.png`. Aucun changement de l'application web, `APP_VERSION` reste 2.3. Release GitHub `v2.3.1`.
+
 ## 2.3 - 2026-10-24 (APK versionCode 16, cache v34)
 
 Publication de l'APK sur GitHub Releases.
