@@ -6,6 +6,10 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.3 (icone adaptative) - 2026-11-05 (APK versionCode 18, cache inchange)
+
+Sur Android 8+ (Play Store professionnel), l'icone etait un PNG ordinaire que le lanceur posait dans un cercle blanc. Ajout d'une icone adaptative : fond uni `#415EB3` (`values/ic_launcher_background.xml`) + premier plan `ic_launcher_foreground.png` (logo dans la zone sure de 66/108 dp), `mipmap-anydpi-v26/ic_launcher.xml` et `ic_launcher_round.xml`, `roundIcon` dans le manifeste. Les PNG historiques restent pour Android 7. Aucun changement de l'application web.
+
 ## 2.3 (correctif icone) - 2026-11-04 (APK versionCode 17, cache inchange)
 
 L'icone du lanceur Android affichait encore l'ancienne icone « TEN EPS » (raquettes) : les `mipmap-*/ic_launcher.png` de l'APK ont ete regeneres depuis `icon_512.png`. Aucun changement de l'application web, `APP_VERSION` reste 2.3. Release GitHub `v2.3.1`.
