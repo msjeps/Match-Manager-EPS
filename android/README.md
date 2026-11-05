@@ -53,7 +53,7 @@ unzip -p app/build/outputs/apk/debug/app-debug.apk assets/index.html | grep -c "
 
 Depuis le 2026-10-11, l'APK diffusée est signée avec une **clé de release** (fichier `.jks` hors dépôt, alias `matchmanager`, copies de sécurité hors dépôt). `android/keystore.properties` (non versionné) en donne le chemin et les mots de passe ; `build.gradle` signe le build `release` avec. Les APK signées avec l'ancienne clé debug doivent être **désinstallées** avant d'installer celle-ci. Ne jamais versionner la clé.
 
-Empreinte SHA-256 du certificat (à comparer avec `apksigner verify --print-certs`) : `0c5ec62a9549faa23aaa2c186191d1cc744da7394ec3566abf87822e7f799309`. Dernière APK diffusée : **2.3** (`versionCode 16`), reconstruite et publiée le 2026-10-24 (SHA-256 du fichier `110b80b9185167c4a41c8ac03335a029554f993ed1033217d62bebfa2daef658`).
+Empreinte SHA-256 du certificat (à comparer avec `apksigner verify --print-certs`) : `0c5ec62a9549faa23aaa2c186191d1cc744da7394ec3566abf87822e7f799309`. Dernière APK diffusée : **2.3.2** (`versionCode 18`, icône adaptative), reconstruite et publiée le 2026-11-05 (SHA-256 du fichier `91b6b1f0ed303c58e6bede4d5c971d2c3e6ca177ead9149d854fb8a9775fc2e6`).
 
 Build de diffusion :
 ```bash
@@ -73,7 +73,7 @@ Procédure :
 4. Après confirmation (dépôt public) : `git push`, puis `gh release create vX.Y MatchManagerEPS.apk --repo msjeps/Match-Manager-EPS --target main --latest --title "Match Manager EPS X.Y" --notes "..."`.
 5. Vérifier le lien « latest » : `curl -sIL <lien> | grep -i content-length` doit donner la taille de l'APK.
 
-Releases publiées : `v2.2` (versionCode 15, correctifs de sécurité du 2026-10-24) et `v2.3` (versionCode 16, lien de téléchargement dans l'aide et le PDF).
+Releases publiées : `v2.2` (versionCode 15, correctifs de sécurité du 2026-10-24) `v2.3` (versionCode 16, lien de téléchargement dans l'aide et le PDF), `v2.3.1` (versionCode 17, nouvelle icône du lanceur) et `v2.3.2` (versionCode 18, icône adaptative : fond uni `#415EB3` + premier plan dans la zone sûre, sans cercle blanc sur Android 8+).
 
 ## À valider sur la tablette avant diffusion
 
