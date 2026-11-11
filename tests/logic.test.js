@@ -387,3 +387,34 @@ test('bracketShapeSig : change quand un tour est généré, pas quand un match e
   app.fn('checkBracketAdvance')();
   assert.notEqual(shape(), s0, 'tour complet : le tour suivant est généré');
 });
+
+test('file d\'attente des poules : tables de la poule respectées, ordre = numéro de match', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'q1', names: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
+    pools: [['q1p0', 'q1p1', 'q1p2', 'q1p3'], ['q1p4', 'q1p5', 'q1p6', 'q1p7']], settings: { tables: 4 } });
+  t.poolTables = [[1, 2], [3, 4]];
+  app.T = t;
+  const q = app.fn('computeQueue')('pool');
+  const poolOf = e => t.pools.findIndex(p => p.id === e.m.poolId);
+  q.entries.filter(e => e.ready && e.table !== null).forEach(e =>
+    assert.ok(t.poolTables[poolOf(e)].includes(e.table), 'table ' + e.table + ' hors des tables de la poule ' + poolOf(e)));
+  // dans une poule, les matchs prêts sont proposés dans l'ordre de la liste
+  [0, 1].forEach(pi => {
+    const nums = q.entries.filter(e => poolOf(e) === pi).map(e => e.m.matchNum);
+    assert.deepEqual(nums, nums.slice().sort((a, b) => a - b));
+  });
+  // les tables de la poule 1 occupées : aucun match de la poule 1 ne prend une table de la poule 2
+  t.matches.filter(m => m.poolId === t.pools[0].id).slice(0, 4).forEach((m, i) => { m.status = 'playing'; m.table = i < 2 ? i + 1 : 0; });
+  const q2 = app.fn('computeQueue')('pool');
+  q2.entries.filter(e => e.ready && poolOf(e) === 0 && e.table !== null).forEach(e => assert.ok([1, 2].includes(e.table), "poule0 table " + e.table + " match " + e.m.matchNum + " ready " + e.ready));
+});
+
+test('liste d\'une poule : en cours, puis à jouer, puis terminés', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'q2', names: ['A', 'B', 'C', 'D'] });
+  app.T = t;
+  t.matches[0].status = 'done';
+  t.matches[3].status = 'playing';
+  const order = app.fn('sortedPoolMatches')(t.matches).map(m => m.matchNum);
+  assert.deepEqual(order, [4, 2, 3, 5, 6, 1]);
+});

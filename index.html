@@ -627,7 +627,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.3';
+const APP_VERSION='2.4';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const SOUND_KEY='mmeps_sound';
 const LS_BACKUP_KEY='teneps_data_illisible';
@@ -1363,7 +1363,21 @@ if(!pool)return;
 const matches=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool');
 renderMatchesHeader();
 renderTimerBar('timer-container',T.settings.duration);
-document.getElementById('matches-list').innerHTML=matches.map(m=>renderMatchCard(m)).join('');
+document.getElementById('matches-list').innerHTML=sortedPoolMatches(matches).map(m=>renderMatchCard(m)).join('');
+}
+// Liste d'une poule : en cours d'abord, puis à jouer, puis terminés en bas (évite de défiler jusqu'au match à saisir)
+function sortedPoolMatches(ms){
+const k=m=>m.status==='playing'?0:m.status==='done'?2:1;
+return ms.slice().sort((a,b)=>(k(a)-k(b))||((a.matchNum||0)-(b.matchNum||0)));
+}
+function reorderPoolCards(){
+const list=document.getElementById('matches-list');
+const pool=T&&T.pools[curPoolIdx];
+if(!list||!pool)return;
+const want=sortedPoolMatches(T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool')).map(m=>'mc-'+m.id);
+const have=Array.prototype.map.call(list.children,el=>el.id);
+if(want.join()===have.join())return;
+want.forEach(id=>{const el=document.getElementById(id);if(el)list.appendChild(el);});
 }
 
 // Avancement de la poule affichée + bouton « Passer aux finales » : mis à jour seuls, sans refaire la liste
@@ -3961,15 +3975,33 @@ const why=[];
 return {m,ready:!why.length,why,
 k1:Math.max(played[m.p1]||0,played[m.p2]||0),k2:(played[m.p1]||0)+(played[m.p2]||0)};
 });
+if(phase==='pool'||phase==='final'){
+// Poules et finales : même ordre que la liste affichée dessous (poule affichée d'abord, puis numéro de match)
+const grpRank=id=>{
+const list=phase==='pool'?T.pools:(T.finals||[]);
+const i=list.findIndex(x=>x.id===id);
+if(phase==='pool'&&i===curPoolIdx)return -1;
+return i<0?999:i;
+};
+entries.sort((a,b)=>(b.ready-a.ready)||(grpRank(a.m.poolId)-grpRank(b.m.poolId))||((a.m.matchNum||0)-(b.m.matchNum||0)));
+}else{
 entries.sort((a,b)=>(b.ready-a.ready)||a.k1-b.k1||a.k2-b.k2||((a.m.round||0)-(b.m.round||0))||((a.m.matchNum||0)-(b.m.matchNum||0)));
+}
 // Table et arbitre proposés pour chaque entrée prête (tables libres attribuées dans l'ordre)
 const pool=freeTables.slice();
 const takenRef={};
 entries.forEach(e=>{
 if(!e.ready)return;
 let t=null;
-if(e.m.table&&pool.includes(e.m.table))t=e.m.table;
-else if(pool.length)t=pool[0];
+// Poules : seules les tables attribuées à la poule du match sont proposées (si elle en a)
+let allowed=pool;
+if(phase==='pool'){
+const pi=T.pools.findIndex(x=>x.id===e.m.poolId);
+const pt=(T.poolTables&&T.poolTables[pi])||[];
+if(pt.length)allowed=pool.filter(x=>pt.includes(x));
+}
+if(e.m.table&&allowed.includes(e.m.table))t=e.m.table;
+else if(allowed.length)t=allowed[0];
 if(t!==null)pool.splice(pool.indexOf(t),1);
 e.table=t;
 e.ref=null;
@@ -3997,7 +4029,7 @@ const u=q.usedTables[t];
 h+='<span class="queue-t '+(u?'busy':'free')+'" title="'+(u?escH(playerName(u.p1)+' / '+playerName(u.p2)):'Libre')+'">T'+t+'</span>';
 }
 h+='</div>';
-const first=q.entries.find(e=>e.ready);
+const first=q.entries.find(e=>e.ready&&e.table!==null)||q.entries.find(e=>e.ready);
 if(first){
 const m=first.m;
 h+='<div class="queue-next"><div style="font-size:.78em;color:var(--txt2)">Prochain match libre &middot; '+escH(matchContextLabel(m))+'</div>'+
@@ -4074,6 +4106,7 @@ return;
 refreshMatchCard(m);
 refreshRefSelects();
 if(m.phase==='pool'){
+reorderPoolCards();
 renderTools('tools-matches');
 renderMatchesHeader();
 renderQueue('queue-matches','pool');

@@ -6,6 +6,12 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.4 - 2026-11-11 (APK versionCode 19, cache v35)
+
+Retours du test en classe, mode 1 (poules, 12 eleves par poule) :
+- **Tables par poule respectees** : la file d'attente ne propose plus que les tables attribuees a la poule du match (`computeQueue`). Une poule dont les tables sont occupees attend, au lieu de prendre la table d'une autre poule. Le « prochain match » est le premier match pret qui a une table libre.
+- **Meme ordre en haut et en bas** : la file d'attente suit l'ordre de la liste (poule affichee d'abord, puis numero de match), au lieu d'un tri par equite qui sautait des matchs. La liste d'une poule place les matchs en cours en haut, les matchs a jouer ensuite, les termines tout en bas (`sortedPoolMatches`) : plus besoin de descendre pour saisir un score. Les cartes se reclassent seules apres chaque changement (`reorderPoolCards`), sans perdre les scores saisis.
+
 ## 2.3 (icone adaptative) - 2026-11-05 (APK versionCode 18, cache inchange)
 
 Sur Android 8+ (Play Store professionnel), l'icone etait un PNG ordinaire que le lanceur posait dans un cercle blanc. Ajout d'une icone adaptative : fond uni `#415EB3` (`values/ic_launcher_background.xml`) + premier plan `ic_launcher_foreground.png` (logo dans la zone sure de 66/108 dp), `mipmap-anydpi-v26/ic_launcher.xml` et `ic_launcher_round.xml`, `roundIcon` dans le manifeste. Les PNG historiques restent pour Android 7. Aucun changement de l'application web. Release GitHub `v2.3.2`.
