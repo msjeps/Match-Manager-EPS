@@ -915,6 +915,7 @@ losePts:state.settings.losePts!==undefined?state.settings.losePts:1,
 drawPts:state.settings.drawPts!==undefined?state.settings.drawPts:1,
 refBonusEnabled:!!state.settings.refBonusEnabled,
 h2hTiebreak:state.settings.h2hTiebreak!==false,
+refScope:'pool',
 refBonusPts:state.settings.refBonusPts||1,
 duration:+document.getElementById('inp-duration').value||0},
 players:[],pools:[],matches:[],phase:'players',finals:[],bracket:null};
@@ -1137,6 +1138,14 @@ html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
 <button onclick="adjPoolSize(${i},1)">+</button></div>
 <span style="color:var(--txt2);font-size:.85em">joueurs</span></div>`;
 }
+// Arbitrage : joueurs de la poule ou tous les joueurs (seulement s'il y a plusieurs poules)
+if(nb>1){
+const rs=T.settings.refScope==='pool'?'pool':'all';
+html+='<div class="section-title">&#9999; Arbitres</div><div style="display:flex;gap:8px;margin-bottom:6px">'+
+'<button class="family-btn'+(rs==='pool'?' selected':'')+'" onclick="setRefScope(\'pool\')">Joueurs de la poule</button>'+
+'<button class="family-btn'+(rs==='all'?' selected':'')+'" onclick="setRefScope(\'all\')">Tous les joueurs</button></div>'+
+'<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">&#9432; Pour les matchs de poule, la liste des arbitres ne propose que les joueurs libres de la poule, ou de toutes les poules.</p>';
+}
 // Tables par poule
 const nbTables=T.settings.tables||10;
 if(!T.poolTables||T.poolTables.length!==nb){
@@ -1171,6 +1180,12 @@ document.getElementById('pool-quali-section').innerHTML=html;
 document.getElementById('pool-config-info').innerHTML=T.mode===1?
 'Mode 1 : chaque poule est un mini-championnat ind\u00e9pendant. R\u00e9partissez par niveau.':
 'Mode 2 : les qualifi\u00e9s de chaque poule se retrouveront en tableau final.';
+}
+
+function setRefScope(v){
+if(!T)return;
+T.settings.refScope=v==='pool'?'pool':'all';
+save();updatePoolConfig();
 }
 
 function setPoolTables(idx,val){
@@ -1424,7 +1439,10 @@ const excluded=new Set([m.p1,m.p2]);
 T.matches.forEach(x=>{if(x.id!==m.id&&x.status==='playing'){excluded.add(x.p1);excluded.add(x.p2);}});
 // Arbitres déjà assignés à d'autres matchs non terminés
 T.matches.forEach(x=>{if(x.id!==m.id&&x.status!=='done'&&x.refereeId)excluded.add(x.refereeId);});
-return T.players.filter(p=>!excluded.has(p.id)&&!p.out);
+// Plusieurs poules, arbitrage « par poule » : seuls les joueurs de la poule du match (poules uniquement)
+let scope=null;
+if(m.phase==='pool'&&T.settings.refScope==='pool'){const po=T.pools.find(x=>x.id===m.poolId);if(po)scope=new Set(po.playerIds);}
+return T.players.filter(p=>!excluded.has(p.id)&&!p.out&&(!scope||scope.has(p.id)));
 }
 
 function toggleMatchPlaying(mid,ev){

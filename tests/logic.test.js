@@ -418,3 +418,20 @@ test('liste d\'une poule : en cours, puis à jouer, puis terminés', () => {
   const order = app.fn('sortedPoolMatches')(t.matches).map(m => m.matchNum);
   assert.deepEqual(order, [4, 2, 3, 5, 6, 1]);
 });
+
+test('arbitres : réglage par poule ou tous les joueurs', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'r1', names: ['A', 'B', 'C', 'D', 'E', 'F'],
+    pools: [['r1p0', 'r1p1', 'r1p2'], ['r1p3', 'r1p4', 'r1p5']] });
+  app.T = t;
+  const m = t.matches.find(x => x.poolId === t.pools[0].id);
+  const get = () => app.fn('getRefereeCandidates')(m).map(p => p.id).sort();
+  t.settings.refScope = 'all';
+  assert.equal(get().length, 4, 'tous les joueurs hors les deux du match');
+  t.settings.refScope = 'pool';
+  const c = get();
+  assert.equal(c.length, 1, 'un seul libre dans la poule');
+  assert.ok(t.pools[0].playerIds.includes(c[0]));
+  delete t.settings.refScope; // ancien tournoi : comportement inchangé
+  assert.equal(get().length, 4);
+});

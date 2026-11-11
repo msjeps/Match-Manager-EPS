@@ -11,6 +11,7 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 Retours du test en classe, mode 1 (poules, 12 eleves par poule) :
 - **Tables par poule respectees** : la file d'attente ne propose plus que les tables attribuees a la poule du match (`computeQueue`). Une poule dont les tables sont occupees attend, au lieu de prendre la table d'une autre poule. Le « prochain match » est le premier match pret qui a une table libre.
 - **Meme ordre en haut et en bas** : la file d'attente suit l'ordre de la liste (poule affichee d'abord, puis numero de match), au lieu d'un tri par equite qui sautait des matchs. La liste d'une poule place les matchs en cours en haut, les matchs a jouer ensuite, les termines tout en bas (`sortedPoolMatches`) : plus besoin de descendre pour saisir un score. Les cartes se reclassent seules apres chaque changement (`reorderPoolCards`), sans perdre les scores saisis.
+- **Arbitres par poule ou pour tous** : avec plusieurs poules, choix dans la configuration des poules (`T.settings.refScope`, `pool` par defaut pour les nouveaux tournois). En mode « poule », la liste des arbitres d'un match de poule ne propose que les joueurs libres de cette poule. Finales et tableau : tous les joueurs. Les anciens tournois sans reglage gardent « tous ».
 
 ## 2.3 (icone adaptative) - 2026-11-05 (APK versionCode 18, cache inchange)
 
