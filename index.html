@@ -3117,6 +3117,11 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">3. Configurer les poules</h3>
 <p>D\u00e9finissez le nombre de poules et la taille de chaque poule. En mode 2, indiquez aussi le nombre de qualifi\u00e9s par poule pour les finales.</p>
+<p>Avec plusieurs poules, deux r\u00e9glages \u00e0 faire ici :</p>
+<ul style="margin:4px 0 4px 20px">
+<li><b>Arbitres</b> : <i>Joueurs de la poule</i> (par d\u00e9faut) ne propose, pour un match de poule, que les joueurs libres de cette poule ; <i>Tous les joueurs</i> propose aussi ceux des autres poules.</li>
+<li><b>Tables par poule</b> : indiquez les num\u00e9ros de tables de chaque poule (ex : 1,2,3). La file d'attente ne lance un match que sur une table de sa poule.</li>
+</ul>
 
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">4. R\u00e9partir les joueurs</h3>
 <p>Trois options de r\u00e9partition :</p>
@@ -3130,10 +3135,11 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <p>Les matchs sont g\u00e9n\u00e9r\u00e9s automatiquement (round-robin). Pour chaque match :</p>
 <ul style="margin:4px 0 4px 20px">
 <li>Saisissez les scores des deux joueurs.</li>
-<li>Attribuez un <b>arbitre</b> via le menu d\u00e9roulant (les joueurs occup\u00e9s sont automatiquement exclus).</li>
+<li>Attribuez un <b>arbitre</b> via le menu d\u00e9roulant (les joueurs occup\u00e9s sont automatiquement exclus ; avec plusieurs poules, seuls les joueurs de la poule sont propos\u00e9s si ce choix est actif).</li>
 <li>Cochez <b>+1 pt arb.</b> si l'arbitrage \u00e9tait de qualit\u00e9 (bonus configurable).</li>
 <li>Cliquez sur <b>Valider</b> pour enregistrer le r\u00e9sultat.</li>
 </ul>
+<p>Dans la liste d'une poule, les matchs <b>en cours</b> sont en haut, puis les matchs <b>\u00e0 jouer</b> dans l'ordre, et les matchs <b>termin\u00e9s</b> tout en bas : le prochain score \u00e0 saisir est toujours pr\u00e8s du haut.</p>
 <p>Le <b>chronometre</b> (si configur\u00e9) s'affiche en haut de l'\u00e9cran avec vibration en fin de temps.</p>
 
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">6. Formats de match</h3>
@@ -3160,7 +3166,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <li><b>Ajouter un joueur</b> &agrave; une poule (avant les finales) : il rencontre tous les joueurs de la poule.</li>
 </ul>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">File d'attente et tables</h3>
-<p>Au-dessus des matchs, la carte <b>&#9201; File d'attente</b> montre les tables libres (vert) ou occup&eacute;es (jaune), puis propose le <b>prochain match libre</b> : celui dont aucun joueur n'est en jeu ni en train d'arbitrer, en priorit&eacute; les joueurs qui ont le moins jou&eacute;. Elle sugg&egrave;re aussi une table et un arbitre (un joueur qui n'a plus de match &agrave; jouer, ou qui a le moins arbitr&eacute;). <b>&#9654; Lancer ce match</b> met le match en cours et applique la table et l'arbitre propos&eacute;s.</p>
+<p>Au-dessus des matchs, la carte <b>&#9201; File d'attente</b> montre les tables libres (vert) ou occup&eacute;es (jaune), puis propose le <b>prochain match libre</b> : celui dont aucun joueur n'est en jeu ni en train d'arbitrer. En poules et finales, elle suit l'ordre de la liste (poule affich&eacute;e d'abord) ; en tableau, elle donne la priorit&eacute; aux joueurs qui ont le moins jou&eacute;. Elle sugg&egrave;re aussi une table (celles de la poule du match, si vous les avez d&eacute;finies) et un arbitre (un joueur qui n'a plus de match &agrave; jouer, ou qui a le moins arbitr&eacute;). <b>&#9654; Lancer ce match</b> met le match en cours et applique la table et l'arbitre propos&eacute;s.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Imprimer ou PDF</h3>
 <p>Le bouton <b>&#128424; Imprimer / PDF</b> (barre d'outils des matchs et &eacute;cran Classements) pr&eacute;pare une feuille A4 en noir et blanc : classements, tableau du tournoi, liste des matchs et scores. Choisissez une imprimante ou &laquo; Enregistrer au format PDF &raquo; pour l'afficher au gymnase.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Palmar&egrave;s par classe</h3>

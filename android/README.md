@@ -46,7 +46,7 @@ Contrôles rapides :
 ```bash
 AAPT=$(ls -d ~/Library/Android/sdk/build-tools/*/aapt2 | tail -1)
 "$AAPT" dump badging app/build/outputs/apk/debug/app-debug.apk | grep package:
-unzip -p app/build/outputs/apk/debug/app-debug.apk assets/index.html | grep -c "APP_VERSION='2.3'"
+unzip -p app/build/outputs/apk/debug/app-debug.apk assets/index.html | grep -c "APP_VERSION='2.4'"
 ```
 
 ## Signature
@@ -73,7 +73,7 @@ Procédure :
 4. Après confirmation (dépôt public) : `git push`, puis `gh release create vX.Y MatchManagerEPS.apk --repo msjeps/Match-Manager-EPS --target main --latest --title "Match Manager EPS X.Y" --notes "..."`.
 5. Vérifier le lien « latest » : `curl -sIL <lien> | grep -i content-length` doit donner la taille de l'APK.
 
-Releases publiées : `v2.2` (versionCode 15, correctifs de sécurité du 2026-10-24) `v2.3` (versionCode 16, lien de téléchargement dans l'aide et le PDF), `v2.3.1` (versionCode 17, nouvelle icône du lanceur) et `v2.3.2` (versionCode 18, icône adaptative : fond uni `#415EB3` + premier plan dans la zone sûre, sans cercle blanc sur Android 8+), `v2.4` (versionCode 19, 2026-11-11 : tables par poule respectées, même ordre file d'attente / liste, arbitres par poule ou tous). Le guide `match-manager-eps.pdf` est joint à la Release.
+Releases publiées : `v2.2` (versionCode 15, correctifs de sécurité du 2026-10-24) `v2.3` (versionCode 16, lien de téléchargement dans l'aide et le PDF), `v2.3.1` (versionCode 17, nouvelle icône du lanceur) et `v2.3.2` (versionCode 18, icône adaptative : fond uni `#415EB3` + premier plan dans la zone sûre, sans cercle blanc sur Android 8+), `v2.4` (versionCode 19, 2026-11-11 : tables par poule respectées, même ordre file d'attente / liste, arbitres par poule ou tous). puis `v2.4.1` (versionCode 20, 2026-11-11 : aide intégrée et guide PDF mis à jour). Le guide `match-manager-eps.pdf` est joint à chaque Release.
 
 ## À valider sur la tablette avant diffusion
 

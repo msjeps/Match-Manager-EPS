@@ -13,6 +13,10 @@ Retours du test en classe, mode 1 (poules, 12 eleves par poule) :
 - **Meme ordre en haut et en bas** : la file d'attente suit l'ordre de la liste (poule affichee d'abord, puis numero de match), au lieu d'un tri par equite qui sautait des matchs. La liste d'une poule place les matchs en cours en haut, les matchs a jouer ensuite, les termines tout en bas (`sortedPoolMatches`) : plus besoin de descendre pour saisir un score. Les cartes se reclassent seules apres chaque changement (`reorderPoolCards`), sans perdre les scores saisis.
 - **Arbitres par poule ou pour tous** : avec plusieurs poules, choix dans la configuration des poules (`T.settings.refScope`, `pool` par defaut pour les nouveaux tournois). En mode « poule », la liste des arbitres d'un match de poule ne propose que les joueurs libres de cette poule. Finales et tableau : tous les joueurs. Les anciens tournois sans reglage gardent « tous ».
 
+## 2.4 (aide et guide) - 2026-11-11 (APK versionCode 20, cache v36)
+
+Aide integree et guide PDF mis a jour pour la 2.4 : tables par poule, choix des arbitres, ordre de la liste d'une poule, nouvelle regle de la file d'attente. Aucun changement de fonctionnement. Release GitHub `v2.4.1`.
+
 ## 2.3 (icone adaptative) - 2026-11-05 (APK versionCode 18, cache inchange)
 
 Sur Android 8+ (Play Store professionnel), l'icone etait un PNG ordinaire que le lanceur posait dans un cercle blanc. Ajout d'une icone adaptative : fond uni `#415EB3` (`values/ic_launcher_background.xml`) + premier plan `ic_launcher_foreground.png` (logo dans la zone sure de 66/108 dp), `mipmap-anydpi-v26/ic_launcher.xml` et `ic_launcher_round.xml`, `roundIcon` dans le manifeste. Les PNG historiques restent pour Android 7. Aucun changement de l'application web. Release GitHub `v2.3.2`.

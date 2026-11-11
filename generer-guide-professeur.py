@@ -136,9 +136,13 @@ def contenu():
     s.append(B("<b>Nouveau tournoi</b> : nom, classe, date, mode et format de match."))
     s.append(B("<b>Joueurs</b> : inscription manuelle, par liste collée, ou import CSV (NOM;Niveau), niveaux de 0 à 5. "
                "Les listes peuvent être sauvegardées et réutilisées."))
-    s.append(B("<b>Poules / répartition</b> : par niveau (serpentin en mode poules + finales), aléatoire ou manuelle."))
+    s.append(B("<b>Poules / répartition</b> : par niveau (serpentin en mode poules + finales), aléatoire ou manuelle. "
+               "Avec plusieurs poules, on choisit aussi les <b>tables de chaque poule</b> (ex : 1,2,3) et l'<b>arbitrage</b> : "
+               "« Joueurs de la poule » (par défaut) ou « Tous les joueurs »."))
     s.append(B("<b>Matchs</b> : générés automatiquement (round-robin), arbitre attribuable à chaque match, bonus "
-               "arbitre configurable. Chaque joueur porte une pastille colorée à l'initiale, de la couleur de sa poule."))
+               "arbitre configurable. Chaque joueur porte une pastille colorée à l'initiale, de la couleur de sa poule. "
+               "Dans la liste d'une poule : matchs en cours en haut, puis à jouer, puis terminés en bas, pour que le "
+               "prochain score à saisir reste près du haut."))
     s.append(B("<b>Classements / finales / tableau</b> : classement en continu (points, confrontation directe, "
                "différence, points marqués), puis finales ou progression du tableau selon le mode."))
     s.append(P("Toute la progression est sauvegardée automatiquement (aucune perte en cas de sortie accidentelle, de "
@@ -146,8 +150,9 @@ def contenu():
 
     s.append(P('Pendant le tournoi', h2))
     s.append(B("<b>File d'attente</b> : au-dessus des matchs, elle indique les tables libres, le prochain match "
-               "possible (joueurs ni en jeu ni arbitres), la table et l'arbitre suggérés, et un bouton « Lancer ce "
-               "match »."))
+               "possible (joueurs ni en jeu ni arbitres, dans l'ordre de la liste), la table et l'arbitre suggérés, et un "
+               "bouton « Lancer ce match ». En poules, la table proposée est toujours une table de la poule du match, "
+               "et l'arbitre un joueur libre de la poule si ce réglage est choisi."))
     s.append(B("<b>Mode tablette élève</b> (icône téléphone sur un match) : un match en grand avec gros boutons + et -, "
                "le joueur en tête s'affiche en vert, confirmation avant validation, puis match suivant. Utile pour "
                "laisser les élèves saisir le score."))

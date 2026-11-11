@@ -34,7 +34,8 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 ## 4. Poules
 
 - Nombre de poules et taille de chacune (la somme doit couvrir tous les joueurs).
-- Tables attribuées par poule.
+- Tables attribuées par poule (`T.poolTables`) : la file d'attente ne propose, pour un match de poule, que les tables de sa poule.
+- **Arbitres par poule ou tous** (plusieurs poules) : réglage `T.settings.refScope` dans la configuration des poules, `pool` par défaut pour les nouveaux tournois ; les anciens tournois gardent « tous ».
 - Répartition : par niveau (poules homogènes en mode 1, serpentin en mode 2), aléatoire, ou manuelle (toucher un joueur puis la poule).
 
 ## 5. Matchs
@@ -42,8 +43,9 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Rondes générées automatiquement (round-robin), numéro de match et table.
 - Statuts : en attente, en cours (toucher la carte), terminé.
 - Saisie des scores avec **brouillons conservés** (un choix d'arbitre ou un changement de carte n'efface rien).
+- **Liste d'une poule** : matchs en cours en haut, à jouer ensuite, terminés en bas (`sortedPoolMatches`, `reorderPoolCards`).
 - Arbitres : liste filtrée (ni les joueurs du match, ni ceux en cours de jeu, ni les arbitres déjà affectés, ni les joueurs retirés), bonus arbitre réglable.
-- **File d'attente** : carte au-dessus des matchs (poules, finales, tableau) avec tables libres / occupées, prochain match libre (joueurs ni en jeu ni arbitres, priorité à ceux qui ont le moins joué), table et arbitre suggérés, « Lancer ce match ».
+- **File d'attente** : carte au-dessus des matchs (poules, finales, tableau) avec tables libres / occupées, prochain match libre (joueurs ni en jeu ni arbitres ; poules et finales : ordre de la liste, poule affichée d'abord ; tableau : priorité à ceux qui ont le moins joué), table et arbitre suggérés, « Lancer ce match ».
 - **Mode tablette élève** (📱) : un match en grand, boutons + et -, confirmation, match suivant. Le score en tête passe en vert, léger rebond à chaque point.
 - **Annuler** (↩) : retour à l'état exact d'avant la dernière action, 8 niveaux par tournoi.
 - **Mise à jour ciblée** : un changement sur un match ne remplace que les cartes dont l'affichage change (le défilement est conservé) ; le tableau n'est reconstruit en entier que lorsqu'un tour ou une consolante est généré.
