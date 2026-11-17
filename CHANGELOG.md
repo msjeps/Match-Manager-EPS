@@ -6,6 +6,13 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.6.1 - 2026-11-17 (APK versionCode 24, cache v40)
+
+Retour du test en classe : l'ecran du haut sert a annoncer les matchs, les files d'attente ne doivent pas etre vues des eleves.
+- **Carte « Matchs a lancer »** (poules) agrandie : noms, table et arbitre en gros, bouton « Lancer ce match » pleine largeur, pastilles de tables plus grandes. Plus de liste des matchs suivants (l'adversaire annonce peut changer selon les matchs finis et les arbitres).
+- **File d'attente de la poule** deplacee dans l'onglet de chaque poule (`renderPoolQueue`) : matchs a jouer de cette poule seulement, « pret » ou « attend : X ».
+- Finales et tableau : carte inchangee.
+
 ## 2.6 - 2026-11-17 (APK versionCode 23, cache v39)
 
 Suite de la 2.5 (dispenses et absents) : decision de fin de tournoi, finales et exports.
