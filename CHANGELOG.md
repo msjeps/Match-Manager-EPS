@@ -6,6 +6,12 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.6.2 - 2026-11-17 (APK versionCode 25, cache v41)
+
+Meme principe que la 2.6.1, pour les finales du mode 2 (Poules + finales).
+- **Carte « Matchs a lancer »** agrandie aussi en finales, sans liste des matchs suivants.
+- **File d'attente de la finale** (`renderGroupQueue`) dans l'onglet de chaque finale.
+
 ## 2.6.1 - 2026-11-17 (APK versionCode 24, cache v40)
 
 Retour du test en classe : l'ecran du haut sert a annoncer les matchs, les files d'attente ne doivent pas etre vues des eleves.

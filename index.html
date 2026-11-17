@@ -479,6 +479,7 @@ body.light-mode .badge-out{color:#C62828}
 <div id="tools-finals"></div>
 <div id="queue-finals"></div>
 <div id="finals-tabs" class="tab-bar"></div>
+<div id="final-queue"></div>
 <div id="finals-list"></div>
 <button class="btn-secondary" onclick="showFinalRankings()" style="margin-top:16px;width:100%">&#128202; Classement g&eacute;n&eacute;ral</button>
 </div>
@@ -645,7 +646,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.6.1';
+const APP_VERSION='2.6.2';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const SOUND_KEY='mmeps_sound';
 const LS_BACKUP_KEY='teneps_data_illisible';
@@ -2130,6 +2131,7 @@ reattachRunningMatchTimers();
 renderTimerBar('finals-timer',T.settings.duration);
 renderTools('tools-finals');
 renderQueue('queue-finals','final');
+renderGroupQueue('final-queue','final');
 const tabs=document.getElementById('finals-tabs');
 tabs.innerHTML=T.finals.map((f,i)=>`<button class="tab-btn${i===curFinalIdx?' active':''}" onclick="curFinalIdx=${i};renderFinals()">${escH(f.name)}</button>`).join('');
 const group=T.finals[curFinalIdx];
@@ -4283,7 +4285,7 @@ if(!el||!T)return;
 const q=computeQueue(phase);
 const playingNow=T.matches.filter(m=>m.status==='playing');
 if(!q.entries.length&&!playingNow.length){el.innerHTML='';return;}
-const big=phase==='pool';
+const big=phase==='pool'||phase==='final';
 let h='<div class="card queue-card'+(big?' queue-big':'')+'"><div style="font-weight:700;margin-bottom:6px'+(big?';font-size:1.15em':'')+'">'+(big?'&#9654; Matchs &agrave; lancer':'&#9201; File d\'attente')+' <span style="font-weight:400;color:var(--txt2);font-size:.85em">('+q.entries.length+' &agrave; jouer)</span></div>';
 h+='<div class="queue-tables">';
 for(let t=1;t<=q.nbTables;t++){
@@ -4318,15 +4320,16 @@ h+='</div>';
 el.innerHTML=h;
 }
 // File d'attente de la poule affichée (onglet) : visible seulement dans la poule concernée
-function renderPoolQueue(){
-const el=document.getElementById('pool-queue');
+function renderPoolQueue(){renderGroupQueue('pool-queue','pool');}
+function renderGroupQueue(id,phase){
+const el=document.getElementById(id);
 if(!el)return;
-const pool=T&&T.pools[curPoolIdx];
+const pool=T&&(phase==='final'?T.finals[curFinalIdx]:T.pools[curPoolIdx]);
 if(!pool){el.innerHTML='';return;}
-const q=computeQueue('pool');
+const q=computeQueue(phase);
 const es=q.entries.filter(e=>e.m.poolId===pool.id);
 if(!es.length){el.innerHTML='';return;}
-let h='<div class="card queue-card"><div style="font-weight:700;margin-bottom:6px">&#9201; File d\'attente de la poule <span style="font-weight:400;color:var(--txt2);font-size:.85em">('+es.length+' &agrave; jouer)</span></div><div style="font-size:.9em">';
+let h='<div class="card queue-card"><div style="font-weight:700;margin-bottom:6px">&#9201; File d\'attente '+(phase==='final'?'de la finale':'de la poule')+' <span style="font-weight:400;color:var(--txt2);font-size:.85em">('+es.length+' &agrave; jouer)</span></div><div style="font-size:.9em">';
 es.forEach((e,i)=>{
 h+='<div class="queue-row"><span style="color:var(--txt2)">'+(i+1)+'.</span> '+escH(playerName(e.m.p1))+' / '+escH(playerName(e.m.p2))+
 (e.ready?' <span style="color:var(--ok-txt)">pr&ecirc;t</span>':' <span style="color:var(--txt2)">attend : '+escH(e.why.join(', '))+'</span>')+'</div>';
@@ -4394,6 +4397,7 @@ renderPoolQueue();
 renderTools('tools-finals');
 renderFinalsProgress();
 renderQueue('queue-finals','final');
+renderGroupQueue('final-queue','final');
 }
 }
 function rerenderFor(m){
