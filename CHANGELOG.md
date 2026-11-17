@@ -6,6 +6,13 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.6.3 - 2026-11-17 (APK versionCode 26, cache v42)
+
+Match sans arbitre : plus de blocage quand il n'y a pas assez de joueurs libres.
+- **Arbitre automatique** (`computeQueue`) : proposé seulement parmi les joueurs qui ne jouent dans aucun autre match prêt avec une table. Avant, avec 4 joueurs et 10 tables, l'arbitre pris parmi les joueurs du match suivant le rendait « occupé » et empêchait de le lancer.
+- Sans joueur libre, « Lancer ce match » lance le match sans arbitre (« Sans arbitre » affiché). Valable en poules, finales et tableau.
+- Aide intégrée mise à jour ; test ajouté (4 joueurs, 10 tables, poules et finales).
+
 ## 2.6.2 - 2026-11-17 (APK versionCode 25, cache v41)
 
 Meme principe que la 2.6.1, pour les finales du mode 2 (Poules + finales).

@@ -616,3 +616,20 @@ test('arbitres : réglage par poule ou tous les joueurs', () => {
   delete t.settings.refScope; // ancien tournoi : comportement inchangé
   assert.equal(get().length, 4);
 });
+
+test("file d'attente : 4 joueurs, 10 tables, aucun arbitre automatique ne bloque un match (poules et finales)", () => {
+  const app = createApp();
+  const names = ['A', 'B', 'C', 'D'];
+  const t = tournament(app, { id: 'q1', mode: 2, names, settings: { tables: 10 } });
+  // Les mêmes matchs servent aussi de finale : on les copie en phase « final »
+  const ids = t.players.map(p => p.id);
+  t.finals = [{ id: 'q1f0', name: 'Finale A', rank: 1, playerIds: ids }];
+  t.matches.filter(m => m.phase === 'pool').forEach(m => t.matches.push({ ...m, id: m.id + 'F', poolId: 'q1f0', phase: 'final' }));
+  app.state.tournaments = [t]; app.state.currentId = t.id; app.T = t;
+  for (const phase of ['pool', 'final']) {
+    const q = app.fn('computeQueue')(phase);
+    const prets = q.entries.filter(e => e.ready);
+    assert.ok(prets.length >= 2, phase + ' : au moins 2 matchs prêts');
+    prets.forEach(e => assert.equal(e.ref, null, phase + ' : pas d\'arbitre qui bloque un autre match'));
+  }
+});

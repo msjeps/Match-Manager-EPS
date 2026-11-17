@@ -646,7 +646,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.6.2';
+const APP_VERSION='2.6.3';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const SOUND_KEY='mmeps_sound';
 const LS_BACKUP_KEY='teneps_data_illisible';
@@ -3263,7 +3263,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <li><b>Ajouter un joueur</b> &agrave; une poule (avant les finales) : il rencontre tous les joueurs de la poule.</li>
 </ul>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">File d'attente et tables</h3>
-<p>Au-dessus des matchs, la carte <b>&#9201; File d'attente</b> montre les tables libres (vert) ou occup&eacute;es (jaune), puis propose le <b>prochain match libre</b> : celui dont aucun joueur n'est en jeu ni en train d'arbitrer. En poules et finales, elle suit l'ordre de la liste (poule affich&eacute;e d'abord) ; en tableau, elle donne la priorit&eacute; aux joueurs qui ont le moins jou&eacute;. Elle sugg&egrave;re aussi une table (celles de la poule du match, si vous les avez d&eacute;finies) et un arbitre (un joueur qui n'a plus de match &agrave; jouer, ou qui a le moins arbitr&eacute;). <b>&#9654; Lancer ce match</b> met le match en cours et applique la table et l'arbitre propos&eacute;s.</p>
+<p>Au-dessus des matchs, la carte <b>&#9201; File d'attente</b> montre les tables libres (vert) ou occup&eacute;es (jaune), puis propose le <b>prochain match libre</b> : celui dont aucun joueur n'est en jeu ni en train d'arbitrer. En poules et finales, elle suit l'ordre de la liste (poule affich&eacute;e d'abord) ; en tableau, elle donne la priorit&eacute; aux joueurs qui ont le moins jou&eacute;. Elle sugg&egrave;re aussi une table (celles de la poule du match, si vous les avez d&eacute;finies) et un arbitre (un joueur qui n'a plus de match &agrave; jouer, ou qui a le moins arbitr&eacute;), mais seulement si cela ne bloque aucun autre match : sans joueur libre, le match se lance sans arbitre (par exemple 4 joueurs : les 2 matchs se jouent en m&ecirc;me temps). <b>&#9654; Lancer ce match</b> met le match en cours et applique la table et l'arbitre propos&eacute;s.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Imprimer ou PDF</h3>
 <p>Le bouton <b>&#128424; Imprimer / PDF</b> (barre d'outils des matchs et &eacute;cran Classements) pr&eacute;pare une feuille A4 en noir et blanc : classements, tableau du tournoi, liste des matchs et scores. Choisissez une imprimante ou &laquo; Enregistrer au format PDF &raquo; pour l'afficher au gymnase.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Palmar&egrave;s par classe</h3>
@@ -4268,9 +4268,17 @@ else if(allowed.length)t=allowed[0];
 if(t!==null)pool.splice(pool.indexOf(t),1);
 e.table=t;
 e.ref=null;
-if(e.m.refereeId){e.ref=e.m.refereeId;takenRef[e.ref]=1;return;}
+if(e.m.refereeId){e.ref=e.m.refereeId;takenRef[e.ref]=1;}
+});
+// Joueurs réservés : ceux des matchs prêts qui ont une table (ils vont jouer). Un arbitre n'est proposé
+// automatiquement que parmi les autres : jamais au prix d'un match qu'on ne pourrait plus lancer
+// (ex. 4 joueurs, 10 tables : les 2 matchs se jouent en même temps, sans arbitre).
+const reserved=new Set();
+entries.forEach(e=>{if(e.ready&&e.table!==null){reserved.add(e.m.p1);reserved.add(e.m.p2);}});
+entries.forEach(e=>{
+if(!e.ready||e.ref)return;
 const poolObj=T.pools.find(p=>p.id===e.m.poolId);
-const cands=getRefereeCandidates(e.m).filter(p=>!takenRef[p.id]);
+const cands=getRefereeCandidates(e.m).filter(p=>!takenRef[p.id]&&!reserved.has(p.id));
 cands.sort((a,b)=>
 ((stillToPlay.has(a.id)?1:0)-(stillToPlay.has(b.id)?1:0))
 ||((poolObj&&poolObj.playerIds.includes(a.id)?0:1)-(poolObj&&poolObj.playerIds.includes(b.id)?0:1))
@@ -4299,7 +4307,7 @@ const m=first.m;
 h+='<div class="queue-next"><div class="qn-ctx" style="font-size:.78em;color:var(--txt2)">Prochain match libre &middot; '+escH(matchContextLabel(m))+'</div>'+
 '<div class="qn-names" style="font-weight:700;font-size:1.05em;margin:2px 0">'+escH(playerName(m.p1))+' <span style="color:var(--txt2);font-weight:400">contre</span> '+escH(playerName(m.p2))+'</div>'+
 '<div class="qn-info" style="font-size:.88em">'+(first.table!==null?'Table <b>T'+first.table+'</b>':'<span style="color:var(--err-txt)">Aucune table libre</span>')+
-(first.ref?' &middot; Arbitre : <b>'+escH(playerName(first.ref))+'</b>':'')+'</div>'+
+(first.ref?' &middot; Arbitre : <b>'+escH(playerName(first.ref))+'</b>':' &middot; <span style="color:var(--txt2)">Sans arbitre</span>')+'</div>'+
 (first.table!==null?'<button class="btn-primary btn-sm qn-btn" style="min-height:44px;margin-top:8px" onclick="launchQueued(\''+m.id+'\')">&#9654; Lancer ce match</button>':'')+
 '</div>';
 }else if(q.entries.length){
