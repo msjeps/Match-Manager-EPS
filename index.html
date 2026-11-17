@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#213364">
@@ -13,21 +13,22 @@
 <meta name="description" content="Match Manager EPS - Organiser les rencontres, les terrains, les arbitres et les classements sans jongler entre plusieurs feuilles.">
 <style>
 :root{--pri:#F3C146;--pri-lt:#F5D080;--pri-dk:#D4A020;--accent:#4DB0FA;--accent-txt:#4DB0FA;--ok:#4CAF50;--ok-txt:#4CAF50;--err:#E64D4C;--err-txt:#E64D4C;--info:#4DB0FA;--warn:#F3C146;--bg:#213364;--surf:#3e5db3;--surf2:#4A6BC5;--txt:#FFFFFF;--txt2:#D6E4FF;--brd:#5572C8;--ombre-douce:0 4px 15px rgba(0,0,0,.25);--ombre-forte:0 8px 25px rgba(0,0,0,.4);--sh:var(--ombre-douce);--rad:16px;--chrome1:#4A6BC5;--chrome2:#3e5db3}
-body.light-mode{--bg:#EEF2FA;--surf:#FFFFFF;--surf2:#F1F4FB;--txt:#1A2540;--txt2:#5A6B8C;--brd:#D7DEEC;--ombre-douce:0 4px 15px rgba(30,50,90,.12);--ombre-forte:0 8px 25px rgba(30,50,90,.18);--pri-lt:#8A6400;--accent-txt:#1565C0;--ok-txt:#2E7D32;--err-txt:#C62828}
+body.light-mode{--bg:#EEF2FA;--surf:#FFFFFF;--surf2:#F1F4FB;--txt:#1A2540;--txt2:#46567A;--brd:#D7DEEC;--ombre-douce:0 4px 15px rgba(30,50,90,.12);--ombre-forte:0 8px 25px rgba(30,50,90,.18);--pri-lt:#8A6400;--accent-txt:#1565C0;--ok-txt:#2E7D32;--err-txt:#C62828}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
-.screen{display:none;min-height:100vh;padding-bottom:20px}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;touch-action:manipulation;background:var(--bg);color:var(--txt);min-height:100vh;min-height:100dvh;overflow-x:hidden}
+button:focus-visible,[role=button]:focus-visible,[role=switch]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+.screen{display:none;min-height:100vh;min-height:100dvh;padding-bottom:20px}
 .screen.active{display:block;animation:screenIn .15s ease-out}
 @keyframes screenIn{from{opacity:0}to{opacity:1}}
 .top-bar{background:linear-gradient(135deg,var(--chrome1),var(--chrome2));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.4);border-bottom:2px solid var(--pri)}
-.top-bar h1{font-size:1.1em;flex:1}
+.top-bar h1{font-size:1.1em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .top-bar .logo{font-size:1.3em;font-weight:700;flex:1;display:flex;align-items:center;gap:10px}
 .top-logo{width:40px;height:40px;border-radius:8px;flex-shrink:0}
 .empty-logo{width:96px;height:96px;border-radius:16px}
 .version-tag{display:block;font-size:.6em;font-weight:400;opacity:.75;margin-top:2px}
 .pied-page{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:30px;padding-top:20px;border-top:1px solid rgba(128,128,128,.3)}
 .pied-page-logo{width:36px;height:36px;border-radius:8px;flex-shrink:0}
-.pied-page p{font-size:.85em;opacity:.7}
+.pied-page p{font-size:.875em;opacity:.7}
 .btn-back{background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 14px;border-radius:8px;font-size:.9em;cursor:pointer}
 .btn-icon{background:none;border:none;color:#fff;font-size:1.4em;cursor:pointer;padding:4px 8px}
 .content{padding:16px;max-width:800px;margin:0 auto}
@@ -41,11 +42,12 @@ textarea{resize:vertical;min-height:80px}
 .btn-secondary{background:transparent;color:var(--pri-lt);border:2px solid var(--pri);padding:10px 18px;border-radius:var(--rad);font-size:.9em;font-weight:600;cursor:pointer;transition:all .2s}
 .btn-secondary:active{background:var(--pri);color:#000}
 .btn-success{background:var(--ok);color:#fff;border:none;padding:10px 18px;border-radius:var(--rad);font-size:.9em;font-weight:600;cursor:pointer}
-.btn-danger{background:var(--err);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:.85em;cursor:pointer}
+.btn-danger{background:var(--err);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:.875em;cursor:pointer}
 .btn-primary,.btn-secondary,.btn-success,.btn-danger,.match-validate{border-radius:25px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;min-height:44px;box-shadow:var(--ombre-douce);transition:transform .15s,background .2s}
 .btn-secondary{box-shadow:none}
+.btn-primary,.btn-secondary{text-transform:none;letter-spacing:0}
 .btn-success,.btn-danger,.match-validate{display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.btn-sm{padding:8px 16px;font-size:.85em}
+.btn-sm{padding:8px 16px;font-size:.875em}
 .btn-primary:active,.btn-secondary:active,.btn-success:active,.btn-danger:active,.match-validate:active,.btn-back:active,.family-btn:active,.mode-card:active,.lvl-btn:active,.level-select button:active,.pool-nav button:active{transform:scale(.95)}
 .btn-back,.tab-btn,.pool-nav button,.lvl-btn{transition:transform .15s,background .2s}
 .tab-btn{min-height:44px}
@@ -58,7 +60,7 @@ textarea{resize:vertical;min-height:80px}
 .stepper input{flex:1;min-width:0;width:auto;height:44px;text-align:center;border:2px solid var(--brd);border-radius:10px;font-size:1.1em;font-weight:700}
 .card{background:var(--surf);border-radius:var(--rad);padding:16px;margin-bottom:12px;box-shadow:var(--sh);border:1px solid var(--brd);border-left:5px solid var(--pri)}
 .card-header{padding:12px 16px;border-radius:var(--rad) var(--rad) 0 0;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:space-between;margin:-16px -16px 12px -16px}
-.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:.75em;font-weight:600}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:.875em;font-weight:600}
 .badge-orange{background:rgba(243,193,70,.2);color:#F3C146}
 .badge-green{background:rgba(76,175,80,.2);color:#66BB6A}
 .badge-blue{background:rgba(33,150,243,.2);color:#42A5F5}
@@ -79,51 +81,51 @@ body.light-mode .badge-red{color:#C62828}
 .format-group{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .format-group .form-group{flex:1;min-width:120px}
 .player-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;margin-bottom:6px}
-.player-item .num{width:30px;height:30px;border-radius:50%;background:var(--pri);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85em;flex-shrink:0}
+.player-item .num{width:30px;height:30px;border-radius:50%;background:var(--pri);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.875em;flex-shrink:0}
 .player-item .name{flex:1;font-weight:600;letter-spacing:.02em}
-.player-item .level{font-size:.8em;color:var(--txt2)}
+.player-item .level{font-size:.875em;color:var(--txt2)}
 .player-item .del{background:none;border:none;color:var(--err-txt);font-size:1.2em;cursor:pointer;min-width:44px;min-height:44px;padding:4px 8px}
 .pool-card{border-radius:var(--rad);overflow:hidden;margin-bottom:16px;box-shadow:var(--sh);background:var(--surf);border:1px solid var(--brd)}
 .pool-header{padding:12px 16px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45);font-weight:700;display:flex;justify-content:space-between;align-items:center}
 .pool-body{padding:12px}
 .pool-player{padding:8px 12px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
 .pool-player:last-child{border-bottom:none}
-.pool-player .seed{width:26px;height:26px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8em;font-weight:700}
+.pool-player .seed{width:26px;height:26px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.875em;font-weight:700}
 .match-card{background:var(--surf);border-radius:var(--rad);padding:14px;margin-bottom:10px;box-shadow:var(--sh);border:1px solid var(--brd);border-left:4px solid var(--brd)}
 .match-card.done{border-left-color:var(--ok);background:rgba(76,175,80,.06)}
 .match-card.pending{border-left-color:var(--warn)}
 .match-card.playing{border-left-color:var(--accent);background:rgba(77,176,250,.1);box-shadow:0 0 0 2px var(--accent),var(--sh)}
 .match-status.playing{color:var(--accent-txt)}
-.match-table-badge{display:inline-flex;align-items:center;gap:3px;min-height:44px;background:rgba(243,193,70,.15);color:var(--pri-lt);border:1px solid var(--pri);border-radius:6px;padding:2px 8px;font-size:.78em;font-weight:700;cursor:pointer}
+.match-table-badge{display:inline-flex;align-items:center;gap:3px;min-height:44px;background:rgba(243,193,70,.15);color:var(--pri-lt);border:1px solid var(--pri);border-radius:6px;padding:2px 8px;font-size:.875em;font-weight:700;cursor:pointer}
 .match-table-badge:empty{display:none}
 .match-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .match-num{font-weight:700;color:var(--pri-lt)}
-.match-status{font-size:.8em;font-weight:600}
+.match-status{font-size:.875em;font-weight:600}
 .match-status.pending{color:var(--pri-lt)}
 .match-status.done{color:var(--ok-txt)}
 .match-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .match-row .pname{flex:1;font-weight:500;font-size:.95em}
-.match-row input[type=number]{width:60px;height:40px;text-align:center;border:2px solid var(--brd);border-radius:8px;font-size:1.1em;font-weight:800;padding:0;color:var(--txt);background:var(--surf2)}
+.match-row input[type=number]{width:64px;height:48px;text-align:center;border:2px solid var(--brd);border-radius:8px;font-size:1.1em;font-weight:800;padding:0;color:var(--txt);background:var(--surf2)}
 .match-row input.winner{border-color:var(--ok);background:rgba(76,175,80,.1);color:#66BB6A}
 body.light-mode .match-row input.winner{color:#2E7D32}
 .match-row input.loser{border-color:var(--brd);background:var(--surf);color:var(--txt2)}
 .match-actions{display:flex;align-items:center;gap:8px;margin-top:8px}
-.match-actions .ref-input{flex:1;padding:8px;border:1px solid var(--brd);border-radius:8px;font-size:.85em;background:var(--surf2);color:var(--txt)}
+.match-actions .ref-input{flex:1;padding:8px;border:1px solid var(--brd);border-radius:8px;font-size:.875em;background:var(--surf2);color:var(--txt)}
 .match-actions .ref-input::placeholder{color:var(--txt2)}
 .match-validate{background:var(--ok);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:.9em}
 .match-validate:disabled{opacity:.4;cursor:not-allowed}
 .mtimer{display:flex;align-items:center;gap:10px;background:var(--surf2);border-radius:8px;padding:6px 10px;margin-top:8px}
-.mtimer-period{font-size:.8em;color:var(--txt2);font-weight:600}
+.mtimer-period{font-size:.875em;color:var(--txt2);font-weight:600}
 .mtimer-time{font-family:'Courier New',monospace;font-size:1.15em;font-weight:800;color:var(--pri-lt)}
-.mtimer-end{font-size:.8em;color:var(--txt2);font-style:italic}
-.mtimer .btn-secondary{padding:6px 12px;font-size:.8em}
+.mtimer-end{font-size:.875em;color:var(--txt2);font-style:italic}
+.mtimer .btn-secondary{padding:6px 12px;font-size:.875em}
 .progress-bar{height:8px;background:var(--brd);border-radius:4px;overflow:hidden;margin:12px 0}
 .progress-fill{height:100%;background:var(--ok);transition:width .3s;border-radius:4px}
 .tab-bar{display:flex;gap:0;background:var(--surf);border-radius:var(--rad);overflow:hidden;border:2px solid var(--brd);margin-bottom:16px}
-.tab-btn{flex:1;padding:10px 8px;border:none;background:none;font-weight:600;font-size:.85em;cursor:pointer;transition:all .2s;color:var(--txt2)}
+.tab-btn{flex:1;padding:10px 8px;border:none;background:none;font-weight:600;font-size:.875em;cursor:pointer;transition:all .2s;color:var(--txt2)}
 .tab-btn.active{background:var(--pri);color:#000}
 .ranking-table{width:100%;border-collapse:collapse;font-size:.9em}
-.ranking-table th{background:linear-gradient(135deg,var(--pri-dk),var(--pri));color:#1A2540;padding:10px 8px;text-align:center;font-size:.8em}
+.ranking-table th{background:linear-gradient(135deg,var(--pri-dk),var(--pri));color:#1A2540;padding:10px 8px;text-align:center;font-size:.875em}
 .ranking-table td{padding:8px;text-align:center;border-bottom:1px solid var(--brd);color:var(--txt)}
 .ranking-table tr:nth-child(even){background:rgba(255,255,255,.03)}
 body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
@@ -149,7 +151,7 @@ body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
 .import-zone{border:2px dashed var(--brd);border-radius:var(--rad);padding:30px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;color:var(--txt2)}
 .import-zone:hover{border-color:var(--pri);background:rgba(243,193,70,.05)}
 .import-zone input{display:none}
-.chip{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.8em;font-weight:600;margin:2px}
+.chip{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.875em;font-weight:600;margin:2px}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
 .modal{background:var(--surf);border-radius:var(--rad);padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.7);border:1px solid var(--brd)}
 .modal h2{margin-bottom:16px;color:var(--pri-lt)}
@@ -162,11 +164,11 @@ body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
 .stat-row{display:flex;justify-content:space-around;padding:12px;background:var(--surf2);border-radius:8px;margin-bottom:12px;border:1px solid var(--brd)}
 .stat-item{text-align:center}
 .stat-item .val{font-size:1.4em;font-weight:700;color:var(--pri-lt)}
-.stat-item .lbl{font-size:.75em;color:var(--txt2)}
+.stat-item .lbl{font-size:.875em;color:var(--txt2)}
 #inp-pname::placeholder,#inp-plist::placeholder{color:#f4eac5}
 body.light-mode #inp-pname::placeholder,body.light-mode #inp-plist::placeholder{color:var(--txt2)}
-.level-select{display:flex;gap:4px}
-.level-select button{width:44px;height:44px;border-radius:50%;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-weight:700;font-size:.8em;cursor:pointer}
+.level-select{display:flex;gap:8px}
+.level-select button{width:44px;height:44px;border-radius:50%;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-weight:700;font-size:.875em;cursor:pointer}
 .level-select button.active{background:var(--pri);color:#000;border-color:var(--pri)}
 .toggle{position:relative;width:58px;height:32px;background:var(--brd);border-radius:16px;cursor:pointer;transition:background .2s}
 .toggle.on{background:var(--ok)}
@@ -176,34 +178,34 @@ body.light-mode #inp-pname::placeholder,body.light-mode #inp-plist::placeholder{
 .player-item:active{background:rgba(243,193,70,.08)}
 .level-editor{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:8px;margin:-2px 0 6px 0;animation:slideDown .2s ease}
 .level-editor-inner{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.lvl-btn{min-height:44px;padding:6px 14px;border:2px solid var(--brd);border-radius:8px;background:var(--surf);color:var(--txt);cursor:pointer;font-size:.85em;transition:all .15s}
+.lvl-btn{min-height:44px;padding:6px 14px;border:2px solid var(--brd);border-radius:8px;background:var(--surf);color:var(--txt);cursor:pointer;font-size:.875em;transition:all .15s}
 .lvl-btn.active{background:var(--pri);color:#000;border-color:var(--pri)}
 .trophy-display{color:var(--pri-lt);font-size:.9em}
-.no-level{color:var(--txt2);font-size:.8em;font-style:italic}
+.no-level{color:var(--txt2);font-size:.875em;font-style:italic}
 @keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:100px}}
 .pool-player.selected{background:rgba(243,193,70,.1);border:2px solid var(--pri);border-radius:8px;margin:-1px}
 .pool-header.drop-target{box-shadow:inset 0 0 0 3px rgba(255,255,255,.6)}
 .set-scores{margin-bottom:8px}
 .set-header,.set-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
-.set-header{font-size:.75em;font-weight:700;color:var(--txt2);text-transform:uppercase}
+.set-header{font-size:.875em;font-weight:700;color:var(--txt2);text-transform:uppercase}
 .pname-col{flex:1;font-weight:500;font-size:.95em}
 .set-col{width:54px;text-align:center;flex-shrink:0}
-.set-col input[type=number]{width:50px;height:38px;text-align:center;border:2px solid var(--brd);border-radius:8px;font-size:1em;font-weight:700;padding:0;color:var(--txt);background:var(--surf2)}
+.set-col input[type=number]{width:54px;height:48px;text-align:center;border:2px solid var(--brd);border-radius:8px;font-size:1em;font-weight:700;padding:0;color:var(--txt);background:var(--surf2)}
 .set-col input.winner{border-color:var(--ok);background:rgba(76,175,80,.1);color:#66BB6A}
 .set-col input.loser{border-color:var(--err);background:rgba(244,67,54,.08);color:#EF9A9A}
 body.light-mode .set-col input.winner{color:#2E7D32}
 body.light-mode .set-col input.loser{color:#C62828}
-.ref-bonus-label{min-height:44px;display:flex;align-items:center;gap:4px;font-size:.8em;white-space:nowrap;cursor:pointer;color:var(--txt)}
+.ref-bonus-label{min-height:44px;display:flex;align-items:center;gap:4px;font-size:.875em;white-space:nowrap;cursor:pointer;color:var(--txt)}
 .ref-bonus-label input[type=checkbox]{width:18px;height:18px;accent-color:var(--pri)}
 .bv-slot{padding:3px 6px;border:1px solid var(--brd);font-size:.72em;background:var(--surf2);color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:24px;line-height:18px}
 .bv-w{background:rgba(76,175,80,.2);font-weight:700;color:#66BB6A}
 .bv-bye{background:rgba(255,255,255,.03);color:var(--txt2);font-style:italic}
 body.light-mode .bv-bye{background:rgba(0,0,0,.03)}
-.bv-champ{padding:6px 8px;border:2px solid var(--ok);border-radius:8px;background:rgba(76,175,80,.1);text-align:center;font-weight:700;font-size:.85em;color:#66BB6A}
+.bv-champ{padding:6px 8px;border:2px solid var(--ok);border-radius:8px;background:rgba(76,175,80,.1);text-align:center;font-weight:700;font-size:.875em;color:#66BB6A}
 body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 .queue-card{padding:12px}
 .queue-tables{display:flex;flex-wrap:wrap;margin:0 -2px 8px}
-.queue-t{margin:2px;padding:4px 9px;border-radius:6px;font-size:.78em;font-weight:700;border:1px solid var(--brd)}
+.queue-t{margin:2px;padding:4px 9px;border-radius:6px;font-size:.875em;font-weight:700;border:1px solid var(--brd)}
 .queue-t.free{background:rgba(76,175,80,.2);color:var(--ok-txt);border-color:var(--ok)}
 .queue-t.busy{background:rgba(243,193,70,.18);color:var(--pri-lt);border-color:var(--pri)}
 .queue-next{background:var(--surf2);border-radius:10px;padding:10px 12px}
@@ -217,18 +219,18 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 .queue-big .qn-btn{min-height:60px;font-size:1.25em;margin-top:14px;width:100%}
 .tools-bar{display:flex;flex-wrap:wrap;margin:0 -4px 8px}
 .tools-bar button{margin:4px}
-.badge-out{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;font-size:.7em;font-weight:700;background:rgba(244,67,54,.2);color:#EF5350}
-.badge-away{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;font-size:.7em;font-weight:700;background:rgba(158,158,158,.3);color:var(--txt2)}
+.badge-out{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;font-size:.875em;font-weight:700;background:rgba(244,67,54,.2);color:#EF5350}
+.badge-away{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;font-size:.875em;font-weight:700;background:rgba(158,158,158,.3);color:var(--txt2)}
 .badge-away.dispense{background:rgba(255,143,0,.25);color:#FFB74D}
 body.light-mode .badge-away.dispense{color:#E65100}
 .ranking-table tr.row-away-dispense td{background:rgba(255,143,0,.22)!important}
 .ranking-table tr.row-away-absent td{background:rgba(158,158,158,.28)!important}
 .match-card.paused{opacity:.6;border-style:dashed}
-.match-pause-note{font-size:.85em;color:var(--txt2);padding:6px 2px}
+.match-pause-note{font-size:.875em;color:var(--txt2);padding:6px 2px}
 .btn-d{background:rgba(255,255,255,.1);border:2px solid transparent;color:var(--txt2);border-radius:50%;min-width:44px;min-height:44px;font-weight:700;cursor:pointer;margin-right:4px}
 .btn-d.on{background:#FF8F00;color:#fff}
 body.light-mode .badge-out{color:#C62828}
-.forfeit-note{font-size:.8em;color:var(--err-txt);font-weight:600;margin:2px 0 6px}
+.forfeit-note{font-size:.875em;color:var(--err-txt);font-weight:600;margin:2px 0 6px}
 .live-content{max-width:900px}
 .live-info{text-align:center;color:var(--txt2);font-size:.95em;margin-bottom:10px}
 .live-sides{display:flex;margin:0 -6px}
@@ -240,7 +242,7 @@ body.light-mode .badge-out{color:#C62828}
 .live-btn{display:block;width:100%;height:76px;margin-top:8px;border-radius:var(--rad);border:3px solid var(--brd);background:var(--surf2);color:var(--txt);font-size:2.8em;font-weight:800;cursor:pointer}
 .live-btn.plus{background:var(--ok);border-color:var(--ok);color:#fff}
 .live-btn:active{opacity:.7}
-.avatar{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-size:.8em;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
+.avatar{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-size:.875em;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
 .card.done{border-left-color:var(--ok)}
 .podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:12px 0 4px}
 .pstep{flex:1;max-width:200px;text-align:center}
@@ -260,7 +262,34 @@ body.light-mode .badge-out{color:#C62828}
 .live-actions .btn-primary{height:64px;font-size:1.3em}
 .live-ok{text-align:center;padding:30px 10px}
 .live-ok .big{font-size:2em;font-weight:800;margin:14px 0}
-@media(max-width:600px){.content{padding:12px}.match-row .pname{font-size:.85em}.set-col{width:46px}.set-col input[type=number]{width:42px;font-size:.9em}}
+
+.inp-err{border-color:var(--err)!important;box-shadow:0 0 0 3px rgba(230,77,76,.35)!important}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;font-size:.875em}
+.step{padding:4px 12px;border-radius:20px;border:1px solid var(--brd);color:var(--txt2);background:var(--surf)}
+.step.done{color:var(--ok-txt);border-color:var(--ok)}
+.step.cur{background:var(--pri);color:#000;border-color:var(--pri);font-weight:700}
+.match-table-badge{cursor:pointer}
+.danger-zone{margin-top:24px;padding-top:12px;border-top:1px dashed var(--brd);text-align:center}
+.pool-player[draggable=true]{cursor:grab}
+.pool-card.drag-over{outline:3px dashed var(--pri);outline-offset:2px}
+@media(hover:hover){
+.btn-primary:hover,.btn-success:hover,.match-validate:hover{filter:brightness(1.1)}
+.btn-secondary:hover{background:rgba(243,193,70,.18)}
+.btn-danger:hover{filter:brightness(1.12)}
+.btn-back:hover,.btn-d:hover{background:rgba(255,255,255,.28)}
+.btn-icon:hover{background:rgba(255,255,255,.15);border-radius:8px}
+.mode-card:hover,.family-btn:hover,.card[role=button]:hover,.player-item:hover,.pool-player:hover,.match-table-badge:hover{border-color:var(--pri)}
+.tab-btn:hover:not(.active),.lvl-btn:hover,.level-select button:hover,.stepper button:hover,.pool-nav button:hover{background:rgba(243,193,70,.2)}
+.toggle:hover{filter:brightness(1.15)}
+}
+@media(min-width:1000px){
+.content{max-width:1100px}
+#matches-list,#finals-list,#dist-pools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+#matches-list .match-card,#finals-list .match-card,#dist-pools .pool-card{margin-bottom:0}
+#finals-list>*:not(.match-card){grid-column:1/-1}
+.live-content,#scr-create .content,#scr-players .content,#scr-settings .content,#scr-admin .content{max-width:800px}
+}
+@media(max-width:600px){.content{padding:12px}.match-row .pname{font-size:.875em}.set-col{width:46px}.set-col input[type=number]{width:44px;font-size:1em}}
 </style>
 </head>
 <body>
@@ -269,7 +298,8 @@ body.light-mode .badge-out{color:#C62828}
 <section id="scr-home" class="screen active">
 <div class="top-bar">
 <div class="logo"><img src="icon_192.png" alt="" class="top-logo"><div>Match Manager EPS<span class="version-tag" id="home-version"></span></div></div>
-<button class="btn-icon" onclick="showScreen('scr-settings')" style="font-size:1.8em;color:#f3c146">&#9881;</button>
+<button class="btn-icon" onclick="showHelp()" aria-label="Aide" title="Aide" style="font-size:1.6em;color:#f3c146;font-weight:700">?</button>
+<button class="btn-icon" onclick="showScreen('scr-settings')" aria-label="Param&egrave;tres" title="Param&egrave;tres" style="font-size:1.8em;color:#f3c146">&#9881;</button>
 </div>
 <div class="content">
 <h2 style="margin-bottom:16px">Mes Tournois</h2>
@@ -295,32 +325,32 @@ body.light-mode .badge-out{color:#C62828}
 <div class="form-group"><label>Classe</label><input type="text" id="inp-tclass" placeholder="ex: 6B"></div>
 <div class="form-group"><label>Mode de jeu</label>
 <div class="mode-cards">
-<div class="mode-card selected" data-mode="1" onclick="selMode(1)">
-<h3>&#127937; Mode 1 - Poules de niveau</h3>
+<div class="mode-card selected" data-mode="1" role="button" tabindex="0" onclick="selMode(1)">
+<h3>&#127937; Poules par niveau</h3>
 <p>Poules ind&eacute;pendantes par niveau</p>
 <small>Chaque poule a son classement. Id&eacute;al pour diff&eacute;rencier les niveaux.</small>
 </div>
-<div class="mode-card" data-mode="2" onclick="selMode(2)">
-<h3>&#128256; Mode 2 - Poules + Tableau final</h3>
+<div class="mode-card" data-mode="2" role="button" tabindex="0" onclick="selMode(2)">
+<h3>&#128256; Poules puis finales</h3>
 <p>Phase de poules puis finales crois&eacute;es</p>
 <small>Les 1ers se rencontrent, les 2e aussi, etc. Classement g&eacute;n&eacute;ral.</small>
 </div>
-<div class="mode-card" data-mode="3" onclick="selMode(3)">
-<h3>&#127919; Mode 3 - Tableau &agrave; &eacute;limination</h3>
+<div class="mode-card" data-mode="3" role="button" tabindex="0" onclick="selMode(3)">
+<h3>&#127919; Élimination directe</h3>
 <p>Bracket + tableaux consolante</p>
 <small>T&ecirc;tes de s&eacute;rie + tableau des perdants pour classer tout le monde.</small>
 </div>
 </div></div>
-<div class="form-group"><label>Nombre de tables ou terrains disponibles</label>
-<div class="stepper"><button onclick="stepV('inp-tables',-1)">&minus;</button><input type="number" id="inp-tables" value="10" min="1" max="20"><button onclick="stepV('inp-tables',1)">+</button></div></div>
+<div class="form-group"><label>Nombre de tables ou terrains disponibles <small style="font-weight:400">(combien de matchs en m&ecirc;me temps)</small></label>
+<div class="stepper"><button onclick="stepV('inp-tables',-1)">&minus;</button><input type="number" inputmode="numeric" pattern="[0-9]*" id="inp-tables" value="10" min="1" max="20"><button onclick="stepV('inp-tables',1)">+</button></div></div>
 <div class="form-group"><label>Format de match</label>
 <div class="family-toggle" id="inp-family-toggle">
-<div class="family-btn selected" data-family="score" onclick="onFormatFamilyChange('inp','score')">&#127955; Match au score</div>
-<div class="family-btn" data-family="time" onclick="onFormatFamilyChange('inp','time')">&#9201; Match au temps</div>
+<div class="family-btn selected" data-family="score" role="button" tabindex="0" onclick="onFormatFamilyChange('inp','score')">&#127955; Match au score</div>
+<div class="family-btn" data-family="time" role="button" tabindex="0" onclick="onFormatFamilyChange('inp','time')">&#9201; Match au temps</div>
 </div>
 <div class="format-group" id="inp-format-score">
-<div class="form-group"><label>Manches gagnantes</label>
-<div class="stepper"><button onclick="stepV('inp-winningsets',-1)">&minus;</button><input type="number" id="inp-winningsets" value="1" min="1" max="2"><button onclick="stepV('inp-winningsets',1)">+</button></div></div>
+<div class="form-group"><label>Manches gagnantes <small style="font-weight:400">(1 = un seul set d&eacute;cisif ; 2 = le premier &agrave; gagner 2 sets)</small></label>
+<div class="stepper"><button onclick="stepV('inp-winningsets',-1)">&minus;</button><input type="number" inputmode="numeric" pattern="[0-9]*" id="inp-winningsets" value="1" min="1" max="2"><button onclick="stepV('inp-winningsets',1)">+</button></div></div>
 <div class="form-group"><label>Points par manche</label>
 <select id="inp-pointsperset"><option value="11">11 pts</option><option value="15">15 pts</option><option value="21">21 pts</option><option value="25">25 pts</option></select></div>
 </div>
@@ -328,11 +358,11 @@ body.light-mode .badge-out{color:#C62828}
 <div class="form-group"><label>Nombre de p&eacute;riodes</label>
 <select id="inp-nbperiods"><option value="1">1 (p&eacute;riode unique)</option><option value="2">2 (mi-temps)</option><option value="3">3 (tiers-temps)</option><option value="4">4 (quart-temps)</option></select></div>
 <div class="form-group"><label>Dur&eacute;e de chaque p&eacute;riode (min)</label>
-<div class="stepper"><button onclick="stepV('inp-perioddur',-1)">&minus;</button><input type="number" id="inp-perioddur" value="20" min="1" max="60"><button onclick="stepV('inp-perioddur',1)">+</button></div></div>
+<div class="stepper"><button onclick="stepV('inp-perioddur',-1)">&minus;</button><input type="number" inputmode="numeric" pattern="[0-9]*" id="inp-perioddur" value="20" min="1" max="60"><button onclick="stepV('inp-perioddur',1)">+</button></div></div>
 </div>
 </div>
-<div class="form-group"><label>Dur&eacute;e de la phase (min, 0 = illimit&eacute;)</label>
-<input type="number" id="inp-duration" value="0" min="0" max="180"></div>
+<div class="form-group"><label>Chronom&egrave;tre de la phase, en minutes <small style="font-weight:400">(laisser 0 si vous ne voulez pas de limite de temps)</small></label>
+<input type="number" inputmode="numeric" pattern="[0-9]*" id="inp-duration" value="0" min="0" max="180"></div>
 <button class="btn-primary" onclick="createTournament()">Cr&eacute;er le tournoi &rarr;</button>
 </div>
 </section>
@@ -347,7 +377,6 @@ body.light-mode .badge-out{color:#C62828}
 <div class="btn-group">
 <button class="btn-secondary btn-sm" onclick="showSaveListModal()">&#128190; Sauvegarder</button>
 <button class="btn-secondary btn-sm" onclick="showLoadListModal()">&#128194; Charger liste</button>
-<button class="btn-danger btn-sm" onclick="clearAllPlayers()">&#128465; Tout supprimer</button>
 </div>
 <div class="tab-bar" style="margin-bottom:12px">
 <button class="tab-btn active" onclick="setPlayerTab(0,this)">+ Un par un</button>
@@ -356,25 +385,26 @@ body.light-mode .badge-out{color:#C62828}
 </div>
 <div id="player-tab-0">
 <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;align-items:flex-start">
-<input type="text" id="inp-pname" placeholder="Nom du joueur" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')addPlayer()">
-<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="level-select" id="level-btns"></div><span style="font-size:.8em;color:var(--txt2)">Choix du niveau</span></div>
+<input type="text" id="inp-pname" enterkeyhint="done" autocomplete="off" placeholder="Nom du joueur" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')addPlayer()">
+<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="level-select" id="level-btns"></div><span style="font-size:.875em;color:var(--txt2)">Niveau (- = inconnu, 1 = d&eacute;butant, 5 = expert)</span></div>
 <button class="btn-success" onclick="addPlayer()">+ Ajouter</button>
 </div>
 </div>
 <div id="player-tab-1" style="display:none">
-<textarea id="inp-plist" placeholder="Un joueur par ligne :&#10;NOM Pr&eacute;nom&#10;NOM Pr&eacute;nom&#10;..." rows="8"></textarea>
+<textarea id="inp-plist" placeholder="Un joueur par ligne, niveau facultatif apr&egrave;s un point-virgule :&#10;DUPONT L&eacute;a;3&#10;MARTIN Tom&#10;..." rows="8"></textarea>
 <button class="btn-secondary" onclick="addFromList()" style="margin-top:8px;width:100%">Ajouter la liste</button>
 </div>
 <div id="player-tab-2" style="display:none">
-<div class="import-zone" onclick="document.getElementById('csv-file').click()">
+<div class="import-zone" role="button" tabindex="0" onclick="document.getElementById('csv-file').click()">
 <div style="font-size:2em;margin-bottom:8px">&#128196;</div>
 <p>Cliquer pour importer un fichier CSV</p>
-<small>Format : Nom;Niveau (niveau optionnel, 1-5)</small>
+<small>Un fichier .csv ou .txt, une ligne par joueur : Nom;Niveau (ex : DUPONT L&eacute;a;3). Le niveau, de 1 &agrave; 5, est facultatif.</small>
 <input type="file" id="csv-file" accept=".csv,.txt" onchange="importCSV(this)">
 </div>
 </div>
 <h3 style="margin:16px 0 8px" id="player-count">Joueurs inscrits (0)</h3>
 <div id="player-list"></div>
+<div id="player-clear" class="danger-zone" style="display:none"><button class="btn-danger btn-sm" onclick="clearAllPlayers()">&#128465; Supprimer tous les joueurs</button></div>
 <div id="player-empty" class="empty-state"><div class="icon">&#128101;</div><p>Aucun joueur inscrit pour le moment</p></div>
 <button class="btn-primary" onclick="goToConfig()" style="margin-top:20px">Continuer &rarr;</button>
 </div>
@@ -389,7 +419,7 @@ body.light-mode .badge-out{color:#C62828}
 <div class="content">
 <div class="card">
 <div class="form-group"><label>Nombre de poules</label>
-<div class="stepper"><button onclick="stepPools(-1)">&minus;</button><input type="number" id="inp-nbpools" value="2" min="1" max="12" onchange="updatePoolConfig()"><button onclick="stepPools(1)">+</button></div></div>
+<div class="stepper"><button onclick="stepPools(-1)">&minus;</button><input type="number" inputmode="numeric" pattern="[0-9]*" id="inp-nbpools" value="2" min="1" max="12" onchange="updatePoolConfig()"><button onclick="stepPools(1)">+</button></div></div>
 <div class="stat-row" id="pool-stats"></div>
 </div>
 <div id="pool-quali-section"></div>
@@ -410,6 +440,7 @@ body.light-mode .badge-out{color:#C62828}
 <button class="btn-secondary btn-sm" onclick="distRandom()">&#128256; M&eacute;langer</button>
 <button class="btn-secondary btn-sm" onclick="distManual()">&#9998; Manuel</button>
 </div>
+<div id="dist-help" class="info-box"></div>
 <div id="dist-pools"></div>
 <button class="btn-primary" onclick="validateDistribution()">Valider et g&eacute;n&eacute;rer les matchs &rarr;</button>
 </div>
@@ -534,27 +565,27 @@ body.light-mode .badge-out{color:#C62828}
 <div class="card">
 <h3>&#127912; Affichage</h3>
 <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-<div class="toggle" id="set-lightmode" onclick="toggleLightMode()"></div>
+<div class="toggle" id="set-lightmode" role="switch" tabindex="0" onclick="toggleLightMode()"></div>
 <span>&#9728;&#65039; Mode clair</span></div>
 </div>
 <div class="card">
 <h3>&#128266; Sons</h3>
 <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-<div class="toggle" id="set-sound" onclick="toggleSound()"></div>
+<div class="toggle" id="set-sound" role="switch" tabindex="0" onclick="toggleSound()"></div>
 <span>&#128276; Son &agrave; la validation d'un match</span></div>
-<p style="font-size:.85em;color:var(--txt2);margin-top:8px">D&eacute;sactiv&eacute; par d&eacute;faut. Un petit &laquo; ding &raquo; &agrave; chaque r&eacute;sultat valid&eacute;, une m&eacute;lodie plus longue &agrave; la fin du tournoi. La sonnerie du chronom&egrave;tre reste toujours active.</p>
+<p style="font-size:.875em;color:var(--txt2);margin-top:8px">D&eacute;sactiv&eacute; par d&eacute;faut. Un petit &laquo; ding &raquo; &agrave; chaque r&eacute;sultat valid&eacute;, une m&eacute;lodie plus longue &agrave; la fin du tournoi. La sonnerie du chronom&egrave;tre reste toujours active.</p>
 </div>
 <div class="card">
 <h3>&#128274; Acc&egrave;s professeur</h3>
-<p style="font-size:.85em;color:var(--txt2);margin:8px 0">Configuration du format de match, du syst&egrave;me de points, du bonus arbitre et des donn&eacute;es.</p>
+<p style="font-size:.875em;color:var(--txt2);margin:8px 0">Configuration du format de match, du syst&egrave;me de points, du bonus arbitre et des donn&eacute;es.</p>
 <button class="btn-secondary" onclick="openAdminAccess()" style="width:100%">&#128273; Configuration avanc&eacute;e</button>
 </div>
 <div class="card">
 <h3>&#10067; Aide</h3>
-<p style="font-size:.85em;color:var(--txt2);margin:8px 0">Guide d'utilisation de l'application</p>
+<p style="font-size:.875em;color:var(--txt2);margin:8px 0">Guide d'utilisation de l'application</p>
 <button class="btn-secondary" onclick="showHelp()" style="width:100%">Ouvrir l'aide</button>
 </div>
-<p style="text-align:center;color:var(--txt2);font-size:.85em;margin-top:20px" id="set-version"></p>
+<p style="text-align:center;color:var(--txt2);font-size:.875em;margin-top:20px" id="set-version"></p>
 </div>
 </section>
 
@@ -568,12 +599,12 @@ body.light-mode .badge-out{color:#C62828}
 <div class="card">
 <h3>Format de match par d&eacute;faut</h3>
 <div class="family-toggle" id="adm-family-toggle">
-<div class="family-btn selected" data-family="score" onclick="onFormatFamilyChange('adm','score')">&#127955; Match au score</div>
-<div class="family-btn" data-family="time" onclick="onFormatFamilyChange('adm','time')">&#9201; Match au temps</div>
+<div class="family-btn selected" data-family="score" role="button" tabindex="0" onclick="onFormatFamilyChange('adm','score')">&#127955; Match au score</div>
+<div class="family-btn" data-family="time" role="button" tabindex="0" onclick="onFormatFamilyChange('adm','time')">&#9201; Match au temps</div>
 </div>
 <div class="format-group" id="adm-format-score">
 <div class="form-group"><label>Manches gagnantes</label>
-<div class="stepper"><button onclick="stepV('adm-winningsets',-1)">&minus;</button><input type="number" id="adm-winningsets" value="1" min="1" max="2" onchange="saveSettings()"><button onclick="stepV('adm-winningsets',1)">+</button></div></div>
+<div class="stepper"><button onclick="stepV('adm-winningsets',-1)">&minus;</button><input type="number" inputmode="numeric" pattern="[0-9]*" id="adm-winningsets" value="1" min="1" max="2" onchange="saveSettings()"><button onclick="stepV('adm-winningsets',1)">+</button></div></div>
 <div class="form-group"><label>Points par manche</label>
 <select id="adm-pointsperset" onchange="saveSettings()"><option value="11">11 pts</option><option value="15">15 pts</option><option value="21">21 pts</option><option value="25">25 pts</option></select></div>
 </div>
@@ -581,43 +612,43 @@ body.light-mode .badge-out{color:#C62828}
 <div class="form-group"><label>Nombre de p&eacute;riodes</label>
 <select id="adm-nbperiods" onchange="saveSettings()"><option value="1">1 (p&eacute;riode unique)</option><option value="2">2 (mi-temps)</option><option value="3">3 (tiers-temps)</option><option value="4">4 (quart-temps)</option></select></div>
 <div class="form-group"><label>Dur&eacute;e de chaque p&eacute;riode (min)</label>
-<div class="stepper"><button onclick="stepV('adm-perioddur',-1)">&minus;</button><input type="number" id="adm-perioddur" value="20" min="1" max="60" onchange="saveSettings()"><button onclick="stepV('adm-perioddur',1)">+</button></div></div>
+<div class="stepper"><button onclick="stepV('adm-perioddur',-1)">&minus;</button><input type="number" inputmode="numeric" pattern="[0-9]*" id="adm-perioddur" value="20" min="1" max="60" onchange="saveSettings()"><button onclick="stepV('adm-perioddur',1)">+</button></div></div>
 </div>
 </div>
 <div class="card">
 <h3>Syst&egrave;me de points (poules)</h3>
 <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-<div class="form-group" style="flex:1;min-width:80px"><label>Victoire</label><input type="number" id="adm-winpts" value="3" min="0" max="10" onchange="saveSettings()"></div>
-<div class="form-group" style="flex:1;min-width:80px"><label>D&eacute;faite manche d&eacute;cisive</label><input type="number" id="adm-lose3pts" value="2" min="0" max="10" onchange="saveSettings()"></div>
-<div class="form-group" style="flex:1;min-width:80px"><label>D&eacute;faite</label><input type="number" id="adm-losepts" value="1" min="0" max="10" onchange="saveSettings()"></div>
-<div class="form-group" style="flex:1;min-width:80px"><label>Match nul</label><input type="number" id="adm-drawpts" value="1" min="0" max="10" onchange="saveSettings()"></div>
+<div class="form-group" style="flex:1;min-width:80px"><label>Victoire</label><input type="number" inputmode="numeric" pattern="[0-9]*" id="adm-winpts" value="3" min="0" max="10" onchange="saveSettings()"></div>
+<div class="form-group" style="flex:1;min-width:80px"><label>D&eacute;faite manche d&eacute;cisive</label><input type="number" inputmode="numeric" pattern="[0-9]*" id="adm-lose3pts" value="2" min="0" max="10" onchange="saveSettings()"></div>
+<div class="form-group" style="flex:1;min-width:80px"><label>D&eacute;faite</label><input type="number" inputmode="numeric" pattern="[0-9]*" id="adm-losepts" value="1" min="0" max="10" onchange="saveSettings()"></div>
+<div class="form-group" style="flex:1;min-width:80px"><label>Match nul</label><input type="number" inputmode="numeric" pattern="[0-9]*" id="adm-drawpts" value="1" min="0" max="10" onchange="saveSettings()"></div>
 </div>
-<p style="font-size:.8em;color:var(--txt2);margin-top:6px">&#9432; D&eacute;faite manche d&eacute;cisive = d&eacute;faite au tie-break en 2 manches gagnantes (1-1). Match nul = uniquement pour les matchs au temps.</p>
+<p style="font-size:.875em;color:var(--txt2);margin-top:6px">&#9432; D&eacute;faite manche d&eacute;cisive = d&eacute;faite au tie-break en 2 manches gagnantes (1-1). Match nul = uniquement pour les matchs au temps.</p>
 </div>
 <div class="card">
 <h3>&#129309; D&eacute;partage</h3>
 <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-<div class="toggle" id="adm-h2h" onclick="toggleH2H()"></div>
+<div class="toggle" id="adm-h2h" role="switch" tabindex="0" onclick="toggleH2H()"></div>
 <span>Confrontation directe avant la diff&eacute;rence de points</span></div>
-<p style="font-size:.8em;color:var(--txt2);margin-top:6px">&#9432; S'applique aux nouveaux tournois (poules). &Agrave; &eacute;galit&eacute; de points : r&eacute;sultat entre les joueurs &agrave; &eacute;galit&eacute;, puis diff&eacute;rence de points, puis points marqu&eacute;s.</p>
+<p style="font-size:.875em;color:var(--txt2);margin-top:6px">&#9432; S'applique aux nouveaux tournois (poules). &Agrave; &eacute;galit&eacute; de points : r&eacute;sultat entre les joueurs &agrave; &eacute;galit&eacute;, puis diff&eacute;rence de points, puis points marqu&eacute;s.</p>
 </div>
 <div class="card">
 <h3>&#9989; Bonus arbitre</h3>
 <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-<div class="toggle" id="adm-refbonus" onclick="toggleRefBonus()"></div>
+<div class="toggle" id="adm-refbonus" role="switch" tabindex="0" onclick="toggleRefBonus()"></div>
 <span>Attribuer un bonus &agrave; l'arbitre</span></div>
 <div style="margin-top:8px"><div class="form-group"><label>Points bonus arbitre</label>
-<input type="number" id="adm-refbonuspts" value="1" min="0" max="5" onchange="saveSettings()"></div></div>
+<input type="number" inputmode="numeric" pattern="[0-9]*" id="adm-refbonuspts" value="1" min="0" max="5" onchange="saveSettings()"></div></div>
 </div>
 <div class="card">
 <h3>&#128273; Mot de passe personnalis&eacute; (optionnel)</h3>
-<p style="font-size:.85em;color:var(--txt2);margin:8px 0">Cet acc&egrave;s est prot&eacute;g&eacute; par le mot de passe par d&eacute;faut (voir le guide professeur). Vous pouvez d&eacute;finir ici un mot de passe qui vous est propre - une fois personnalis&eacute;, le mot de passe par d&eacute;faut ne fonctionne plus directement (pour emp&ecirc;cher un &eacute;l&egrave;ve qui le conna&icirc;trait de contourner votre mot de passe). En cas d'oubli, 3 tentatives incorrectes sur l'&eacute;cran de connexion font appara&icirc;tre un bouton pour r&eacute;initialiser au mot de passe par d&eacute;faut.</p>
+<p style="font-size:.875em;color:var(--txt2);margin:8px 0">Cet acc&egrave;s est prot&eacute;g&eacute; par le mot de passe par d&eacute;faut (voir le guide professeur). Vous pouvez d&eacute;finir ici un mot de passe qui vous est propre - une fois personnalis&eacute;, le mot de passe par d&eacute;faut ne fonctionne plus directement (pour emp&ecirc;cher un &eacute;l&egrave;ve qui le conna&icirc;trait de contourner votre mot de passe). En cas d'oubli, 3 tentatives incorrectes sur l'&eacute;cran de connexion font appara&icirc;tre un bouton pour r&eacute;initialiser au mot de passe par d&eacute;faut.</p>
 <div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="adm-nouveau-mdp" placeholder="Laisser vide pour ne rien changer" autocomplete="off"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap">
 <button type="button" class="btn-secondary" onclick="definirMdpAdmin()">&#128190; Enregistrer ce mot de passe</button>
 <button type="button" class="btn-secondary" onclick="supprimerMdpAdmin()">&#128260; Revenir au mot de passe par d&eacute;faut</button>
 </div>
-<p id="adm-mdp-message" style="display:none;margin-top:8px;color:var(--ok-txt);font-size:.85em"></p>
+<p id="adm-mdp-message" style="display:none;margin-top:8px;color:var(--ok-txt);font-size:.875em"></p>
 </div>
 <div class="card">
 <h3>&#128465; Donn&eacute;es</h3>
@@ -646,7 +677,28 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.6.3';
+const APP_VERSION='2.7.0';
+/* Accessibilite clavier (PC/Mac) et saisie : Entree/Espace activent un element role=button|switch, Echap ferme une modale, un champ numerique se selectionne au focus */
+document.addEventListener('keydown',function(e){
+const t=e.target;
+if((e.key==='Enter'||e.key===' ')&&t&&t.getAttribute&&(t.getAttribute('role')==='button'||t.getAttribute('role')==='switch')&&t===e.target){e.preventDefault();t.click();return;}
+if(e.key==='Tab'){const mo=document.querySelector('#modal-container .modal, #modal-container [style*="fixed"] > div');if(mo){const f=mo.querySelectorAll('button,input,select,textarea,[tabindex="0"]');if(f.length){const a=f[0],z=f[f.length-1];if(!mo.contains(document.activeElement)){e.preventDefault();a.focus();}else if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();}}}}
+if(e.key==='Escape'){const mc=document.getElementById('modal-container');if(mc&&mc.firstElementChild){modalCb=null;closeModal();}}
+});
+function badField(ids,msg){
+ids=[].concat(ids);let first=null;
+ids.forEach(function(id){const el=document.getElementById(id);if(el){el.classList.add('inp-err');if(!first)first=el;}});
+if(first){try{first.focus();}catch(x){}}
+toast(msg,4500);
+}
+document.addEventListener('input',function(e){if(e.target&&e.target.classList)e.target.classList.remove('inp-err');});
+var dragPid=null;
+document.addEventListener('dragstart',function(e){const el=e.target.closest&&e.target.closest('.pool-player[data-pid]');if(!el)return;dragPid=el.getAttribute('data-pid');try{e.dataTransfer.setData('text/plain',dragPid);e.dataTransfer.effectAllowed='move';}catch(x){}});
+document.addEventListener('dragover',function(e){const c=e.target.closest&&e.target.closest('.pool-card[data-pool]');if(c&&dragPid){e.preventDefault();c.classList.add('drag-over');}});
+document.addEventListener('dragleave',function(e){const c=e.target.closest&&e.target.closest('.pool-card[data-pool]');if(c)c.classList.remove('drag-over');});
+document.addEventListener('drop',function(e){const c=e.target.closest&&e.target.closest('.pool-card[data-pool]');if(!c||!dragPid)return;e.preventDefault();selectedPlayerForMove=dragPid;dragPid=null;moveToPool(c.getAttribute('data-pool'));});
+document.addEventListener('dragend',function(){dragPid=null;document.querySelectorAll('.drag-over').forEach(function(x){x.classList.remove('drag-over');});});
+document.addEventListener('focusin',function(e){const t=e.target;if(t&&t.tagName==='INPUT'&&t.type==='number'){try{t.select();}catch(x){}if(t.scrollIntoView)setTimeout(function(){try{t.scrollIntoView({block:'center'});}catch(x){}},300);}});
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const SOUND_KEY='mmeps_sound';
 const LS_BACKUP_KEY='teneps_data_illisible';
@@ -767,10 +819,28 @@ document.addEventListener('input',onMatchFieldEdit);
 document.addEventListener('change',onMatchFieldEdit);
 
 /* ===== NAVIGATION ===== */
+function stepsFor(id){
+if(!T)return null;
+const m3=T.mode===3,m2=T.mode===2;
+const labels=m3?['Joueurs','Tableau','Classement']:m2?['Joueurs','Poules','R\u00e9partition','Matchs','Finales','Classement']:['Joueurs','Poules','R\u00e9partition','Matchs','Classement'];
+const idx=m3?{'scr-players':0,'scr-bracket':1,'scr-rankings':2}:m2?{'scr-players':0,'scr-pool-config':1,'scr-distribution':2,'scr-matches':3,'scr-finals':4,'scr-rankings':5}:{'scr-players':0,'scr-pool-config':1,'scr-distribution':2,'scr-matches':3,'scr-rankings':4};
+if(idx[id]===undefined)return null;
+return {labels:labels,cur:idx[id]};
+}
+function renderSteps(id){
+const sc=document.getElementById(id);if(!sc)return;
+const c=sc.querySelector('.content');if(!c)return;
+let el=c.querySelector(':scope > .steps');
+const st=stepsFor(id);
+if(!st){if(el)el.remove();return;}
+if(!el){el=document.createElement('div');el.className='steps';el.setAttribute('aria-label','Etapes du tournoi');c.insertBefore(el,c.firstChild);}
+el.innerHTML=st.labels.map(function(l,i){return '<span class="step'+(i<st.cur?' done':i===st.cur?' cur':'')+'">'+(i<st.cur?'\u2713 ':(i+1)+'. ')+l+'</span>';}).join('');
+}
 function showScreen(id){
 document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 window.scrollTo(0,0);
+renderSteps(id);
 if(id==='scr-home')renderHome();
 if(id==='scr-players')renderPlayers();
 if(id==='scr-pool-config')updatePoolConfig();
@@ -837,7 +907,7 @@ function toast(msg,ms){const d=document.createElement('div');d.className='toast'
 /* ===== HOME ===== */
 function renderHome(){
 const el=document.getElementById('tournament-list');
-if(!state.tournaments.length){el.innerHTML='<div class="empty-state"><div class="icon"><img src="icon_192.png" alt="" class="empty-logo"></div><p>Aucun tournoi. Cr\u00e9ez-en un !</p></div>';return;}
+if(!state.tournaments.length){el.innerHTML='<div class="empty-state"><div class="icon"><img src="icon_192.png" alt="" class="empty-logo"></div><h3 style="color:var(--txt);margin-bottom:10px">Bienvenue !</h3><p style="margin-bottom:12px">Pour organiser un tournoi en 3 \u00e9tapes :</p><ol style="text-align:left;display:inline-block;line-height:1.8"><li>Touchez <b>+ Nouveau tournoi</b> ci-dessous</li><li>Ajoutez vos joueurs (un par un ou en liste)</li><li>Lancez les matchs et saisissez les scores</li></ol><p style="margin-top:12px"><button class="btn-secondary btn-sm" onclick="showHelp()">&#10067; Ouvrir l\'aide</button></p></div>';return;}
 el.innerHTML=state.tournaments.map(t=>{
 const modeNames={1:'Poules de niveau',2:'Poules + Finales',3:'Tableau \u00e9limination'};
 const phaseNames={players:'Inscription',pools:'Configuration',matches:'Matchs en cours',finals:'Finales',bracket:'Bracket',done:'Termin\u00e9'};
@@ -845,15 +915,15 @@ let fin=false;
 try{fin=withTournament(t,()=>tournamentOrder().finished);}catch(e){}
 const total=t.matches.length,nbDone=t.matches.filter(m=>m.status==='done').length;
 const pct=total?Math.round(100*nbDone/total):0;
-const prog=total?`<div style="display:flex;justify-content:space-between;font-size:.8em;color:var(--txt2);margin-top:10px"><span>${nbDone}/${total} matchs</span><span>${pct}%</span></div>
+const prog=total?`<div style="display:flex;justify-content:space-between;font-size:.875em;color:var(--txt2);margin-top:10px"><span>${nbDone}/${total} matchs</span><span>${pct}%</span></div>
 <div class="progress-bar" style="margin:4px 0 0"><div class="progress-fill" style="width:${pct}%"></div></div>`:'';
 const go=fin?`<button class="btn-primary btn-sm" style="width:auto;margin-top:12px" onclick="event.stopPropagation();openResults('${t.id}')">&#127941; Voir le podium</button>`
 :`<button class="btn-primary btn-sm" style="width:auto;margin-top:12px" onclick="event.stopPropagation();openTournament('${t.id}')">&#9654; Reprendre</button>`;
-return`<div class="card${fin?' done':''}" style="cursor:pointer" onclick="openTournament('${t.id}')">
+return`<div class="card${fin?' done':''}" role="button" tabindex="0" style="cursor:pointer" onclick="openTournament('${t.id}')">
 <div style="display:flex;justify-content:space-between;align-items:start">
 <div><h3 style="color:var(--pri-lt)">&#127942; ${escH(t.name)}</h3>
-<p style="font-size:.85em;color:var(--txt2)">&#128197; ${escH(t.date)} - ${escH(t.classe||'')}</p>
-<p style="font-size:.85em">${t.players.length} joueurs &bull; Mode ${t.mode}</p>
+<p style="font-size:.875em;color:var(--txt2)">&#128197; ${escH(t.date)} - ${escH(t.classe||'')}</p>
+<p style="font-size:.875em">${t.players.length} joueurs</p>
 <span class="badge badge-orange">${modeNames[t.mode]}</span>
 ${fin?'<span class="badge badge-green">&#127941; Termin&eacute;</span>':'<span class="badge badge-blue">'+(phaseNames[t.phase]||t.phase)+'</span>'}</div>
 <button class="btn-danger btn-sm" onclick="event.stopPropagation();delTournament('${t.id}')">&#128465;</button>
@@ -923,7 +993,7 @@ document.getElementById(prefix+'-perioddur').value=settings.periodDuration||20;
 
 function createTournament(){
 const name=document.getElementById('inp-tname').value.trim();
-if(!name){toast('Entrez un nom de tournoi');return;}
+if(!name){badField('inp-tname','Entrez un nom de tournoi (ex : Tournoi 6B)');return;}
 T={id:uid(),name,classe:document.getElementById('inp-tclass').value.trim(),
 date:new Date().toLocaleDateString('fr-FR'),mode:selModeVal,
 settings:{tables:+document.getElementById('inp-tables').value||10,
@@ -971,10 +1041,10 @@ return 0;
 function addPlayer(){
 const inp=document.getElementById('inp-pname');
 const name=inp.value.trim().toUpperCase();
-if(!name){toast('Entrez un nom');return;}
+if(!name){badField('inp-pname','Entrez le nom du joueur');return;}
 const level=getSelectedLevel();
 T.players.push({id:uid(),name,level});
-save();inp.value='';renderPlayerList();
+save();inp.value='';renderPlayerList();inp.focus();
 if(navigator.vibrate)navigator.vibrate(30);
 }
 
@@ -1029,9 +1099,10 @@ function renderPlayerList(){
 const el=document.getElementById('player-list');
 const empty=document.getElementById('player-empty');
 document.getElementById('player-count').textContent='Joueurs inscrits ('+T.players.length+')';
+const clr=document.getElementById('player-clear');if(clr)clr.style.display=T.players.length?'':'none';
 if(!T.players.length){el.innerHTML='';empty.style.display='';return;}
 empty.style.display='none';
-el.innerHTML=T.players.map((p,i)=>`<div class="player-item" onclick="toggleLevelEditor('${p.id}',event)">
+el.innerHTML=T.players.map((p,i)=>`<div class="player-item" role="button" tabindex="0" onclick="toggleLevelEditor('${p.id}',event)">
 <div class="num">${i+1}</div><div class="name">${escH(p.name)}${p.away==='dispense'?'<span class="badge-away dispense">Dispens\u00e9</span>':''}</div>
 <div class="level-trophies">${trophyHtml(p.level)}</div>
 <button class="btn-d${p.away==='dispense'?' on':''}" title="Dispens\u00e9 : ne joue pas, arbitre" onclick="event.stopPropagation();togglePlayerDispense('${p.id}')">D</button>
@@ -1065,7 +1136,7 @@ else{showScreen('scr-home');}
 }
 
 function goToConfig(){
-if(T.players.length<2){toast('Ajoutez au moins 2 joueurs');return;}
+if(T.players.length<2){toast('Ajoutez au moins 2 joueurs pour continuer',4000);const pn=document.getElementById('inp-pname');if(pn)pn.focus();return;}
 if(T.mode===3){
 T.phase='bracket';save();
 generateBracket();
@@ -1082,8 +1153,8 @@ if(!T||!T.players.length){toast('Aucun joueur \u00e0 sauvegarder');return;}
 let html='<div class="form-group"><label>Nom de la liste</label><input type="text" id="save-list-name" placeholder="ex: 6B - Groupe 1"></div>';
 if(state.savedLists.length){
 html+='<div class="section-title" style="font-size:.9em">Listes existantes</div>';
-html+=state.savedLists.map((l,i)=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid var(--brd)" onclick="document.getElementById(\'save-list-name\').value=\''+escH(escJs(l.name))+'\'"><span style="font-weight:500">'+escH(l.name)+'</span><span style="color:var(--txt2);font-size:.85em">'+l.players.length+' joueurs</span></div>').join('');
-html+='<p style="font-size:.8em;color:var(--txt2);margin-top:6px">Cliquez sur un nom pour le remplacer</p>';
+html+=state.savedLists.map((l,i)=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid var(--brd)" onclick="document.getElementById(\'save-list-name\').value=\''+escH(escJs(l.name))+'\'"><span style="font-weight:500">'+escH(l.name)+'</span><span style="color:var(--txt2);font-size:.875em">'+l.players.length+' joueurs</span></div>').join('');
+html+='<p style="font-size:.875em;color:var(--txt2);margin-top:6px">Cliquez sur un nom pour le remplacer</p>';
 }
 html+='<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" style="width:auto" onclick="doSaveList()">Sauvegarder ('+T.players.length+' joueurs)</button></div>';
 showModal('Sauvegarder la liste',html);
@@ -1106,7 +1177,7 @@ save();closeModal();
 
 function showLoadListModal(){
 if(!state.savedLists.length){toast('Aucune liste sauvegard\u00e9e');return;}
-let html=state.savedLists.map((l,i)=>'<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between"><div><strong>'+escH(l.name)+'</strong><br><span style="font-size:.85em;color:var(--txt2)">'+l.players.length+' joueur(s)</span></div><button class="btn-danger btn-sm" onclick="deleteSavedList('+i+')" title="Supprimer">&times;</button></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-primary" style="flex:1;padding:10px" onclick="loadSavedList('+i+',true)">Charger (remplacer)</button><button class="btn-secondary" style="flex:1;padding:10px" onclick="loadSavedList('+i+',false)">Ajouter aux joueurs</button></div></div>').join('');
+let html=state.savedLists.map((l,i)=>'<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between"><div><strong>'+escH(l.name)+'</strong><br><span style="font-size:.875em;color:var(--txt2)">'+l.players.length+' joueur(s)</span></div><button class="btn-danger btn-sm" onclick="deleteSavedList('+i+')" title="Supprimer">&times;</button></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-primary" style="flex:1;padding:10px" onclick="loadSavedList('+i+',true)">Charger (remplacer)</button><button class="btn-secondary" style="flex:1;padding:10px" onclick="loadSavedList('+i+',false)">Ajouter aux joueurs</button></div></div>').join('');
 html+='<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Fermer</button></div>';
 showModal('Charger une liste',html);
 }
@@ -1154,9 +1225,9 @@ for(let i=0;i<nb;i++){
 html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
 <span style="font-weight:600;min-width:80px">Poule ${i+1}</span>
 <div class="stepper"><button onclick="adjPoolSize(${i},-1)">&minus;</button>
-<input type="number" id="psize-${i}" value="${T.poolSizes[i]}" min="2" max="${total}" onchange="setPoolSize(${i},+this.value)">
+<input type="number" inputmode="numeric" pattern="[0-9]*" id="psize-${i}" value="${T.poolSizes[i]}" min="2" max="${total}" onchange="setPoolSize(${i},+this.value)">
 <button onclick="adjPoolSize(${i},1)">+</button></div>
-<span style="color:var(--txt2);font-size:.85em">joueurs</span></div>`;
+<span style="color:var(--txt2);font-size:.875em">joueurs</span></div>`;
 }
 // Arbitrage : joueurs de la poule ou tous les joueurs (seulement s'il y a plusieurs poules)
 if(nb>1){
@@ -1164,7 +1235,7 @@ const rs=T.settings.refScope==='pool'?'pool':'all';
 html+='<div class="section-title">&#9999; Arbitres</div><div style="display:flex;gap:8px;margin-bottom:6px">'+
 '<button class="family-btn'+(rs==='pool'?' selected':'')+'" onclick="setRefScope(\'pool\')">Joueurs de la poule</button>'+
 '<button class="family-btn'+(rs==='all'?' selected':'')+'" onclick="setRefScope(\'all\')">Tous les joueurs</button></div>'+
-'<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">&#9432; Pour les matchs de poule, la liste des arbitres ne propose que les joueurs libres de la poule, ou de toutes les poules.</p>';
+'<p style="font-size:.875em;color:var(--txt2);margin-bottom:12px">&#9432; Pour les matchs de poule, la liste des arbitres ne propose que les joueurs libres de la poule, ou de toutes les poules.</p>';
 }
 // Tables par poule
 const nbTables=T.settings.tables||10;
@@ -1179,7 +1250,7 @@ T.poolTables.push(arr);
 }
 save();
 }
-html+='<div class="section-title">&#127993; Tables par poule <span style="font-size:.78em;color:var(--txt2)">('+nbTables+' tables)</span></div>';
+html+='<div class="section-title">&#127993; Tables par poule <span style="font-size:.875em;color:var(--txt2)">('+nbTables+' tables)</span></div>';
 for(let i=0;i<nb;i++){
 html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
 <span style="font-weight:600;min-width:80px">Poule ${i+1}</span>
@@ -1192,14 +1263,14 @@ for(let i=0;i<nb;i++){
 html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
 <span style="font-weight:600;min-width:80px">Poule ${i+1}</span>
 <div class="stepper"><button onclick="stepV('quali-${i}',-1)">&minus;</button>
-<input type="number" id="quali-${i}" value="2" min="1" max="${T.poolSizes[i]}">
+<input type="number" inputmode="numeric" pattern="[0-9]*" id="quali-${i}" value="2" min="1" max="${T.poolSizes[i]}">
 <button onclick="stepV('quali-${i}',1)">+</button></div>
-<span style="color:var(--txt2);font-size:.85em">/ ${T.poolSizes[i]}</span></div>`;
+<span style="color:var(--txt2);font-size:.875em">/ ${T.poolSizes[i]}</span></div>`;
 }}
 document.getElementById('pool-quali-section').innerHTML=html;
 document.getElementById('pool-config-info').innerHTML=T.mode===1?
-'Mode 1 : chaque poule est un mini-championnat ind\u00e9pendant. R\u00e9partissez par niveau.':
-'Mode 2 : les qualifi\u00e9s de chaque poule se retrouveront en tableau final.';
+'Poules par niveau : chaque poule est un mini-championnat ind\u00e9pendant. R\u00e9partissez par niveau.':
+'Poules puis finales : les qualifi\u00e9s de chaque poule se retrouveront en tableau final.';
 }
 
 function setRefScope(v){
@@ -1314,14 +1385,16 @@ const POOL_COLORS=[['#1565C0','#42A5F5'],['#00897B','#4DB6AC'],['#F57C00','#FFB7
 
 function renderDistribution(){
 const el=document.getElementById('dist-pools');
+const dh=document.getElementById('dist-help');
+if(dh){const sp=selectedPlayerForMove&&T.players.find(x=>x.id===selectedPlayerForMove);dh.innerHTML=sp?'&#128071; <b>'+escH(sp.name)+'</b> est s\u00e9lectionn\u00e9 : touchez la poule de destination (ou touchez-le \u00e0 nouveau pour annuler).':'Pour changer un joueur de poule : <b>touchez le joueur</b>, puis <b>la poule de destination</b> (sur ordinateur, vous pouvez aussi le glisser-d\u00e9poser).';}
 el.innerHTML=T.pools.map((pool,pi)=>{
 const col=POOL_COLORS[pi%POOL_COLORS.length];
 const players=pool.playerIds.map(id=>T.players.find(p=>p.id===id)).filter(Boolean);
-return`<div class="pool-card">
-<div class="pool-header" style="background:linear-gradient(135deg,${col[0]},${col[1]});cursor:pointer" onclick="moveToPool('${pool.id}')">
+return`<div class="pool-card" data-pool="${pool.id}">
+<div class="pool-header" style="background:linear-gradient(135deg,${col[0]},${col[1]});cursor:pointer" role="button" tabindex="0" onclick="moveToPool('${pool.id}')">
 <span>&#127937; ${escH(pool.name)}</span><span class="badge" style="background:rgba(255,255,255,.3);color:#fff">${players.length} joueurs</span>
-${selectedPlayerForMove?'<span style="font-size:.8em;opacity:.8">&#128071; D\u00e9poser ici</span>':''}
-</div><div class="pool-body">${players.map((p,i)=>`<div class="pool-player${selectedPlayerForMove===p.id?' selected':''}" onclick="selectPlayerForMove('${p.id}',event)" style="cursor:pointer"><div class="seed">${i+1}</div><span>${escH(p.name)}</span>${p.level?'<span class="chip" style="background:rgba(77,176,250,.2);color:#4DB0FA">Niv.'+p.level+'</span>':''}</div>`).join('')}
+${selectedPlayerForMove?'<span style="font-size:.875em;opacity:.8">&#128071; D\u00e9poser ici</span>':''}
+</div><div class="pool-body">${players.map((p,i)=>`<div class="pool-player${selectedPlayerForMove===p.id?' selected':''}" draggable="true" data-pid="${p.id}" role="button" tabindex="0" onclick="selectPlayerForMove('${p.id}',event)" style="cursor:pointer"><div class="seed">${i+1}</div><span>${escH(p.name)}</span>${p.level?'<span class="chip" style="background:rgba(77,176,250,.2);color:#4DB0FA">Niv.'+p.level+'</span>':''}</div>`).join('')}
 ${!players.length?'<p style="padding:12px;color:var(--txt2);text-align:center">Touchez un joueur puis cette poule</p>':''}
 </div></div>`;
 }).join('');
@@ -1441,7 +1514,7 @@ const paused=matches.filter(isWaitingMatch).length;
 document.getElementById('matches-progress').innerHTML=`
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
 <span style="font-weight:600">${done}/${total} termin\u00e9s${playing?' - <span style="color:var(--accent-txt)">'+playing+' en cours</span>':''}${paused?' - <span style="color:var(--txt2)">\u23f8 '+paused+' en pause</span>':''}</span>
-<span style="color:var(--txt2);font-size:.85em">${total?Math.round(100*done/total):0}%</span></div>
+<span style="color:var(--txt2);font-size:.875em">${total?Math.round(100*done/total):0}%</span></div>
 <div class="progress-bar"><div class="progress-fill" style="width:${total?100*done/total:0}%"></div></div>`;
 
 // Next phase button
@@ -1512,9 +1585,9 @@ const waiting=isWaitingMatch(m);
 const dis=(isDone||waiting)?'disabled':'';
 const isPlaying=m.status==='playing';
 const statusLabel=waiting?'\u23f8 En pause':isDone?'\u2705 Termin\u00e9':isPlaying?'\u{1F3D3} En cours':'\u23f3 En attente';
-const tableBadge=m.table?`<span class="match-table-badge" onclick="editMatchTable('${m.id}',event)" title="Modifier la table">T${m.table}</span>`:`<span class="match-table-badge" onclick="editMatchTable('${m.id}',event)" title="Attribuer une table" style="opacity:.5;border-style:dashed">T?</span>`;
+const tableBadge=m.table?`<span class="match-table-badge" role="button" tabindex="0" onclick="editMatchTable('${m.id}',event)" title="Modifier la table">Table ${m.table} &#9998;</span>`:`<span class="match-table-badge" role="button" tabindex="0" onclick="editMatchTable('${m.id}',event)" title="Attribuer une table" style="opacity:.75;border-style:dashed">Table ? &#9998;</span>`;
 const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
-const refSelectHtml='<select class="ref-input" id="ref-'+m.id+'" '+dis+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.85em">'+refOptionsHtml(m)+'</select>';
+const refSelectHtml='<select class="ref-input" aria-label="Arbitre du match" id="ref-'+m.id+'" '+dis+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.875em">'+refOptionsHtml(m)+'</select>';
 const actionsHtml=waiting?(involvesExcluded(m)?'<div class="match-pause-note">\u23f8 Exclu du classement (cl\u00f4ture sans '+escH(waitingWho(m))+').</div>':'<div class="match-pause-note">\u23f8 En attente : '+escH(waitingWho(m))+'. Le match reprend quand le joueur est r\u00e9tabli (bouton Joueurs).</div>'):`<div class="match-actions">
 ${refSelectHtml}
 <label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${(isDone?m.refBonus:draftValue('refbonus-'+m.id,m.refBonus))?'checked':''} ${dis}>+1 pt arb.</label>
@@ -1531,9 +1604,9 @@ return`<div class="match-card ${m.status}${waiting?' paused':''}" id="mc-${m.id}
 <span class="match-status ${m.status}">${statusLabel}</span></div>
 ${m.forfeit?forfeitNote(m):''}
 <div class="match-row"><span class="pname"${w1?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p1)}${escH(p1.name)}</span>
-<input type="number" id="s1-${m.id}" value="${s1}" min="0" max="99" class="${w1?'winner':w2?'loser':''}" ${dis}></div>
+<input type="number" inputmode="numeric" pattern="[0-9]*" id="s1-${m.id}" value="${s1}" min="0" max="99" class="${w1?'winner':w2?'loser':''}" ${dis}></div>
 <div class="match-row"><span class="pname"${w2?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p2)}${escH(p2.name)}</span>
-<input type="number" id="s2-${m.id}" value="${s2}" min="0" max="99" class="${w2?'winner':w1?'loser':''}" ${dis}></div>
+<input type="number" inputmode="numeric" pattern="[0-9]*" id="s2-${m.id}" value="${s2}" min="0" max="99" class="${w2?'winner':w1?'loser':''}" ${dis}></div>
 ${T.settings.matchFamily==='time'?renderMatchTimerWidget(m):''}
 ${actionsHtml}</div>`;
 }
@@ -1556,13 +1629,13 @@ ${m.forfeit?forfeitNote(m):''}
 <div class="set-scores">
 <div class="set-header"><div class="pname-col"></div><div class="set-col">S1</div><div class="set-col">S2</div><div class="set-col set3-${m.id}" style="${s3d}">S3</div></div>
 <div class="set-row"><div class="pname-col"${isW1?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p1)}${escH(p1.name)}</div>
-<div class="set-col"><input type="number" id="s1a-${m.id}" value="${sets[0].s1}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
-<div class="set-col"><input type="number" id="s2a-${m.id}" value="${sets[1].s1}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
-<div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3a-${m.id}" value="${sets[2]?sets[2].s1:''}" min="0" max="99" ${dis}></div></div>
+<div class="set-col"><input type="number" inputmode="numeric" pattern="[0-9]*" id="s1a-${m.id}" value="${sets[0].s1}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col"><input type="number" inputmode="numeric" pattern="[0-9]*" id="s2a-${m.id}" value="${sets[1].s1}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col set3-${m.id}" style="${s3d}"><input type="number" inputmode="numeric" pattern="[0-9]*" id="s3a-${m.id}" value="${sets[2]?sets[2].s1:''}" min="0" max="99" ${dis}></div></div>
 <div class="set-row"><div class="pname-col"${isW2?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p2)}${escH(p2.name)}</div>
-<div class="set-col"><input type="number" id="s1b-${m.id}" value="${sets[0].s2}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
-<div class="set-col"><input type="number" id="s2b-${m.id}" value="${sets[1].s2}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
-<div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3b-${m.id}" value="${sets[2]?sets[2].s2:''}" min="0" max="99" ${dis}></div></div>
+<div class="set-col"><input type="number" inputmode="numeric" pattern="[0-9]*" id="s1b-${m.id}" value="${sets[0].s2}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col"><input type="number" inputmode="numeric" pattern="[0-9]*" id="s2b-${m.id}" value="${sets[1].s2}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col set3-${m.id}" style="${s3d}"><input type="number" inputmode="numeric" pattern="[0-9]*" id="s3b-${m.id}" value="${sets[2]?sets[2].s2:''}" min="0" max="99" ${dis}></div></div>
 </div>${actionsHtml}</div>`;
 }
 
@@ -1587,10 +1660,10 @@ const refBonusEl=document.getElementById('refbonus-'+mid);
 if(isBo3){
 const g=id=>{const el=document.getElementById(id);return el?+el.value:NaN;};
 const s1a=g('s1a-'+mid),s1b=g('s1b-'+mid),s2a=g('s2a-'+mid),s2b=g('s2b-'+mid);
-if(isNaN(s1a)||isNaN(s1b)){toast('Entrez les scores du Set 1');return;}
-if(s1a===s1b){toast('Set 1 : pas de score \u00e9gal');return;}
-if(isNaN(s2a)||isNaN(s2b)){toast('Entrez les scores du Set 2');return;}
-if(s2a===s2b){toast('Set 2 : pas de score \u00e9gal');return;}
+if(isNaN(s1a)||isNaN(s1b)){badField(['s1a-'+mid,'s1b-'+mid],'Entrez les scores du Set 1');return;}
+if(s1a===s1b){badField(['s1a-'+mid,'s1b-'+mid],'Set 1 : les deux scores ne peuvent pas \u00eatre \u00e9gaux');return;}
+if(isNaN(s2a)||isNaN(s2b)){badField(['s2a-'+mid,'s2b-'+mid],'Entrez les scores du Set 2');return;}
+if(s2a===s2b){badField(['s2a-'+mid,'s2b-'+mid],'Set 2 : les deux scores ne peuvent pas \u00eatre \u00e9gaux');return;}
 let w1=0,w2=0;
 if(s1a>s1b)w1++;else w2++;
 if(s2a>s2b)w1++;else w2++;
@@ -1598,18 +1671,18 @@ const sets=[{s1:s1a,s2:s1b},{s1:s2a,s2:s2b}];
 let tp1=s1a+s2a,tp2=s1b+s2b;
 if(w1===1&&w2===1){
 const s3a=g('s3a-'+mid),s3b=g('s3b-'+mid);
-if(isNaN(s3a)||isNaN(s3b)){toast('Entrez les scores du Set 3');return;}
-if(s3a===s3b){toast('Set 3 : pas de score \u00e9gal');return;}
+if(isNaN(s3a)||isNaN(s3b)){badField(['s3a-'+mid,'s3b-'+mid],'Les sets sont 1-1 : entrez les scores du Set 3');return;}
+if(s3a===s3b){badField(['s3a-'+mid,'s3b-'+mid],'Set 3 : les deux scores ne peuvent pas \u00eatre \u00e9gaux');return;}
 sets.push({s1:s3a,s2:s3b});tp1+=s3a;tp2+=s3b;
 if(s3a>s3b)w1++;else w2++;
 }
 pushUndo('R\u00e9sultat : '+matchLabel(m)+' ('+w1+'-'+w2+')',[mid]);
 m.sets=sets;m.score1=w1;m.score2=w2;m.totalPts1=tp1;m.totalPts2=tp2;
 }else{
-const s1=+document.getElementById('s1-'+mid).value;
-const s2=+document.getElementById('s2-'+mid).value;
-if(isNaN(s1)||isNaN(s2)){toast('Entrez les scores');return;}
-if(s1===s2&&!drawAllowed){toast('Pas de match nul');return;}
+const s1v=document.getElementById('s1-'+mid).value,s2v=document.getElementById('s2-'+mid).value;
+const s1=+s1v,s2=+s2v;
+if(s1v===''||s2v===''||isNaN(s1)||isNaN(s2)){badField(['s1-'+mid,'s2-'+mid],'Entrez le score des deux joueurs');return;}
+if(s1===s2&&!drawAllowed){badField(['s1-'+mid,'s2-'+mid],'Pas de match nul : un des deux joueurs doit avoir le meilleur score');return;}
 pushUndo('R\u00e9sultat : '+matchLabel(m)+' ('+s1+'-'+s2+')',[mid]);
 m.score1=s1;m.score2=s2;m.totalPts1=s1;m.totalPts2=s2;
 }
@@ -2025,7 +2098,7 @@ const canvas=document.createElement('canvas');
 container.appendChild(canvas);
 QRGen.toCanvas(canvas,buildQRData(),5);
 const p=document.createElement('p');
-p.style.cssText='font-size:.8em;color:var(--txt2);margin-top:8px';
+p.style.cssText='font-size:.875em;color:var(--txt2);margin-top:8px';
 p.textContent='Scannez pour r\u00e9cup\u00e9rer les r\u00e9sultats';
 container.appendChild(p);
 }
@@ -2083,7 +2156,7 @@ html+=`<tr${r.away?rowAwayCls(r):quali?' style="background:rgba(76,175,80,.08)"'
 <td>${r.pf}</td><td>${r.pa}</td><td>${r.pf-r.pa>=0?'+':''}${r.pf-r.pa}</td>${hasAnyBonus?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
 html+='</tbody></table>';
-if(T.settings.h2hTiebreak===true)html+='<p style="font-size:.78em;color:var(--txt2);margin-top:6px">&Eacute;galit&eacute; de points : confrontation directe, puis diff&eacute;rence de points, puis points marqu&eacute;s.</p>';
+if(T.settings.h2hTiebreak===true)html+='<p style="font-size:.875em;color:var(--txt2);margin-top:6px">&Eacute;galit&eacute; de points : confrontation directe, puis diff&eacute;rence de points, puis points marqu&eacute;s.</p>';
 return html;
 }
 
@@ -2178,12 +2251,12 @@ const hasArb=all.some(r=>r.refBonus>0);
 let html=`<h3 style="color:var(--pri-lt);margin-bottom:6px">Classement g\u00e9n\u00e9ral</h3>`;
 const avg1=rankModeEff()==='avg',showJ1=all.some(r=>r.away||r.left)&&T.matches.some(m=>m.phase==='pool'&&isWaitingMatch(m)&&!involvesExcluded(m));
 html+=rankProvisionalHtml();
-html+=`<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Tous les joueurs - tri par ${avg1?'points par match jou\u00e9':'points totaux'}${refEnabled?' (V + D + bonus arb)':' (V + D)'}</p>`;
-html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.75em">Poule</th><th title="Points totaux">Pts</th>${avg1?'<th title="Points par match jou\u00e9">Moy</th>':''}${showJ1?'<th title="Matchs jou\u00e9s / total">J</th>':''}<th>V</th>${hasD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence">Diff</th>${hasArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
+html+=`<p style="font-size:.875em;color:var(--txt2);margin-bottom:12px">Tous les joueurs - tri par ${avg1?'points par match jou\u00e9':'points totaux'}${refEnabled?' (V + D + bonus arb)':' (V + D)'}</p>`;
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.875em">Poule</th><th title="Points totaux">Pts</th>${avg1?'<th title="Points par match jou\u00e9">Moy</th>':''}${showJ1?'<th title="Matchs jou\u00e9s / total">J</th>':''}<th>V</th>${hasD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence">Diff</th>${hasArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.pf-r.pa;
-html+=`<tr${r.away?rowAwayCls(r):podiumCls(i+1,all)}><td class="rank">${medal(i+1,all)}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td>${avg1?'<td>'+(r.played?(r.pts/r.played).toFixed(2):'-')+'</td>':''}${showJ1?'<td>'+r.played+(r.left?'/'+(r.played+r.left):'')+'</td>':''}<td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr${r.away?rowAwayCls(r):podiumCls(i+1,all)}><td class="rank">${medal(i+1,all)}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.875em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td>${avg1?'<td>'+(r.played?(r.pts/r.played).toFixed(2):'-')+'</td>':''}${showJ1?'<td>'+r.played+(r.left?'/'+(r.played+r.left):'')+'</td>':''}<td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
 html+='</tbody></table>';
 el.innerHTML=html;
@@ -2211,7 +2284,7 @@ if(refId)finalRefBonus[refId]=(finalRefBonus[refId]||0)+refBP;
 const anyArb=Object.values(poolStats).some(s=>s.refBonus>0)||Object.keys(finalRefBonus).length>0;
 
 let html=`<h3 style="color:var(--pri-lt);margin-bottom:6px">Classement g\u00e9n\u00e9ral</h3>`;
-html+=`<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Pts = poule + finale${refEnabled?' + bonus arbitre':''} - rang d\u00e9termin\u00e9 par les victoires en finale</p>`;
+html+=`<p style="font-size:.875em;color:var(--txt2);margin-bottom:12px">Pts = poule + finale${refEnabled?' + bonus arbitre':''} - rang d\u00e9termin\u00e9 par les victoires en finale</p>`;
 let globalRank=1;
 
 for(const group of T.finals){
@@ -2245,11 +2318,11 @@ const hors=calcOutsideFinalsRanking(finalRefBonus);
 if(hors.length){
 const hD3=hors.some(r=>r.l3>0),hD=hors.some(r=>r.d>0),hArb=hors.some(r=>r.refBonus>0);
 html+=`<h4 style="margin:16px 0 8px;color:var(--txt)">Hors finales (classement de poule)</h4>`;
-html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.75em">Poule</th><th>Pts</th><th>V</th>${hD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hD3?'<th title="Défaites 3 sets">D3</th>':''}<th>PF</th><th>PC</th><th>Diff</th>${hArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.875em">Poule</th><th>Pts</th><th>V</th>${hD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hD3?'<th title="Défaites 3 sets">D3</th>':''}<th>PF</th><th>PC</th><th>Diff</th>${hArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
 for(const r of hors){
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.pf-r.pa;
-html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr><td class="rank">${globalRank}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.875em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 globalRank++;
 }
 html+='</tbody></table>';
@@ -2478,14 +2551,14 @@ const si=T.bracket.seedInfo||[];
 const byeEntries=(T.bracket.rounds[0]||[]).filter(e=>e&&typeof e==='object'&&e.bye);
 seedHtml=`<div class="info-box" style="margin-bottom:12px">
 <strong>\u{1F3C6} Tableau de ${T.bracket.size} - ${T.bracket.nbPlayers||T.players.length} joueurs - ${T.bracket.nbSeeds} exemption(s)</strong><br>
-<span style="font-size:.85em;color:#4DB0FA"><strong>T\u00eates de s\u00e9rie</strong> (exempt\u00e9es du 1er tour) :</span>
+<span style="font-size:.875em;color:#4DB0FA"><strong>T\u00eates de s\u00e9rie</strong> (exempt\u00e9es du 1er tour) :</span>
 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${si.map(s=>
 '<span class="chip" style="background:rgba(243,193,70,.15);color:var(--pri-lt);border:1px solid var(--pri)">'+
 '<strong>TS'+s.rank+'</strong> '+escH(s.name)+(s.level?' '+'\u{1F3C6}'.repeat(s.level):'')+'</span>').join('')}
 </div></div>
 <div style="margin-bottom:12px">${byeEntries.map(e=>{
 const p=T.players.find(x=>x.id===e.bye);
-return p?'<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(76,175,80,.1);border-radius:8px;margin-bottom:4px;border-left:4px solid var(--ok)"><span style="color:var(--ok-txt);font-weight:700">\u2705</span><span style="font-weight:500">'+escH(p.name)+'</span><span style="color:var(--txt2);font-size:.85em">\u2192 qualifi\u00e9(e) directement (t\u00eate de s\u00e9rie)</span></div>':'';
+return p?'<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(76,175,80,.1);border-radius:8px;margin-bottom:4px;border-left:4px solid var(--ok)"><span style="color:var(--ok-txt);font-weight:700">\u2705</span><span style="font-weight:500">'+escH(p.name)+'</span><span style="color:var(--txt2);font-size:.875em">\u2192 qualifi\u00e9(e) directement (t\u00eate de s\u00e9rie)</span></div>':'';
 }).join('')}</div>`;
 }
 content.innerHTML=seedHtml+`<div id="bracket-progress">${bracketProgressHtml(tab)}</div>
@@ -2612,7 +2685,7 @@ if(!ranking.find(r=>r.id===p.id))ranking.push({id:p.id,rank:ranking.length+1,not
 html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Note</th></tr></thead><tbody>`;
 for(const r of ranking){
 const p=T.players.find(x=>x.id===r.id);
-html+=`<tr${podiumCls(r.rank)}><td class="rank">${medal(r.rank)}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.8em">${r.note}</td></tr>`;
+html+=`<tr${podiumCls(r.rank)}><td class="rank">${medal(r.rank)}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.875em">${r.note}</td></tr>`;
 }
 html+='</tbody></table>';
 el.innerHTML=html;
@@ -2641,11 +2714,11 @@ const container=document.getElementById('qr-container');
 const today=new Date().toLocaleDateString('fr-FR');
 // Info XLS
 const _p2=document.createElement('p');
-_p2.style.cssText='font-size:.75em;color:var(--txt2);margin-top:4px';
+_p2.style.cssText='font-size:.875em;color:var(--txt2);margin-top:4px';
 _p2.textContent='XLSX : Onglet 1 = Matchs (poules, finales, tableau) | Onglet 2 = Classement final';
 container.appendChild(_p2);
 const _p3=document.createElement('p');
-_p3.style.cssText='font-size:.75em;color:var(--txt2)';
+_p3.style.cssText='font-size:.875em;color:var(--txt2)';
 _p3.textContent='Fichier : '+exportFileName();
 container.appendChild(_p3);
 }
@@ -3013,7 +3086,7 @@ const url=URL.createObjectURL(blob);
 const a=document.createElement('a');
 a.href=url;a.download=xlsxName;
 document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
-toast('XLSX t\u00e9l\u00e9charg\u00e9 ✓');
+toast('Fichier enregistr\u00e9 dans votre dossier T\u00e9l\u00e9chargements : '+xlsxName,5000);
 }
 
 /* ===== ACCÈS PROF ===== */
@@ -3072,11 +3145,11 @@ return false;
 function openAdminAccess(){
 adminFailedAttempts=0;
 const html=`<div class="form-group"><label>Mot de passe</label><input type="password" id="admin-pwd-input" placeholder="Entrez le mot de passe" onkeydown="if(event.key==='Enter')verifyAdminPassword()"></div>
-<p style="font-size:.85em;color:var(--txt2)">Vous trouverez le mot de passe dans le guide professeur, sur la page de l'application du site <code>outils-eps.fr</code>.</p>
-<p style="font-size:.85em;color:var(--txt2)">Ce mot de passe peut être modifié à tout moment depuis les Paramètres, une fois connecté.</p>
+<p style="font-size:.875em;color:var(--txt2)">Vous trouverez le mot de passe dans le guide professeur, sur la page de l'application du site <code>outils-eps.fr</code>.</p>
+<p style="font-size:.875em;color:var(--txt2)">Ce mot de passe peut être modifié à tout moment depuis les Paramètres, une fois connecté.</p>
 <div id="admin-pwd-error" style="color:var(--err-txt);margin-top:8px;display:none">&#10060; Mot de passe incorrect</div>
 <div id="admin-pwd-reset" style="display:none;margin-top:15px;padding-top:15px;border-top:1px solid var(--brd)">
-<p style="font-size:.85em;color:var(--txt2);margin-bottom:8px">Mot de passe personnalisé oublié ?</p>
+<p style="font-size:.875em;color:var(--txt2);margin-bottom:8px">Mot de passe personnalisé oublié ?</p>
 <button type="button" class="btn-secondary" style="width:100%" onclick="resetAdminPasswordFromLogin()">&#128260; Réinitialiser au mot de passe par défaut</button>
 </div>
 <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" style="width:auto" onclick="verifyAdminPassword()">Valider</button></div>`;
@@ -3185,9 +3258,9 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <p>Depuis l'\u00e9cran d'accueil, appuyez sur <b>+ Nouveau tournoi</b>. Renseignez le nom, la classe, le nombre de tables ou terrains disponibles, le format de match et la dur\u00e9e optionnelle du chronometre.</p>
 <p>Choisissez le mode de tournoi :</p>
 <ul style="margin:4px 0 4px 20px">
-<li><b>Mode 1 - Poules de niveau</b> : poules ind\u00e9pendantes, chaque poule a son propre classement.</li>
-<li><b>Mode 2 - Poules + Finales</b> : phase de poules puis finales crois\u00e9es (les 1ers s'affrontent, les 2\u00e8mes, etc.).</li>
-<li><b>Mode 3 - Tableau \u00e0 \u00e9limination</b> : bracket avec t\u00eates de s\u00e9rie, petite finale et tableaux consolante.</li>
+<li><b>Poules par niveau</b> : poules ind\u00e9pendantes, chaque poule a son propre classement.</li>
+<li><b>Poules puis finales</b> : phase de poules puis finales crois\u00e9es (les 1ers s'affrontent, les 2\u00e8mes, etc.).</li>
+<li><b>\u00c9limination directe</b> : bracket avec t\u00eates de s\u00e9rie, petite finale et tableaux consolante.</li>
 </ul>
 
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">2. Inscrire les joueurs</h3>
@@ -3502,7 +3575,7 @@ html+=connectorLine(fromX,fromY,champX,champY+18);
 }
 html+='</svg></div>';
 // Legend
-html+='<div style="display:flex;gap:12px;margin-top:10px;font-size:.8em;flex-wrap:wrap">';
+html+='<div style="display:flex;gap:12px;margin-top:10px;font-size:.875em;flex-wrap:wrap">';
 html+='<span><span style="display:inline-block;width:14px;height:14px;background:'+C.win+';border:1px solid #1E3A5F;border-radius:3px;vertical-align:middle"></span> Vainqueur</span>';
 html+='<span><span style="display:inline-block;width:14px;height:14px;background:'+C.bye+';border:1px solid #1E3A5F;border-radius:3px;vertical-align:middle"></span> Bye (exempté)</span>';
 html+='<span><span style="display:inline-block;width:14px;height:14px;background:'+C.pend+';border:1px solid #1E3A5F;border-radius:3px;vertical-align:middle"></span> En attente</span>';
@@ -3567,7 +3640,7 @@ function lastUndo(){const st=T&&undoStacks[T.id];return st&&st.length?st[st.leng
 function confirmUndo(){
 const e=lastUndo();if(!e)return;
 showModal('&#8617; Annuler la derni&egrave;re action',
-'<p style="margin-bottom:6px">'+escH(e.label)+'</p><p style="font-size:.85em;color:var(--txt2)">Le tournoi revient exactement &agrave; l\'&eacute;tat d\'avant (tours et finales g&eacute;n&eacute;r&eacute;s ensuite compris).</p>'+
+'<p style="margin-bottom:6px">'+escH(e.label)+'</p><p style="font-size:.875em;color:var(--txt2)">Le tournoi revient exactement &agrave; l\'&eacute;tat d\'avant (tours et finales g&eacute;n&eacute;r&eacute;s ensuite compris).</p>'+
 '<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Non</button><button class="btn-primary" style="width:auto" onclick="undoLast()">Oui, annuler</button></div>');
 }
 function undoLast(){
@@ -3630,9 +3703,9 @@ const n=pendingPause().length;
 showModal('&#127937; Fin des matchs jouables',
 '<p style="margin-bottom:10px">Il reste <b>'+n+' match(s) en pause</b> : '+escH(names)+'.</p>'+
 '<button class="btn-secondary" style="width:100%;margin-bottom:6px" onclick="closeModal()">Attendre la prochaine s\u00e9ance</button>'+
-'<p style="font-size:.8em;color:var(--txt2);margin-bottom:14px">Le classement reste provisoire. Rien ne change, on reprend ces matchs plus tard (&#128101; Joueurs, R\u00e9tablir).</p>'+
+'<p style="font-size:.875em;color:var(--txt2);margin-bottom:14px">Le classement reste provisoire. Rien ne change, on reprend ces matchs plus tard (&#128101; Joueurs, R\u00e9tablir).</p>'+
 '<button class="btn-primary" style="width:100%;margin-bottom:6px" onclick="closeWithout()">Cl\u00f4turer sans eux</button>'+
-'<p style="font-size:.8em;color:var(--txt2)">Le classement est calcul\u00e9 sans ces joueurs : <b>leurs matchs (jou\u00e9s ou non) ne comptent pour personne</b>, ainsi chacun perd le m\u00eame nombre de matchs. Ils apparaissent &laquo; non class\u00e9s &raquo; en bas du tableau. Ensuite, les finales du mode 2 sont possibles. &laquo; Rouvrir &raquo; permet de revenir en arri\u00e8re.</p>'+
+'<p style="font-size:.875em;color:var(--txt2)">Le classement est calcul\u00e9 sans ces joueurs : <b>leurs matchs (jou\u00e9s ou non) ne comptent pour personne</b>, ainsi chacun perd le m\u00eame nombre de matchs. Ils apparaissent &laquo; non class\u00e9s &raquo; en bas du tableau. Ensuite, les finales du mode 2 sont possibles. &laquo; Rouvrir &raquo; permet de revenir en arri\u00e8re.</p>'+
 '<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button></div>');
 }
 function closeWithout(){
@@ -3729,8 +3802,8 @@ html+='<div class="section-title" style="font-size:.95em;margin:16px 0 6px">&#10
 '<div style="display:flex"><div class="form-group" style="flex:1;margin-right:8px"><label>Niveau</label><select id="lp-level">'+[0,1,2,3,4,5].map(l=>'<option value="'+l+'">'+(l?l:'Aucun')+'</option>').join('')+'</select></div>'+
 (T.pools.length?'<div class="form-group" style="flex:1"><label>Poule</label><select id="lp-pool">'+T.pools.map(p=>'<option value="'+p.id+'">'+escH(p.name)+'</option>').join('')+'</select></div>':'')+
 '</div><button class="btn-primary" onclick="addLatePlayer()">Ajouter</button>';
-if(T.mode===3)html+='<p style="font-size:.8em;color:var(--txt2);margin-top:6px">Le tableau est r&eacute;g&eacute;n&eacute;r&eacute; (aucun match encore jou&eacute;).</p>';
-else html+='<p style="font-size:.8em;color:var(--txt2);margin-top:6px">Le joueur rencontre tous les joueurs de la poule choisie.</p>';
+if(T.mode===3)html+='<p style="font-size:.875em;color:var(--txt2);margin-top:6px">Le tableau est r&eacute;g&eacute;n&eacute;r&eacute; (aucun match encore jou&eacute;).</p>';
+else html+='<p style="font-size:.875em;color:var(--txt2);margin-top:6px">Le joueur rencontre tous les joueurs de la poule choisie.</p>';
 }
 showModal('&#128101; Joueurs du tournoi',html);
 }
@@ -3743,10 +3816,10 @@ if(T.mode===3){
 html+='<button class="btn-danger" style="width:100%;margin-bottom:8px" onclick="withdrawPlayer(\''+pid+'\',\'forfait\')">Forfait : l\'adversaire est qualifi&eacute;</button>';
 }else{
 html+='<button class="btn-danger" style="width:100%;margin-bottom:6px" onclick="withdrawPlayer(\''+pid+'\',\'forfait\')">Forfait</button>'+
-'<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Ses matchs d&eacute;j&agrave; jou&eacute;s restent compt&eacute;s, les autres sont annul&eacute;s. Il reste affich&eacute; en bas du classement.</p>';
+'<p style="font-size:.875em;color:var(--txt2);margin-bottom:12px">Ses matchs d&eacute;j&agrave; jou&eacute;s restent compt&eacute;s, les autres sont annul&eacute;s. Il reste affich&eacute; en bas du classement.</p>';
 if(!finalsExist){
 html+='<button class="btn-danger" style="width:100%;margin-bottom:6px" onclick="withdrawPlayer(\''+pid+'\',\'absent\')">Absent</button>'+
-'<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Retir&eacute; de la poule, <b>tous</b> ses matchs sont annul&eacute;s'+(played?' ('+played+' déjà joué(s) : leur résultat est supprimé)':'')+'. Les autres joueurs ne sont pas pénalisés.</p>';
+'<p style="font-size:.875em;color:var(--txt2);margin-bottom:12px">Retir&eacute; de la poule, <b>tous</b> ses matchs sont annul&eacute;s'+(played?' ('+played+' déjà joué(s) : leur résultat est supprimé)':'')+'. Les autres joueurs ne sont pas pénalisés.</p>';
 }
 }
 html+='<div class="modal-actions"><button class="btn-secondary" onclick="showPlayersManager()">Retour</button></div>';
@@ -3894,10 +3967,10 @@ if(how==='copy')copyTextToClipboard(text);
 else{saveTextFile(backupFileName(idx<0?null:state.tournaments[idx]),text,'application/json');if(idx<0||state.tournaments.length===1)markExported();}
 }
 function showBackupModal(){
-let html='<p style="font-size:.85em;color:var(--txt2);margin-bottom:10px">Pour déplacer un tournoi vers une autre tablette ou en garder une copie : enregistrez un fichier, ou copiez le texte et collez-le sur l\'autre appareil.</p>';
+let html='<p style="font-size:.875em;color:var(--txt2);margin-bottom:10px">Pour déplacer un tournoi vers une autre tablette ou en garder une copie : enregistrez un fichier, ou copiez le texte et collez-le sur l\'autre appareil.</p>';
 if(!state.tournaments.length)html+='<p class="info-box">Aucun tournoi &agrave; exporter.</p>';
 state.tournaments.forEach((t,i)=>{
-html+='<div class="card" style="margin-bottom:8px;padding:10px"><div style="font-weight:600;margin-bottom:6px">'+escH(t.name)+' <span style="color:var(--txt2);font-weight:400;font-size:.85em">'+escH(t.classe||'')+'</span></div>'+
+html+='<div class="card" style="margin-bottom:8px;padding:10px"><div style="font-weight:600;margin-bottom:6px">'+escH(t.name)+' <span style="color:var(--txt2);font-weight:400;font-size:.875em">'+escH(t.classe||'')+'</span></div>'+
 '<button class="btn-secondary btn-sm" onclick="exportBackup('+i+',\'file\')">&#128190; Fichier</button> '+
 '<button class="btn-secondary btn-sm" onclick="exportBackup('+i+',\'copy\')">&#128203; Copier</button></div>';
 });
@@ -4161,9 +4234,10 @@ renderLive();
 /* ===== MODAL UTIL ===== */
 function showModal(title,html){
 const mc=document.getElementById('modal-container');
-mc.innerHTML='<div class="modal-overlay" onclick="closeModal()"><div class="modal" style="max-width:95vw;max-height:90vh;padding:16px" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h2 style="font-size:1.05em;margin:0;color:var(--pri-lt)">'+title+'</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.5em;cursor:pointer;color:var(--txt2);padding:4px 8px">&times;</button></div>'+html+'</div></div>';
+mc.innerHTML='<div class="modal-overlay" onclick="closeModal()"><div class="modal" style="max-width:95vw;max-height:90vh;padding:16px" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h2 style="font-size:1.05em;margin:0;color:var(--pri-lt)">'+title+'</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.5em;cursor:pointer;color:var(--txt2);padding:4px 8px">&times;</button></div>'+html+'</div></div>';focusModal();
 }
 function closeModal(){document.getElementById('modal-container').innerHTML='';}
+function focusModal(){setTimeout(function(){const mc=document.getElementById('modal-container');if(!mc)return;const t=mc.querySelector('input:not([type=hidden]),textarea,select')||mc.querySelector('.btn-primary,.btn-danger,.btn-secondary');if(t&&!mc.contains(document.activeElement))t.focus();},60);}
 
 /* ===== BOÎTES DE DIALOGUE MAISON (remplacent confirm / alert / prompt natifs) ===== */
 // Les boîtes natives ne sont pas fiables dans le WebView Android (non testées sur tablette) et ne
@@ -4185,7 +4259,7 @@ function askNumber(title,label,value,onOk){
 modalCb=null;
 askNumberCb=onOk;
 showModal(escH(title),'<label for="ask-input" style="display:block;margin-bottom:8px">'+escH(label)+'</label>'+
-'<input type="number" id="ask-input" min="1" max="99" value="'+escH(value==null?'':value)+'" onkeydown="if(event.key===\'Enter\')askNumberOk()">'+
+'<input type="number" inputmode="numeric" pattern="[0-9]*" id="ask-input" min="1" max="99" value="'+escH(value==null?'':value)+'" onkeydown="if(event.key===\'Enter\')askNumberOk()">'+
 '<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" style="width:auto;min-height:44px" onclick="askNumberOk()">Valider</button></div>');
 setTimeout(()=>{const i=document.getElementById('ask-input');if(i){i.focus();i.select();}},50);
 }
@@ -4294,7 +4368,7 @@ const q=computeQueue(phase);
 const playingNow=T.matches.filter(m=>m.status==='playing');
 if(!q.entries.length&&!playingNow.length){el.innerHTML='';return;}
 const big=phase==='pool'||phase==='final';
-let h='<div class="card queue-card'+(big?' queue-big':'')+'"><div style="font-weight:700;margin-bottom:6px'+(big?';font-size:1.15em':'')+'">'+(big?'&#9654; Matchs &agrave; lancer':'&#9201; File d\'attente')+' <span style="font-weight:400;color:var(--txt2);font-size:.85em">('+q.entries.length+' &agrave; jouer)</span></div>';
+let h='<div class="card queue-card'+(big?' queue-big':'')+'"><div style="font-weight:700;margin-bottom:6px'+(big?';font-size:1.15em':'')+'">'+(big?'&#9654; Matchs &agrave; lancer':'&#9201; File d\'attente')+' <span style="font-weight:400;color:var(--txt2);font-size:.875em">('+q.entries.length+' &agrave; jouer)</span></div>';
 h+='<div class="queue-tables">';
 for(let t=1;t<=q.nbTables;t++){
 const u=q.usedTables[t];
@@ -4304,7 +4378,7 @@ h+='</div>';
 const first=q.entries.find(e=>e.ready&&e.table!==null)||q.entries.find(e=>e.ready);
 if(first){
 const m=first.m;
-h+='<div class="queue-next"><div class="qn-ctx" style="font-size:.78em;color:var(--txt2)">Prochain match libre &middot; '+escH(matchContextLabel(m))+'</div>'+
+h+='<div class="queue-next"><div class="qn-ctx" style="font-size:.875em;color:var(--txt2)">Prochain match libre &middot; '+escH(matchContextLabel(m))+'</div>'+
 '<div class="qn-names" style="font-weight:700;font-size:1.05em;margin:2px 0">'+escH(playerName(m.p1))+' <span style="color:var(--txt2);font-weight:400">contre</span> '+escH(playerName(m.p2))+'</div>'+
 '<div class="qn-info" style="font-size:.88em">'+(first.table!==null?'Table <b>T'+first.table+'</b>':'<span style="color:var(--err-txt)">Aucune table libre</span>')+
 (first.ref?' &middot; Arbitre : <b>'+escH(playerName(first.ref))+'</b>':' &middot; <span style="color:var(--txt2)">Sans arbitre</span>')+'</div>'+
@@ -4315,7 +4389,7 @@ h+='<div class="queue-next" style="color:var(--txt2)">Aucun match disponible : l
 }
 const rest=big?[]:q.entries.filter(e=>e!==first);
 if(rest.length){
-h+='<div style="margin-top:8px;font-size:.85em">';
+h+='<div style="margin-top:8px;font-size:.875em">';
 rest.slice(0,6).forEach((e,i)=>{
 h+='<div class="queue-row"><span style="color:var(--txt2)">'+(i+2)+'.</span> '+escH(playerName(e.m.p1))+' / '+escH(playerName(e.m.p2))+
 ' <span style="color:var(--txt2)">('+escH(matchContextLabel(e.m))+')</span>'+
@@ -4337,7 +4411,7 @@ if(!pool){el.innerHTML='';return;}
 const q=computeQueue(phase);
 const es=q.entries.filter(e=>e.m.poolId===pool.id);
 if(!es.length){el.innerHTML='';return;}
-let h='<div class="card queue-card"><div style="font-weight:700;margin-bottom:6px">&#9201; File d\'attente '+(phase==='final'?'de la finale':'de la poule')+' <span style="font-weight:400;color:var(--txt2);font-size:.85em">('+es.length+' &agrave; jouer)</span></div><div style="font-size:.9em">';
+let h='<div class="card queue-card"><div style="font-weight:700;margin-bottom:6px">&#9201; File d\'attente '+(phase==='final'?'de la finale':'de la poule')+' <span style="font-weight:400;color:var(--txt2);font-size:.875em">('+es.length+' &agrave; jouer)</span></div><div style="font-size:.9em">';
 es.forEach((e,i)=>{
 h+='<div class="queue-row"><span style="color:var(--txt2)">'+(i+1)+'.</span> '+escH(playerName(e.m.p1))+' / '+escH(playerName(e.m.p2))+
 (e.ready?' <span style="color:var(--ok-txt)">pr&ecirc;t</span>':' <span style="color:var(--txt2)">attend : '+escH(e.why.join(', '))+'</span>')+'</div>';
@@ -4443,10 +4517,10 @@ const anyTable=ms.some(m=>m.table);
 let h='<h3>'+escH(title)+'</h3><table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur 1</th><th>Score</th><th style="text-align:left">Joueur 2</th>'+(anyTable?'<th>Table</th>':'')+(anyRef?'<th style="text-align:left">Arbitre</th>':'')+'</tr></thead><tbody>';
 ms.forEach((m,i)=>{
 const done=m.status==='done';
-let sc=done?((m.score1!==null?m.score1:'')+' - '+(m.score2!==null?m.score2:'')):(isWaitingMatch(m)?'<span style="font-size:.8em;color:#555">en pause</span>':'');
+let sc=done?((m.score1!==null?m.score1:'')+' - '+(m.score2!==null?m.score2:'')):(isWaitingMatch(m)?'<span style="font-size:.875em;color:#555">en pause</span>':'');
 if(done&&m.sets&&m.sets.length&&T.settings.matchFamily==='score'&&T.settings.winningSets===2)
-sc+='<div style="font-size:.8em;color:#555">'+m.sets.filter(s=>s.s1!==''||s.s2!=='').map(s=>escH(s.s1)+'-'+escH(s.s2)).join(' / ')+'</div>';
-if(m.forfeit)sc+='<div style="font-size:.8em;color:#555">forfait</div>';
+sc+='<div style="font-size:.875em;color:#555">'+m.sets.filter(s=>s.s1!==''||s.s2!=='').map(s=>escH(s.s1)+'-'+escH(s.s2)).join(' / ')+'</div>';
+if(m.forfeit)sc+='<div style="font-size:.875em;color:#555">forfait</div>';
 const w1=done&&m.score1>m.score2,w2=done&&m.score2>m.score1;
 const ref=m.refereeId?playerName(m.refereeId):(m.referee||'');
 h+='<tr><td>'+(m.matchNum||i+1)+'</td><td class="pname"'+(w1?' style="font-weight:700"':'')+'>'+escH(playerName(m.p1))+'</td><td>'+sc+'</td><td class="pname"'+(w2?' style="font-weight:700"':'')+'>'+escH(playerName(m.p2))+'</td>'+
@@ -4644,13 +4718,13 @@ let c=data.find(x=>x.key===palmCls)||data[0];
 palmCls=c.key;
 let html='<div style="display:flex;flex-wrap:wrap;margin:0 -3px 6px">'+data.map(x=>
 '<button class="tab-btn'+(x.key===c.key?' active':'')+'" style="margin:3px;flex:0 0 auto" onclick="palmCls=\''+escH(escJs(x.key))+'\';showPalmares()">'+escH(x.label)+' ('+x.tournaments.length+')</button>').join('')+'</div>';
-html+='<div style="display:flex;flex-wrap:wrap;align-items:center;margin:0 -3px 8px;font-size:.85em"><span style="margin:0 6px;color:var(--txt2)">Trier par :</span>'+
+html+='<div style="display:flex;flex-wrap:wrap;align-items:center;margin:0 -3px 8px;font-size:.875em"><span style="margin:0 6px;color:var(--txt2)">Trier par :</span>'+
 [['pts','Points'],['pct','% victoires'],['podium','Podiums']].map(o=>'<button class="tab-btn'+(palmSort===o[0]?' active':'')+'" style="margin:3px;flex:0 0 auto" onclick="palmSort=\''+o[0]+'\';showPalmares()">'+o[1]+'</button>').join('')+'</div>';
 const rows=palmaresRows(c);
 html+='<div style="overflow:auto;max-height:50vh;-webkit-overflow-scrolling:touch">'+(rows.length?palmaresTableHtml(c,rows):'<p class="empty-state">Aucun match jou&eacute; dans les tournois coch&eacute;s.</p>')+'</div>';
 html+='<div style="margin-top:12px;font-weight:600">Tournois pris en compte</div>'+c.tournaments.map(t=>
 '<label style="display:flex;align-items:center;gap:10px;padding:8px 2px;font-size:.9em"><input type="checkbox" style="width:22px;height:22px" '+(t.excluded?'':'checked')+' onchange="togglePalmaresTournament(\''+t.id+'\')"><span>'+escH(t.name)+' <span style="color:var(--txt2)">'+escH(t.date||'')+' - '+(t.finished?'termin&eacute;':'en cours')+'</span></span></label>').join('');
-html+='<p style="font-size:.78em;color:var(--txt2);margin-top:8px">Les joueurs sont rapproch&eacute;s par nom. <b>Pts</b> : points de classement de chaque tournoi (leur bar&egrave;me) additionn&eacute;s. <b>Diff</b> : points marqu&eacute;s moins encaiss&eacute;s. <b>Podiums</b> : places 1 &agrave; 3 du classement g&eacute;n&eacute;ral d\'un tournoi termin&eacute;. Les matchs gagn&eacute;s ou perdus par forfait ne sont pas compt&eacute;s. D&eacute;cochez un tournoi pour l\'exclure (copie, essai) : valable jusqu\'&agrave; la fermeture de l\'application.</p>';
+html+='<p style="font-size:.875em;color:var(--txt2);margin-top:8px">Les joueurs sont rapproch&eacute;s par nom. <b>Pts</b> : points de classement de chaque tournoi (leur bar&egrave;me) additionn&eacute;s. <b>Diff</b> : points marqu&eacute;s moins encaiss&eacute;s. <b>Podiums</b> : places 1 &agrave; 3 du classement g&eacute;n&eacute;ral d\'un tournoi termin&eacute;. Les matchs gagn&eacute;s ou perdus par forfait ne sont pas compt&eacute;s. D&eacute;cochez un tournoi pour l\'exclure (copie, essai) : valable jusqu\'&agrave; la fermeture de l\'application.</p>';
 html+='<button class="btn-secondary" style="width:100%;margin-top:8px" onclick="printPalmares()">&#128424; Imprimer / PDF</button>';
 showModal('&#127941; Palmar&egrave;s par classe',html);
 }

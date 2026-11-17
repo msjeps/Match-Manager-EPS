@@ -6,6 +6,19 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.7.0 - 2026-11-17 (APK versionCode 27, cache v44)
+
+Audit ergonomie, vue d'une utilisatrice debutante (tablette, PC, Mac). Aucune regle de calcul modifiee.
+- **Saisie** : clavier numerique sur tous les champs de nombre (`inputmode`), champs de score de 48 px, contenu selectionne au focus, champ recentre au-dessus du clavier virtuel. Un champ de score fautif est entoure en rouge avec un message de 4,5 s (plus de simple toast).
+- **Debuter** : bouton « ? » d'aide sur l'accueil, accueil vide avec les 3 etapes, modes renommes (« Poules par niveau », « Poules puis finales », « Elimination directe »), champs de creation expliques, echelle des niveaux expliquee, exemples dans la liste et l'import.
+- **Fil d'etapes** (Joueurs, Poules, Repartition, Matchs, Finales, Classement) en haut des ecrans du tournoi.
+- **Joueurs** : « Supprimer tous les joueurs » deplace sous la liste (masque si vide), focus conserve apres un ajout.
+- **Repartition** : consigne toujours affichee, joueur selectionne nomme, glisser-deposer a la souris.
+- **Lisibilite** : texte de 14 px minimum, police systeme (system-ui), boutons principaux en minuscules, contraste du texte secondaire du mode clair, titre tronque proprement, zoom par pincement autorise, `100dvh`.
+- **PC / Mac** : navigation au clavier (Tab, Entree, Espace) sur cartes, bascules et poules, cadre de focus visible, survol des boutons, Echap ferme les fenetres, focus pris par la fenetre ouverte et Tab y reste, mise en page en 2 colonnes des matchs et poules au-dessus de 1000 px.
+- **Divers** : badge « Table ? » lisible comme un bouton, message d'export precisant le dossier Telechargements.
+- Non change volontairement : le bouton « Valider » ne demande pas de confirmation (ralentirait la saisie en classe ; « Modifier » et « Annuler » existent).
+
 ## 2.6.3 - 2026-11-17 (APK versionCode 26, cache v42)
 
 Match sans arbitre : plus de blocage quand il n'y a pas assez de joueurs libres.
