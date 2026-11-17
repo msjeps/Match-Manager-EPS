@@ -187,7 +187,7 @@ def contenu():
     s.append(B("<b>Médailles</b> : les trois premiers de chaque classement reçoivent une médaille (or, argent, bronze) "
                "dès qu'un match est joué."))
     s.append(B("<b>Podium</b> : à la validation du dernier match, une fenêtre « Tournoi terminé ! » affiche les trois "
-               "premiers (une seule fois). Le podium reste affiché en haut de l'écran Classements."))
+               "premiers (une seule fois) ; en poules par niveau, un podium par poule, car les poules sont indépendantes. Le podium reste affiché en haut de l'écran Classements."))
     s.append(B("<b>Accueil</b> : chaque tournoi indique sa progression (matchs joués sur total) et propose « Reprendre » "
                "ou, une fois terminé, « Voir le podium » (liseré vert)."))
     s.append(B("<b>Sons</b> (Paramètres, désactivés par défaut) : un petit « ding » à chaque résultat validé et une "
