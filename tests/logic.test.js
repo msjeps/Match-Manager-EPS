@@ -449,6 +449,66 @@ test('suivi de l\'export : résultats non exportés comptés, remis à zéro apr
   assert.equal(st.dirty, true); assert.equal(st.n, 1, 'un résultat saisi depuis l\'export');
   assert.match(app.fn('backupFileName')(t), /^MatchManagerEPS_sauvegarde_.+_\d{2}-\d{2}-\d{4}_\d{2}h\d{2}\.json$/);
 });
+// ----- clôture « sans eux » (temps 2) -----
+function poolAvecAbsent(app, id) {
+  const t = tournament(app, { id, names: ['A', 'B', 'C', 'D'] });
+  app.T = t;
+  const away = t.players[3].id;
+  const get = (x, y) => t.matches.find(m => (m.p1 === x && m.p2 === y) || (m.p1 === y && m.p2 === x));
+  // A bat tout le monde, B bat C ; D (absent) a perdu contre A avant de partir
+  const win = (w, l) => { const m = get(w, l); play(m, m.p1 === w ? 11 : 3, m.p1 === w ? 3 : 11); };
+  win(t.players[0].id, t.players[1].id); win(t.players[0].id, t.players[2].id); win(t.players[1].id, t.players[2].id);
+  win(t.players[0].id, away);
+  app.fn('setAway')(away, 'absent');
+  return { t, away };
+}
+test('clôture : décision demandée seulement quand tous les matchs jouables sont terminés', () => {
+  const app = createApp();
+  const { t } = poolAvecAbsent(app, 'c1');
+  assert.equal(app.fn('closureDue')(), true);
+  const a = createApp();
+  const t2 = tournament(a, { id: 'c2', names: ['A', 'B', 'C', 'D'] });
+  a.T = t2; a.fn('setAway')(t2.players[3].id, 'absent');
+  assert.equal(a.fn('closureDue')(), false, 'il reste des matchs jouables');
+});
+test('clôture sans eux : leurs matchs ne comptent pour personne, non classés en dernier, finales possibles', () => {
+  const app = createApp();
+  const { t, away } = poolAvecAbsent(app, 'c3');
+  const avant = app.fn('calcPoolRanking')(t.pools[0].id).find(r => r.id === t.players[0].id);
+  assert.equal(avant.w, 3);
+  app.fn('closeWithout')();
+  assert.deepEqual(app.plain(t.excluded), [away]);
+  const rk = app.fn('calcPoolRanking')(t.pools[0].id);
+  const ra = rk.find(r => r.id === t.players[0].id);
+  assert.equal(ra.w, 2, 'la victoire sur l\'absent ne compte plus');
+  assert.equal(rk[rk.length - 1].id, away); assert.equal(rk[rk.length - 1].excl, true);
+  assert.equal(app.fn('closureDue')(), false);
+  assert.equal(app.fn('tournamentOrder')().finished, true, 'tournoi terminé sans l\'absent');
+  assert.equal(app.fn('tournamentOrder')().ids.includes(away), false, 'pas au classement général');
+  // annuler : retour à l'état d'avant la clôture
+  app.fn('undoLast')();
+  assert.equal(app.T.excluded, undefined);
+  assert.equal(app.fn('calcPoolRanking')(app.T.pools[0].id).find(r => r.id === app.T.players[0].id).w, 3);
+});
+test('clôture : rétablir un joueur le sort de la liste des exclus', () => {
+  const app = createApp();
+  const { t, away } = poolAvecAbsent(app, 'c4');
+  app.fn('closeWithout')();
+  app.fn('setAway')(away, null);
+  assert.equal(t.excluded, undefined);
+  assert.equal(app.fn('calcPoolRanking')(t.pools[0].id).find(r => r.id === t.players[0].id).w, 3);
+});
+test('export XLSX avec joueur en pause : colonnes Statut, Joués et À jouer, titre provisoire', () => {
+  const app = createApp();
+  const { t } = poolAvecAbsent(app, 'c5');
+  t.pools = [t.pools[0]];
+  const x = exportXlsx(app, t);
+  assert.equal(x.matchs[0].G, 'Arbitre'); assert.equal(x.matchs[0].H, 'Statut');
+  assert.ok(x.matchs.some(r => r.H === 'En pause'));
+  assert.ok(String(x.classement[0].A).includes('PROVISOIRE'));
+  const hdr = x.classement.find(r => r.A === 'Rang');
+  assert.equal(hdr.J !== undefined && Object.values(hdr).includes('Statut'), true);
+});
 test('version affichée et version Android alignées', () => {
   const app = createApp();
   const gradle = fs.readFileSync(path.join(__dirname, '..', 'android', 'app', 'build.gradle'), 'utf8');

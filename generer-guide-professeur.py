@@ -164,6 +164,11 @@ def contenu():
                "d'origine. Le classement provisoire garde ces joueurs à leur rang, en couleur (orange dispensé, gris "
                "absent), avec les colonnes Moy (points par match) et J (joués / total) ; un bouton choisit le tri "
                "« Points par match » (par défaut tant que des matchs sont en pause) ou « Points totaux »."))
+    s.append(B("<b>Fin des matchs jouables</b> : quand il ne reste que des matchs en pause, un encadré propose « Attendre "
+               "la prochaine séance » (classement provisoire) ou « Clôturer sans eux » : leurs matchs, joués ou non, ne "
+               "comptent plus pour personne (chacun perd le même nombre de matchs), ils sont « non classés » en bas du "
+               "tableau, et les finales du mode 2 deviennent possibles. « Rouvrir » ou « Annuler » reviennent en "
+               "arrière. Les exports XLSX et l'impression indiquent le statut et la mention « provisoire »."))
     s.append(B("<b>Forfait ou retrait définitif</b> (bouton « Joueurs », « Retirer ») : un forfait reste classé en "
                "dernier, ses matchs joués sont conservés et, en tableau, l'adversaire est qualifié. Un joueur peut "
                "aussi être ajouté en retard. Le réglage des arbitres (poule ou tous) est aussi dans « Joueurs »."))

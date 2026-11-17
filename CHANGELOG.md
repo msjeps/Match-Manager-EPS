@@ -6,6 +6,14 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.6 - 2026-11-17 (APK versionCode 23, cache v39)
+
+Suite de la 2.5 (dispenses et absents) : decision de fin de tournoi, finales et exports.
+- **Decision de cloture** : quand tous les matchs jouables sont termines et qu'il ne reste que des matchs en pause (`closureDue`), un encadre propose **Attendre** (classement provisoire) ou **Cloturer sans eux** (`closeWithout`, `T.excluded`). Cloture : les matchs des joueurs exclus, joues ou non, sont ignores du calcul pour tout le monde (`involvesExcluded` dans `calcPoolRanking`), les exclus sont « non classes » en bas du tableau et absents du classement general / podium. Les resultats restent dans les donnees : **Rouvrir** (`reopenClosure`) ou **Annuler** reviennent en arriere ; retablir un joueur le sort de la liste.
+- **Finales du mode 2** : le bouton « Passer aux finales » apparait quand tous les matchs de poule sont termines ou exclus ; les exclus ne sont jamais qualifies.
+- **Exports** : XLSX (onglet Matchs : colonne Statut ; classement du mode 1 : titre « PROVISOIRE », colonnes Joues, A jouer, Statut) et impression (mention provisoire, « en pause » dans la liste des matchs, sans boutons).
+- Import : `T.excluded` assaini ; `UNDO_FIELDS` inclut `excluded`.
+
 ## 2.5 - 2026-11-17 (APK versionCode 22, cache v38)
 
 Retour du test en classe (2 dispensees, absents d'une seance a l'autre) : retirer un joueur apres la validation des poules supprimait ses matchs ou obligeait a tout regenerer.

@@ -637,7 +637,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.5';
+const APP_VERSION='2.6';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const SOUND_KEY='mmeps_sound';
 const LS_BACKUP_KEY='teneps_data_illisible';
@@ -822,7 +822,7 @@ function openResults(id){
 T=state.tournaments.find(t=>t.id===id);
 if(T)showScreen('scr-rankings');
 }
-function pnameHtml(p){return p?escH(p.name)+(p.out?'<span class="badge-out">'+(p.out==='absent'?'Absent':'Forfait')+'</span>':(p.away?'<span class="badge-away '+p.away+'">'+(p.away==='dispense'?'Dispens\u00e9':'Absent')+'</span>':'')):'?';}
+function pnameHtml(p){return p?escH(p.name)+(p.out?'<span class="badge-out">'+(p.out==='absent'?'Absent':'Forfait')+'</span>':(p.away?'<span class="badge-away '+p.away+'">'+(isExcluded(p.id)?'Non class\u00e9':p.away==='dispense'?'Dispens\u00e9':'Absent')+'</span>':'')):'?';}
 function toast(msg,ms){const d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),ms||2500)}
 
 /* ===== HOME ===== */
@@ -1435,9 +1435,9 @@ document.getElementById('matches-progress').innerHTML=`
 <div class="progress-bar"><div class="progress-fill" style="width:${total?100*done/total:0}%"></div></div>`;
 
 // Next phase button
-const eb=document.getElementById('export-banner');if(eb)eb.innerHTML=exportBannerHtml();
+const eb=document.getElementById('export-banner');if(eb)eb.innerHTML=closureBannerHtml()+exportBannerHtml();
 const btn=document.getElementById('btn-next-phase');
-const allDone=T.matches.filter(m=>m.phase==='pool').every(m=>m.status==='done');
+const allDone=T.matches.filter(m=>m.phase==='pool').every(m=>m.status==='done'||involvesExcluded(m));
 if(allDone&&T.mode===2&&T.phase!=='finals'){
 btn.style.display='';btn.textContent='Passer aux finales \u2192';btn.className='btn-primary';
 }else{btn.style.display='none';}
@@ -1505,7 +1505,7 @@ const statusLabel=waiting?'\u23f8 En pause':isDone?'\u2705 Termin\u00e9':isPlayi
 const tableBadge=m.table?`<span class="match-table-badge" onclick="editMatchTable('${m.id}',event)" title="Modifier la table">T${m.table}</span>`:`<span class="match-table-badge" onclick="editMatchTable('${m.id}',event)" title="Attribuer une table" style="opacity:.5;border-style:dashed">T?</span>`;
 const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
 const refSelectHtml='<select class="ref-input" id="ref-'+m.id+'" '+dis+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.85em">'+refOptionsHtml(m)+'</select>';
-const actionsHtml=waiting?'<div class="match-pause-note">\u23f8 En attente : '+escH(waitingWho(m))+'. Le match reprend quand le joueur est r\u00e9tabli (bouton Joueurs).</div>':`<div class="match-actions">
+const actionsHtml=waiting?(involvesExcluded(m)?'<div class="match-pause-note">\u23f8 Exclu du classement (cl\u00f4ture sans '+escH(waitingWho(m))+').</div>':'<div class="match-pause-note">\u23f8 En attente : '+escH(waitingWho(m))+'. Le match reprend quand le joueur est r\u00e9tabli (bouton Joueurs).</div>'):`<div class="match-actions">
 ${refSelectHtml}
 <label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${(isDone?m.refBonus:draftValue('refbonus-'+m.id,m.refBonus))?'checked':''} ${dis}>+1 pt arb.</label>
 ${isDone?(m.forfeit?'':'<button class="btn-secondary btn-sm" onclick="unlockMatch(\''+m.id+'\')">&#9998; Modifier</button>'):
@@ -1906,7 +1906,7 @@ return stats;
 
 function calcPoolRanking(poolId){
 const pool=T.pools.find(p=>p.id===poolId);if(!pool)return[];
-const matches=T.matches.filter(m=>m.poolId===poolId&&m.phase==='pool'&&m.status==='done');
+const matches=T.matches.filter(m=>m.poolId===poolId&&m.phase==='pool'&&m.status==='done'&&!involvesExcluded(m));
 const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
 const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
 const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
@@ -1924,8 +1924,8 @@ if(refId&&stats[refId]){stats[refId].refBonus+=refBP;stats[refId].pts+=refBP;}
 }
 }
 const arr=Object.values(stats);
-arr.forEach(r=>{const pl=T.players.find(x=>x.id===r.id);r.out=pl&&pl.out?pl.out:null;r.away=pl&&pl.away?pl.away:null;r.played=r.w+r.l+r.d;
-r.left=T.matches.filter(m=>m.phase==='pool'&&m.poolId===poolId&&m.status!=='done'&&(m.p1===r.id||m.p2===r.id)).length;});
+arr.forEach(r=>{const pl=T.players.find(x=>x.id===r.id);r.out=pl&&pl.out?pl.out:null;r.away=pl&&pl.away?pl.away:null;r.excl=isExcluded(r.id);r.played=r.w+r.l+r.d;
+r.left=r.excl?0:T.matches.filter(m=>m.phase==='pool'&&m.poolId===poolId&&m.status!=='done'&&!involvesExcluded(m)&&(m.p1===r.id||m.p2===r.id)).length;});
 return sortPoolRanking(arr,matches,{wPts,l3Pts,lPts,drawPts},T.settings.h2hTiebreak===true);
 }
 
@@ -1937,15 +1937,15 @@ return sortPoolRanking(arr,matches,{wPts,l3Pts,lPts,drawPts},T.settings.h2hTiebr
 function rankModeEff(){
 const m=T&&T.settings.rankMode;
 if(m==='avg'||m==='total')return m;
-return T&&T.matches.some(x=>x.phase==='pool'&&isWaitingMatch(x))?'avg':'total';
+return T&&T.matches.some(x=>x.phase==='pool'&&isWaitingMatch(x)&&!involvesExcluded(x))?'avg':'total';
 }
 function rankKey(r,mode){const n=r.played!==undefined?r.played:(r.w||0)+(r.l||0)+(r.d||0);return mode==='avg'?(n?r.pts/n:0):r.pts;}
-function cmpRank(a,b){const mode=rankModeEff();return (a.out?1:0)-(b.out?1:0)||rankKey(b,mode)-rankKey(a,mode)||b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf;}
+function cmpRank(a,b){const mode=rankModeEff();return ((a.out||a.excl)?1:0)-((b.out||b.excl)?1:0)||rankKey(b,mode)-rankKey(a,mode)||b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf;}
 function sortPoolRanking(arr,matches,cfg,h2h){
 const mode=rankModeEff();
 if(h2h){
 const groups={};
-arr.forEach(r=>{if(!r.out){const k=rankKey(r,mode).toFixed(6);(groups[k]=groups[k]||[]).push(r);}});
+arr.forEach(r=>{if(!r.out&&!r.excl){const k=rankKey(r,mode).toFixed(6);(groups[k]=groups[k]||[]).push(r);}});
 Object.keys(groups).forEach(k=>{
 const g=groups[k];
 if(g.length<2)return;
@@ -1954,7 +1954,7 @@ const mini=statsFromMatches(matches,ids,cfg);
 g.forEach(r=>{const m=mini[r.id];r.h2hPts=m.pts;r.h2hDiff=m.pf-m.pa;});
 });
 }
-return arr.sort((a,b)=>(a.out?1:0)-(b.out?1:0)||rankKey(b,mode)-rankKey(a,mode)||b.pts-a.pts
+return arr.sort((a,b)=>((a.out||a.excl)?1:0)-((b.out||b.excl)?1:0)||rankKey(b,mode)-rankKey(a,mode)||b.pts-a.pts
 ||(b.h2hPts||0)-(a.h2hPts||0)||(b.h2hDiff||0)-(a.h2hDiff||0)
 ||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
 }
@@ -1972,7 +1972,7 @@ const extra=(finalRefBonus&&finalRefBonus[r.id])||0;
 rows.push({...r,pts:r.pts+extra,refBonus:(r.refBonus||0)+extra,poolName:pool.name});
 }
 }
-rows.sort((a,b)=>b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+rows.sort((a,b)=>(a.excl?1:0)-(b.excl?1:0)||b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
 return rows;
 }
 
@@ -1983,7 +1983,7 @@ function rankingsSig(){
 return [T.id,T.mode,T.phase,T.name,T.classe,T.date,(T.finals||[]).length,T.bracket?T.bracket.rounds.length:0,
 JSON.stringify(T.settings),state.settings.refBonusEnabled?1:0,
 T.pools.map(p=>p.playerIds.join(',')+':'+p.quali).join(';'),
-T.players.map(p=>p.name+(p.out||'')+(p.away||'')).join(','),
+T.players.map(p=>p.name+(p.out||'')+(p.away||'')).join(',')+'|'+(T.excluded||[]).join(','),
 T.matches.map(matchSig).join(';')].join('#');
 }
 function renderRankings(){
@@ -2046,15 +2046,18 @@ T.settings.rankMode=v==='total'?'total':'avg';
 save();rankingsSigLast='';showRankTab(rankTabIdx);
 }
 // Bandeau « classement provisoire » + bouton de bascule du tri (seulement si des matchs sont en pause)
+let printBuilding=false;
 function rankProvisionalHtml(){
-const paused=T.matches.filter(m=>m.phase==='pool'&&isWaitingMatch(m)).length;
+if(T.excluded&&T.excluded.length)return '<div class="info-box" style="margin-bottom:10px"><b>Classement sans '+escH(T.excluded.map(playerName).join(', '))+'</b> (non class\u00e9s) : leurs matchs ne comptent pas.'+(printBuilding?'':'<br><button class="btn-secondary btn-sm" style="margin-top:6px" onclick="reopenClosure()">Rouvrir (attendre leurs matchs)</button>')+'</div>';
+const paused=T.matches.filter(m=>m.phase==='pool'&&isWaitingMatch(m)&&!involvesExcluded(m)).length;
 if(!paused)return '';
+if(printBuilding)return '<p><b>Classement provisoire</b> : '+paused+' match(s) en pause (absents ou dispens\u00e9s).</p>';
 const mode=rankModeEff();
 return '<div class="info-box" style="margin-bottom:10px"><b>Classement provisoire</b> : '+paused+' match(s) en pause (absents ou dispens\u00e9s).<div style="display:flex;gap:8px;margin-top:8px"><button class="family-btn'+(mode==='avg'?' selected':'')+'" onclick="setRankMode(\'avg\')">Points par match</button><button class="family-btn'+(mode==='total'?' selected':'')+'" onclick="setRankMode(\'total\')">Points totaux</button></div></div>';
 }
 function rowAwayCls(r){return r.away?' class="row-away-'+r.away+'"':'';}
 function renderRankingTable(ranking,title,qualiCount){
-const showJ=T.matches.some(m=>m.phase==='pool'&&isWaitingMatch(m));
+const showJ=T.matches.some(m=>m.phase==='pool'&&isWaitingMatch(m)&&!involvesExcluded(m));
 const avg=rankModeEff()==='avg';
 const hasAnyBonus=ranking.some(r=>r.refBonus>0);
 const hasAnyL3=ranking.some(r=>r.l3>0);
@@ -2089,7 +2092,7 @@ function generateFinals(){
 // On teste T.matches (pas T.finals) pour éviter un état incohérent
 if(T.matches.some(m=>m.phase==='final'))return;
 T.finals=[];T.matches=T.matches.filter(m=>m.phase==='pool');
-const rankings=T.pools.map(p=>calcPoolRanking(p.id).filter(r=>!r.out));
+const rankings=T.pools.map(p=>calcPoolRanking(p.id).filter(r=>!r.out&&!r.excl));
 const maxQuali=Math.max(...T.pools.map(p=>p.quali||2));
 for(let rank=0;rank<maxQuali;rank++){
 const groupPlayers=[];
@@ -2162,7 +2165,7 @@ const hasD3=all.some(r=>r.l3>0);
 const hasD=all.some(r=>r.d>0);
 const hasArb=all.some(r=>r.refBonus>0);
 let html=`<h3 style="color:var(--pri-lt);margin-bottom:6px">Classement g\u00e9n\u00e9ral</h3>`;
-const avg1=rankModeEff()==='avg',showJ1=all.some(r=>r.away||r.left)&&T.matches.some(m=>m.phase==='pool'&&isWaitingMatch(m));
+const avg1=rankModeEff()==='avg',showJ1=all.some(r=>r.away||r.left)&&T.matches.some(m=>m.phase==='pool'&&isWaitingMatch(m)&&!involvesExcluded(m));
 html+=rankProvisionalHtml();
 html+=`<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Tous les joueurs - tri par ${avg1?'points par match jou\u00e9':'points totaux'}${refEnabled?' (V + D + bonus arb)':' (V + D)'}</p>`;
 html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.75em">Poule</th><th title="Points totaux">Pts</th>${avg1?'<th title="Points par match jou\u00e9">Moy</th>':''}${showJ1?'<th title="Matchs jou\u00e9s / total">J</th>':''}<th>V</th>${hasD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence">Diff</th>${hasArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
@@ -2802,6 +2805,8 @@ const h1=[sh('Poule / Phase',true),sh('Match',true),sh('Joueur 1',true),sh(isBo3
 if(isBo3x)h1.push(sh('Set 1 J1',true),sh('Set 1 J2',true),sh('Set 2 J1',true),sh('Set 2 J2',true),sh('Set 3 J1',true),sh('Set 3 J2',true),sh('Total pts J1',true),sh('Total pts J2',true));
 h1.push(sh('Arbitre',true));
 if(hasRefBonus)h1.push(sh('Bonus Arb',true));
+const hasPause=T.players.some(p=>p.away);
+if(hasPause)h1.push(sh('Statut',true));
 s1rows.push(h1);
 // Tous les matchs, groupés par phase : poules, finales (mode 2), tours du tableau / petite finale /
 // consolantes (mode 3). Un score est celui saisi (en manches gagnées pour un match en 2 sets gagnants).
@@ -2850,6 +2855,7 @@ row.push(hasSets?nm(t1,true):null,hasSets?nm(t2,true):null);
 }
 row.push(sh(refName));
 if(hasRefBonus)row.push(nm(m.refBonus&&done?refBP:0));
+if(hasPause)row.push(sh(done?(m.forfeit?'Forfait':'Termin\u00e9'):isWaitingMatch(m)?(involvesExcluded(m)?'Exclu du classement':'En pause'):'\u00c0 jouer'));
 s1rows.push(row);
 }
 }
@@ -2864,7 +2870,9 @@ if(br.length){br.forEach((e,i)=>s2rows.push([nm(i+1),sh(e.name)]));}
 else{T.players.forEach((p,i)=>s2rows.push([nm(i+1),sh(p.name)]));}
 }else if(T.mode===1){
 // Mode 1 : classement croisé toutes poules
-s2rows.push([sh('Classement g\u00e9n\u00e9ral - toutes poules'+(hasRefBonus?' (victoires + d\u00e9faites + bonus arb)':' (victoires + d\u00e9faites)'),true)]);
+const nbPause=T.matches.filter(m=>m.phase==='pool'&&isWaitingMatch(m)&&!involvesExcluded(m)).length;
+const exclTxt=(T.excluded&&T.excluded.length)?' - sans '+T.excluded.map(playerName).join(', ')+' (non class\u00e9s)':'';
+s2rows.push([sh('Classement g\u00e9n\u00e9ral - toutes poules'+(hasRefBonus?' (victoires + d\u00e9faites + bonus arb)':' (victoires + d\u00e9faites)')+(nbPause?' - PROVISOIRE : '+nbPause+' match(s) en pause, tri par '+(rankModeEff()==='avg'?'points par match jou\u00e9':'points totaux'):'')+exclTxt,true)]);
 s2rows.push([]);
 const all=[];
 for(const pool of T.pools){const rk=calcPoolRanking(pool.id);for(const r of rk)all.push({...r,poolName:pool.name});}
@@ -2877,6 +2885,8 @@ hdr1.push(sh('D\u00e9faites',true));
 if(hasL3_m1)hdr1.push(sh('Def.3sets',true));
 hdr1.push(sh('PF',true),sh('PC',true),sh('Diff\u00e9rence',true));
 if(hasRefBonus)hdr1.push(sh('Bonus.Arb',true));
+const hasStat_m1=all.some(r=>r.away||r.excl);
+if(hasStat_m1)hdr1.push(sh('Jou\u00e9s',true),sh('\u00c0 jouer',true),sh('Statut',true));
 s2rows.push(hdr1);
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
@@ -2886,6 +2896,7 @@ row.push(nm(r.l));
 if(hasL3_m1)row.push(nm(r.l3||0));
 row.push(nm(r.pf),nm(r.pa),nm(r.pf-r.pa));
 if(hasRefBonus)row.push(nm(r.refBonus||0));
+if(hasStat_m1)row.push(nm(r.played||0),nm(r.left||0),sh(r.excl?'Non class\u00e9':r.away==='dispense'?'Dispens\u00e9':r.away==='absent'?'Absent':''));
 s2rows.push(row);
 });
 }else{
@@ -3228,6 +3239,8 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <li><b>Absent</b> (bouton &#128101; Joueurs) : ses matchs non jou&eacute;s attendent la prochaine s&eacute;ance (carte grise &laquo; En pause &raquo;, absente de la file d'attente) ; il n'arbitre pas.</li>
 <li><b>R&eacute;tablir</b> : le joueur rejoue ses matchs, dans l'ordre d'origine.</li>
 <li><b>Classement provisoire</b> : les joueurs en pause restent dans le tableau, en couleur (orange = dispens&eacute;, gris = absent), avec les colonnes Moy (points par match) et J (jou&eacute;s / total). Un bouton permet de choisir le tri : <i>Points par match</i> (par d&eacute;faut tant que des matchs sont en pause) ou <i>Points totaux</i>.</li>
+<li><b>Fin des matchs jouables</b> : quand il ne reste que des matchs en pause, un encadr&eacute; propose de <b>Attendre la prochaine s&eacute;ance</b> (le classement reste provisoire) ou de <b>Cl&ocirc;turer sans eux</b> : leurs matchs (jou&eacute;s ou non) ne comptent plus pour personne, ils apparaissent &laquo; non class&eacute;s &raquo; en bas du tableau, et les finales du mode 2 deviennent possibles. <b>Rouvrir</b> annule la cl&ocirc;ture ; <b>Annuler</b> aussi. R&eacute;tablir un joueur le fait revenir dans le calcul.</li>
+<li>Les exports XLSX et l'impression indiquent les matchs en pause (colonne Statut, Jou&eacute;s / &Agrave; jouer, mention &laquo; provisoire &raquo;).</li>
 <li>Le r&eacute;glage <b>Arbitres</b> (joueurs de la poule ou tous) est aussi dans &#128101; Joueurs. Les dispens&eacute;s arbitrent toujours toutes les poules.</li>
 </ul>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Sauvegarde sur un ordinateur</h3>
@@ -3509,7 +3522,7 @@ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace
 // tours / finales générés par la suite et les scores qui étaient en cours de saisie.
 const UNDO_KEY='mmeps_undo';
 const UNDO_MAX=8;
-const UNDO_FIELDS=['players','pools','poolSizes','poolTables','matches','finals','bracket','phase'];
+const UNDO_FIELDS=['players','pools','poolSizes','poolTables','matches','finals','bracket','phase','excluded'];
 let undoStacks={};
 function loadUndo(){
 try{undoStacks=JSON.parse(localStorage.getItem(UNDO_KEY))||{};}catch(e){undoStacks={};}
@@ -3581,12 +3594,67 @@ function isAway(pid){return !!awayOf(pid);}
 function isWaitingMatch(m){return !!m&&m.status!=='done'&&m.p1&&m.p2&&(isAway(m.p1)||isAway(m.p2));}
 function waitingWho(m){return [m.p1,m.p2].filter(isAway).map(id=>playerName(id)+' ('+(awayOf(id)==='dispense'?'dispens\u00e9':'absent')+')').join(', ');}
 function outLabel(p){return p.out?' ('+(p.out==='absent'?'absent':'forfait')+')':(p.away?' ('+(p.away==='dispense'?'dispens\u00e9':'absent')+')':'');}
+/* Cl\u00f4ture « sans eux » : T.excluded = joueurs en pause dont les matchs sont ignor\u00e9s du calcul pour tout le monde
+   (jou\u00e9s ou non). Les r\u00e9sultats restent dans les donn\u00e9es : « Rouvrir » revient en arri\u00e8re. */
+function isExcluded(pid){return !!(T&&T.excluded&&T.excluded.indexOf(pid)>=0);}
+function involvesExcluded(m){return isExcluded(m.p1)||isExcluded(m.p2);}
+function pendingPause(){return T.matches.filter(m=>m.phase==='pool'&&isWaitingMatch(m)&&!involvesExcluded(m));}
+// tous les matchs de poule jouables sont termin\u00e9s, mais il reste des matchs en pause \u00e0 d\u00e9cider
+function closureDue(){
+if(T.mode===3||!T.pools.length)return false;
+const pp=pendingPause();
+if(!pp.length)return false;
+return T.matches.filter(m=>m.phase==='pool'&&!involvesExcluded(m)&&m.status!=='done').every(m=>isWaitingMatch(m));
+}
+function closureWho(){
+const ids=[];pendingPause().forEach(m=>[m.p1,m.p2].forEach(id=>{if(isAway(id)&&ids.indexOf(id)<0)ids.push(id);}));
+return ids;
+}
+function showClosureDialog(){
+if(!T)return;
+const ids=closureWho();
+if(!ids.length)return;
+const names=ids.map(id=>playerName(id)+' ('+(awayOf(id)==='dispense'?'dispens\u00e9':'absent')+')').join(', ');
+const n=pendingPause().length;
+showModal('&#127937; Fin des matchs jouables',
+'<p style="margin-bottom:10px">Il reste <b>'+n+' match(s) en pause</b> : '+escH(names)+'.</p>'+
+'<button class="btn-secondary" style="width:100%;margin-bottom:6px" onclick="closeModal()">Attendre la prochaine s\u00e9ance</button>'+
+'<p style="font-size:.8em;color:var(--txt2);margin-bottom:14px">Le classement reste provisoire. Rien ne change, on reprend ces matchs plus tard (&#128101; Joueurs, R\u00e9tablir).</p>'+
+'<button class="btn-primary" style="width:100%;margin-bottom:6px" onclick="closeWithout()">Cl\u00f4turer sans eux</button>'+
+'<p style="font-size:.8em;color:var(--txt2)">Le classement est calcul\u00e9 sans ces joueurs : <b>leurs matchs (jou\u00e9s ou non) ne comptent pour personne</b>, ainsi chacun perd le m\u00eame nombre de matchs. Ils apparaissent &laquo; non class\u00e9s &raquo; en bas du tableau. Ensuite, les finales du mode 2 sont possibles. &laquo; Rouvrir &raquo; permet de revenir en arri\u00e8re.</p>'+
+'<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button></div>');
+}
+function closeWithout(){
+const ids=closureWho();
+if(!ids.length){closeModal();return;}
+pushUndo('Cl\u00f4ture sans '+ids.map(playerName).join(', '),[]);
+T.excluded=Array.from(new Set((T.excluded||[]).concat(ids)));
+save();closeModal();rankingsSigLast='';
+gotoPhaseScreen();
+toast('Class\u00e9 sans '+ids.length+' joueur(s)');
+}
+function reopenClosure(){
+if(!T||!T.excluded||!T.excluded.length)return;
+askConfirm('Rouvrir le classement ?','Les joueurs non class\u00e9s reviennent dans le calcul avec leurs r\u00e9sultats et leurs matchs en pause. Les finales d\u00e9j\u00e0 g\u00e9n\u00e9r\u00e9es ne sont pas modifi\u00e9es.','Rouvrir',()=>{
+pushUndo('Classement rouvert',[]);
+delete T.excluded;save();rankingsSigLast='';
+gotoPhaseScreen();
+},false);
+}
+function closureBannerHtml(){
+if(!T||T.mode===3)return '';
+if(T.excluded&&T.excluded.length){
+return '<div class="info-box" style="margin-top:8px"><b>Classement d\u00e9finitif sans '+escH(T.excluded.map(playerName).join(', '))+'</b> : leurs matchs ne comptent pas.<br><button class="btn-secondary btn-sm" style="margin-top:6px" onclick="reopenClosure()">Rouvrir (attendre leurs matchs)</button></div>';
+}
+if(closureDue())return '<div class="info-box" style="margin-top:8px;border-left-color:#FF8F00"><b>Tous les matchs jouables sont termin\u00e9s.</b> '+pendingPause().length+' match(s) en pause.<br><button class="btn-primary btn-sm" style="margin-top:6px;width:auto" onclick="showClosureDialog()">Attendre ou cl\u00f4turer sans eux ?</button></div>';
+return '';
+}
 function setAway(pid,kind){
 const p=T.players.find(x=>x.id===pid);if(!p||p.out)return;
 if(kind&&p.away===kind)return;
 const mine=T.matches.filter(m=>m.p1===pid||m.p2===pid);
 pushUndo((kind==='dispense'?'Dispens\u00e9 : ':kind==='absent'?'Absent : ':'R\u00e9tabli : ')+p.name,mine.map(m=>m.id));
-if(kind)p.away=kind;else delete p.away;
+if(kind)p.away=kind;else{delete p.away;if(T.excluded){T.excluded=T.excluded.filter(id=>id!==pid);if(!T.excluded.length)delete T.excluded;}}
 if(kind){
 mine.forEach(m=>{if(m.status==='playing'){m.status='pending';m.table=null;detachMatchTimerTick(m.id);}});
 if(kind==='absent')T.matches.forEach(m=>{if(m.refereeId===pid&&m.status!=='done'){m.refereeId='';m.referee='';}});
@@ -3864,6 +3932,7 @@ if(!ok(t.id)||!Array.isArray(t.players)||!Array.isArray(t.matches))return null;
 if(t.players.length>500||t.matches.length>5000)return null;
 if(!Array.isArray(t.pools))t.pools=[];
 if(!Array.isArray(t.finals))t.finals=[];
+if(Array.isArray(t.excluded))t.excluded=t.excluded.filter(ok);else delete t.excluded;
 for(const p of t.players){if(!p||!ok(p.id))return null;p.name=clean(p.name);p.level=Math.max(0,Math.min(5,+p.level||0));if(p.out&&p.out!=='absent')p.out='forfait';if(p.away!=='absent'&&p.away!=='dispense')delete p.away;}
 for(const pl of t.pools){if(!pl||!ok(pl.id)||!Array.isArray(pl.playerIds)||!pl.playerIds.every(ok))return null;pl.name=clean(pl.name);}
 for(const f of t.finals){if(!f||!ok(f.id)||!Array.isArray(f.playerIds)||!f.playerIds.every(ok))return null;f.name=clean(f.name);}
@@ -4334,7 +4403,7 @@ const anyTable=ms.some(m=>m.table);
 let h='<h3>'+escH(title)+'</h3><table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur 1</th><th>Score</th><th style="text-align:left">Joueur 2</th>'+(anyTable?'<th>Table</th>':'')+(anyRef?'<th style="text-align:left">Arbitre</th>':'')+'</tr></thead><tbody>';
 ms.forEach((m,i)=>{
 const done=m.status==='done';
-let sc=done?((m.score1!==null?m.score1:'')+' - '+(m.score2!==null?m.score2:'')):'';
+let sc=done?((m.score1!==null?m.score1:'')+' - '+(m.score2!==null?m.score2:'')):(isWaitingMatch(m)?'<span style="font-size:.8em;color:#555">en pause</span>':'');
 if(done&&m.sets&&m.sets.length&&T.settings.matchFamily==='score'&&T.settings.winningSets===2)
 sc+='<div style="font-size:.8em;color:#555">'+m.sets.filter(s=>s.s1!==''||s.s2!=='').map(s=>escH(s.s1)+'-'+escH(s.s2)).join(' / ')+'</div>';
 if(m.forfeit)sc+='<div style="font-size:.8em;color:#555">forfait</div>';
@@ -4360,6 +4429,10 @@ return '@page{size:A4 '+(landscape?'landscape':'portrait')+';margin:10mm}'+
 '.pied{margin-top:6mm;font-size:9pt;color:#555}';
 }
 function buildPrintDoc(opt){
+printBuilding=true;
+try{return buildPrintDocInner(opt);}finally{printBuilding=false;}
+}
+function buildPrintDocInner(opt){
 const el=document.createElement('div');
 const sections=[];
 if(opt.rank){
@@ -4434,7 +4507,7 @@ try{return fn();}finally{T=prev;}
 }
 // Ordre du classement général du tournoi T (le même que celui affiché / exporté) + tournoi terminé ?
 function tournamentOrder(){
-const allDone=T.matches.length>0&&T.matches.every(m=>m.status==='done');
+const allDone=T.matches.length>0&&T.matches.every(m=>m.status==='done'||involvesExcluded(m));
 const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
 const l3Pts=T.settings.loseSets3Pts!==undefined?T.settings.loseSets3Pts:2;
 const lPts=T.settings.losePts!==undefined?T.settings.losePts:1;
@@ -4447,7 +4520,7 @@ if(T.mode===1){
 const all=[];
 for(const pool of T.pools)for(const r of calcPoolRanking(pool.id))all.push(r);
 all.sort(cmpRank);
-return {ids:all.filter(r=>!r.out).map(r=>r.id),finished:allDone};
+return {ids:all.filter(r=>!r.out&&!r.excl).map(r=>r.id),finished:allDone};
 }
 // mode 2 : groupes de finale (rang de finale, puis points cumulés), puis joueurs hors finales
 if(!T.finals||!T.finals.length)return {ids:[],finished:false};
