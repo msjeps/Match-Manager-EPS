@@ -633,3 +633,13 @@ test("file d'attente : 4 joueurs, 10 tables, aucun arbitre automatique ne bloque
     prets.forEach(e => assert.equal(e.ref, null, phase + ' : pas d\'arbitre qui bloque un autre match'));
   }
 });
+
+test('noms de fichier : date ET heure, deux exports du meme jour ne portent jamais le meme nom', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'nf', names: ['A', 'B', 'C'] });
+  app.T = t; app.state.tournaments.push(t);
+  const re = /_\d{2}-\d{2}-\d{4}_\d{2}h\d{2}\./;
+  assert.match(app.fn("exportFileName")(), re);
+  assert.match(app.fn("backupFileName")(t), re);
+  assert.match(app.fn("fileStamp")(), /^\d{2}-\d{2}-\d{4}_\d{2}h\d{2}$/);
+});

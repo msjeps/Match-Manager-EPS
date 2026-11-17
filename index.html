@@ -677,7 +677,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.7.1';
+const APP_VERSION='2.7.2';
 /* Accessibilite clavier (PC/Mac) et saisie : Entree/Espace activent un element role=button|switch, Echap ferme une modale, un champ numerique se selectionne au focus */
 document.addEventListener('keydown',function(e){
 const t=e.target;
@@ -785,7 +785,7 @@ function downloadUnreadableBackup(){
 let raw='';
 try{raw=localStorage.getItem(LS_BACKUP_KEY)||'';}catch(e){}
 if(!raw){toast('Aucune copie disponible');return;}
-const name='MatchManagerEPS_sauvegarde_illisible_'+new Date().toLocaleDateString('fr-FR').replace(/\//g,'-')+'.json';
+const name='MatchManagerEPS_sauvegarde_illisible_'+fileStamp()+'.json';
 if(typeof AndroidDownload!=='undefined'&&AndroidDownload.saveFile){
 try{AndroidDownload.saveFile(btoa(unescape(encodeURIComponent(raw))),name,'application/json');return;}catch(e){}
 }
@@ -2799,14 +2799,20 @@ for(const p of T.players){if(!ranking.find(r=>r.id===p.id))ranking.push({id:p.id
 return ranking;
 }
 
-// Nom d'export : MatchManagerEPS_Classe_Date.xlsx (sans accent ni caractère spécial : valable
+// Nom d'export : MatchManagerEPS_Classe_Date_Heure.xlsx (sans accent ni caractère spécial : valable
 // sur Android, Windows et macOS). Sans classe, on retombe sur le nom du tournoi.
+/* Horodatage des noms de fichier : date ET heure (jj-mm-aaaa_HHhMM). Avec la date seule, deux exports du meme jour
+   portent le meme nom et le dernier ecrase le precedent (perte constatee le 2026-11-17). Ne jamais produire un nom sans l'heure. */
+function fileStamp(){
+const now=new Date();
+const date=now.toLocaleDateString('fr-FR').replace(/\//g,'-');
+return date+'_'+String(now.getHours()).padStart(2,'0')+'h'+String(now.getMinutes()).padStart(2,'0');
+}
 function exportFileName(){
 const safe=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'')
 .replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40);
 const part=safe(T&&T.classe)||safe(T&&T.name)||'Tournoi';
-const date=new Date().toLocaleDateString('fr-FR').replace(/\//g,'-');
-return 'MatchManagerEPS_'+part+'_'+date+'.xlsx';
+return 'MatchManagerEPS_'+part+'_'+fileStamp()+'.xlsx';
 }
 
 function downloadCSV(){
@@ -3896,10 +3902,7 @@ toast(name+' ajouté');
 const BACKUP_APP='MatchManagerEPS';
 function backupFileName(t){
 const safe=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40);
-const now=new Date();
-const date=now.toLocaleDateString('fr-FR').replace(/\//g,'-');
-const hm=String(now.getHours()).padStart(2,'0')+'h'+String(now.getMinutes()).padStart(2,'0');
-return 'MatchManagerEPS_sauvegarde_'+(t?(safe(t.classe)||safe(t.name)||'Tournoi'):'complete')+'_'+date+'_'+hm+'.json';
+return 'MatchManagerEPS_sauvegarde_'+(t?(safe(t.classe)||safe(t.name)||'Tournoi'):'complete')+'_'+fileStamp()+'.json';
 }
 function buildBackup(idx){
 const list=idx<0?state.tournaments:[state.tournaments[idx]].filter(Boolean);

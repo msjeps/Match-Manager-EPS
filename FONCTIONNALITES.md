@@ -69,7 +69,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 ## 7. Export et partage
 
 - **Palmarès par classe** (accueil) : cumul des tournois d'une classe par joueur (nom), tri points / % victoires / podiums, tournois décochables, impression / PDF. Pas d'export XLSX du palmarès.
-- **XLSX** (fichier Excel fait main, sans dépendance) : onglet « Matchs » (poules, finales, tableau, arbitre, bonus ; en 2 manches gagnantes : manches gagnées, détail des 3 sets et total de points par joueur) et onglet « Classement final ». Nom : `MatchManagerEPS_Classe_Date.xlsx`.
+- **XLSX** (fichier Excel fait main, sans dépendance) : onglet « Matchs » (poules, finales, tableau, arbitre, bonus ; en 2 manches gagnantes : manches gagnées, détail des 3 sets et total de points par joueur) et onglet « Classement final ». Nom : `MatchManagerEPS_Classe_jj-mm-aaaa_HHhMM.xlsx` (date et heure, jamais la date seule).
 - **Impression / PDF** : A4 noir et blanc (classements, arbre du tableau en paysage, matchs et scores), au choix. APK : gestionnaire d'impression Android ; navigateur : `print()`.
 - **QR code des résultats** (préfixe `TENEPS|`, lu par l'app SCAN EPS) : coupé par ligne entière au-delà de 2000 caractères, avec `...+N obs`.
 - **Sauvegarde / transfert JSON** (nom `MatchManagerEPS_sauvegarde_<Classe>_<jj-mm-aaaa>_<HHhMM>.json`) : un tournoi ou tous, en fichier ou par copier/coller, import avec contrôle des identifiants et des textes (id déjà présent : import en copie). Pas de transfert par QR : un tournoi dépasse la capacité d'un QR.

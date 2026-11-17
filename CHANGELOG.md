@@ -6,6 +6,10 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.7.2 - 2026-11-17 (APK versionCode 29, cache v46)
+
+- **Noms de fichier avec l'heure** : l'export XLSX (`MatchManagerEPS_<Classe>_<jj-mm-aaaa>_<HHhMM>.xlsx`) et la copie « donnees illisibles » portent maintenant la date ET l'heure, comme le JSON de sauvegarde depuis la 2.5. Helper unique `fileStamp()`. Cause : avec la date seule, deux exports du meme jour avaient le meme nom et le dernier ecrasait le precedent. Test automatique ajoute (`noms de fichier : date ET heure`).
+
 ## 2.7.1 - 2026-11-17 (APK versionCode 28, cache v45)
 
 Poules par niveau : les poules sont independantes, plus de classement general.

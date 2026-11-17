@@ -197,7 +197,7 @@ def contenu():
     s.append(P('Récupération des résultats', h2))
     s.append(B("<b>Export Excel (XLSX)</b> : à télécharger depuis l'écran Classements. Onglet Matchs (poules, finales, "
                "tableau) et onglet Classement final. En 2 manches gagnantes, le détail des sets et le total de points "
-               "de chaque joueur sont inclus. Fichier nommé MatchManagerEPS_Classe_Date.xlsx."))
+               "de chaque joueur sont inclus. Fichier nommé MatchManagerEPS_Classe_Date_Heure.xlsx."))
     s.append(B("<b>Impression / PDF</b> : classements, arbre du tableau (en paysage), matchs et scores, en A4 noir et "
                "blanc. Sur tablette, le gestionnaire d'impression Android s'ouvre : choisissez « Enregistrer au format "
                "PDF »."))
