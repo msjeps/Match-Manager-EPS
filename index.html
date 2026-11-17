@@ -677,7 +677,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.7.0';
+const APP_VERSION='2.7.1';
 /* Accessibilite clavier (PC/Mac) et saisie : Entree/Espace activent un element role=button|switch, Echap ferme une modale, un champ numerique se selectionne au focus */
 document.addEventListener('keydown',function(e){
 const t=e.target;
@@ -871,6 +871,9 @@ return '<span class="avatar" style="background:'+c+';color:'+(lum>150?'#1A2540':
 }
 // Podium (3 premiers du classement général) d'un tournoi terminé : ord = tournamentOrder()
 function podiumHtml(ord){
+if(ord.groups&&ord.groups.length>1){
+return ord.groups.map(g=>g.ids.length?'<h4 style="margin:10px 0 2px;text-align:center;color:var(--pri-lt)">'+escH(g.name)+'</h4>'+podiumHtml({ids:g.ids}):'').join('');
+}
 const top=ord.ids.slice(0,3).map(id=>T.players.find(p=>p.id===id)).filter(Boolean);
 if(!top.length)return '';
 const meds=['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'];
@@ -887,7 +890,7 @@ function maybeCelebrate(){
 let ord;
 try{ord=tournamentOrder();}catch(e){return false;}
 if(!ord.finished||!ord.ids.length)return false;
-const sig=ord.ids.slice(0,3).join('|');
+const sig=(ord.groups?ord.groups.map(g=>g.ids.slice(0,3).join(',')):[ord.ids.slice(0,3).join(',')]).join('|');
 if(T.celebratedSig===sig)return false;
 T.celebratedSig=sig;save();
 if(navigator.vibrate)navigator.vibrate([100,60,100,60,200]);
@@ -2083,7 +2086,7 @@ renderBracketRankingContent(content);
 return;
 }
 tabs.innerHTML=T.pools.map((p,i)=>`<button class="tab-btn${i===0?' active':''}" onclick="showRankTab(${i},this)">${escH(p.name)}</button>`).join('');
-if(T.mode===2||(T.mode===1&&T.pools.length>1)){
+if(T.mode===2){
 tabs.innerHTML+=`<button class="tab-btn" onclick="showRankTab(-1,this)">G\u00e9n\u00e9ral \u2605</button>`;
 }
 showRankTab(0);
@@ -2953,17 +2956,19 @@ const br=getBracketFullRanking();
 if(br.length){br.forEach((e,i)=>s2rows.push([nm(i+1),sh(e.name)]));}
 else{T.players.forEach((p,i)=>s2rows.push([nm(i+1),sh(p.name)]));}
 }else if(T.mode===1){
-// Mode 1 : classement croisé toutes poules
+// Mode 1 : poules indépendantes, un classement par poule (pas de classement général)
 const nbPause=T.matches.filter(m=>m.phase==='pool'&&isWaitingMatch(m)&&!involvesExcluded(m)).length;
 const exclTxt=(T.excluded&&T.excluded.length)?' - sans '+T.excluded.map(playerName).join(', ')+' (non class\u00e9s)':'';
-s2rows.push([sh('Classement g\u00e9n\u00e9ral - toutes poules'+(hasRefBonus?' (victoires + d\u00e9faites + bonus arb)':' (victoires + d\u00e9faites)')+(nbPause?' - PROVISOIRE : '+nbPause+' match(s) en pause, tri par '+(rankModeEff()==='avg'?'points par match jou\u00e9':'points totaux'):'')+exclTxt,true)]);
+let firstPool=true;
+for(const pool of T.pools){
+if(!firstPool)s2rows.push([]);
+firstPool=false;
+s2rows.push([sh('Classement '+pool.name+(hasRefBonus?' (victoires + d\u00e9faites + bonus arb)':' (victoires + d\u00e9faites)')+(nbPause?' - PROVISOIRE : '+nbPause+' match(s) en pause, tri par '+(rankModeEff()==='avg'?'points par match jou\u00e9':'points totaux'):'')+exclTxt,true)]);
 s2rows.push([]);
-const all=[];
-for(const pool of T.pools){const rk=calcPoolRanking(pool.id);for(const r of rk)all.push({...r,poolName:pool.name});}
-all.sort(cmpRank);
+const all=calcPoolRanking(pool.id);
 const hasL3_m1=all.some(r=>r.l3>0);
 const hasD_m1=all.some(r=>r.d>0);
-const hdr1=[sh('Rang',true),sh('Joueur',true),sh('Poule',true),sh('Points',true),sh('Victoires',true)];
+const hdr1=[sh('Rang',true),sh('Joueur',true),sh('Points',true),sh('Victoires',true)];
 if(hasD_m1)hdr1.push(sh('Nuls',true));
 hdr1.push(sh('D\u00e9faites',true));
 if(hasL3_m1)hdr1.push(sh('Def.3sets',true));
@@ -2974,7 +2979,7 @@ if(hasStat_m1)hdr1.push(sh('Jou\u00e9s',true),sh('\u00c0 jouer',true),sh('Statut
 s2rows.push(hdr1);
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
-const row=[nm(i+1),sh(p?p.name+outLabel(p):'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
+const row=[nm(i+1),sh(p?p.name+outLabel(p):'?'),nm(r.pts),nm(r.w)];
 if(hasD_m1)row.push(nm(r.d||0));
 row.push(nm(r.l));
 if(hasL3_m1)row.push(nm(r.l3||0));
@@ -2983,6 +2988,7 @@ if(hasRefBonus)row.push(nm(r.refBonus||0));
 if(hasStat_m1)row.push(nm(r.played||0),nm(r.left||0),sh(r.excl?'Non class\u00e9':r.away==='dispense'?'Dispens\u00e9':r.away==='absent'?'Absent':''));
 s2rows.push(row);
 });
+}
 }else{
 // Mode 2 : classement cumulatif poule + finale + bonus arb
 const poolSt={};
@@ -4554,7 +4560,7 @@ let h='<h2>Classements</h2>';
 if(T.mode===3){
 renderBracketRankingContent(el);h+=el.innerHTML;
 }else{
-const showOverall=(T.mode===2&&T.finals&&T.finals.length>0)||(T.mode===1&&T.pools.length>1);
+const showOverall=(T.mode===2&&T.finals&&T.finals.length>0);
 if(showOverall){renderOverallRanking(el);h+=el.innerHTML;}
 T.pools.forEach(p=>{h+=renderRankingTable(calcPoolRanking(p.id),p.name,T.mode===2?p.quali:0);});
 }
@@ -4620,6 +4626,11 @@ const prev=T;T=t;
 try{return fn();}finally{T=prev;}
 }
 // Ordre du classement général du tournoi T (le même que celui affiché / exporté) + tournoi terminé ?
+// Rang (0 = premier) d'un joueur : dans sa poule en mode 1, dans le classement général sinon
+function rankInOrder(ord,id){
+if(ord.groups){for(const g of ord.groups){const i=g.ids.indexOf(id);if(i>=0)return i;}return -1;}
+return ord.ids.indexOf(id);
+}
 function tournamentOrder(){
 const allDone=T.matches.length>0&&T.matches.every(m=>m.status==='done'||involvesExcluded(m));
 const wPts=T.settings.winPts!==undefined?T.settings.winPts:3;
@@ -4631,10 +4642,9 @@ const last=T.bracket&&T.bracket.rounds&&T.bracket.rounds[T.bracket.rounds.length
 return {ids:getBracketFullRanking().map(e=>e.id),finished:!!(allDone&&last&&last.length===1)};
 }
 if(T.mode===1){
-const all=[];
-for(const pool of T.pools)for(const r of calcPoolRanking(pool.id))all.push(r);
-all.sort(cmpRank);
-return {ids:all.filter(r=>!r.out&&!r.excl).map(r=>r.id),finished:allDone};
+// poules indépendantes : un podium par poule, pas de classement croisé
+const groups=T.pools.map(pool=>({name:pool.name,ids:calcPoolRanking(pool.id).filter(r=>!r.out&&!r.excl).map(r=>r.id)}));
+return {ids:[].concat(...groups.map(g=>g.ids)),groups,finished:allDone};
 }
 // mode 2 : groupes de finale (rang de finale, puis points cumulés), puis joueurs hors finales
 if(!T.finals||!T.finals.length)return {ids:[],finished:false};
@@ -4685,7 +4695,7 @@ const k=p.name.trim().toUpperCase();
 const e=c.players[k]||(c.players[k]={name:p.name.trim(),tn:0,j:0,w:0,l:0,d:0,pf:0,pa:0,pts:0,first:0,podium:0});
 e.tn++;e.j+=s.played;e.w+=s.w;e.l+=s.l;e.d+=s.d;e.pf+=s.pf;e.pa+=s.pa;e.pts+=s.pts;
 if(ord.finished){
-const idx=ord.ids.indexOf(p.id);
+const idx=rankInOrder(ord,p.id);
 if(idx===0)e.first++;
 if(idx>=0&&idx<3)e.podium++;
 }

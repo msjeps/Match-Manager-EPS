@@ -6,6 +6,16 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.7.1 - 2026-11-17 (APK versionCode 28, cache v45)
+
+Poules par niveau : les poules sont independantes, plus de classement general.
+- **Classements** : l'onglet « General » n'existe plus en mode 1 (il reste en mode 2, avec les finales).
+- **Podium** : un podium par poule (carte Podium et fenetre de fin de tournoi) quand il y a plusieurs poules.
+- **Export XLSX et impression** : un classement par poule, rang repart de 1 dans chaque poule.
+- **Palmares** : « 1ers » et « podiums » comptes dans la poule du joueur.
+
+---
+
 ## 2.7.0 - 2026-11-17 (APK versionCode 27, cache v44)
 
 Audit ergonomie, vue d'une utilisatrice debutante (tablette, PC, Mac). Aucune regle de calcul modifiee.
