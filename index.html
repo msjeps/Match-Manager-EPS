@@ -208,6 +208,13 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 .queue-t.busy{background:rgba(243,193,70,.18);color:var(--pri-lt);border-color:var(--pri)}
 .queue-next{background:var(--surf2);border-radius:10px;padding:10px 12px}
 .queue-row{padding:3px 0}
+.queue-big{padding:16px}
+.queue-big .queue-t{font-size:1em;padding:8px 14px;min-height:36px}
+.queue-big .queue-next{padding:16px 18px}
+.queue-big .qn-ctx{font-size:.95em;color:var(--txt2)}
+.queue-big .qn-names{font-weight:700;font-size:1.7em;line-height:1.25;margin:8px 0}
+.queue-big .qn-info{font-size:1.35em;margin-top:6px}
+.queue-big .qn-btn{min-height:60px;font-size:1.25em;margin-top:14px;width:100%}
 .tools-bar{display:flex;flex-wrap:wrap;margin:0 -4px 8px}
 .tools-bar button{margin:4px}
 .badge-out{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;font-size:.7em;font-weight:700;background:rgba(244,67,54,.2);color:#EF5350}
@@ -422,6 +429,7 @@ body.light-mode .badge-out{color:#C62828}
 <div id="matches-tabs" class="tab-bar"></div>
 <div id="matches-progress"></div>
 <div id="export-banner"></div>
+<div id="pool-queue"></div>
 <div id="matches-list"></div>
 <div class="btn-group" style="margin-top:20px">
 <button class="btn-secondary" onclick="showScreen('scr-rankings')">&#128202; Classements</button>
@@ -1401,6 +1409,7 @@ const pool=T.pools[curPoolIdx];
 if(!pool)return;
 const matches=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool');
 renderMatchesHeader();
+renderPoolQueue();
 renderTimerBar('timer-container',T.settings.duration);
 document.getElementById('matches-list').innerHTML=sortedPoolMatches(matches).map(m=>renderMatchCard(m)).join('');
 }
@@ -4274,7 +4283,8 @@ if(!el||!T)return;
 const q=computeQueue(phase);
 const playingNow=T.matches.filter(m=>m.status==='playing');
 if(!q.entries.length&&!playingNow.length){el.innerHTML='';return;}
-let h='<div class="card queue-card"><div style="font-weight:700;margin-bottom:6px">&#9201; File d\'attente <span style="font-weight:400;color:var(--txt2);font-size:.85em">('+q.entries.length+' &agrave; jouer)</span></div>';
+const big=phase==='pool';
+let h='<div class="card queue-card'+(big?' queue-big':'')+'"><div style="font-weight:700;margin-bottom:6px'+(big?';font-size:1.15em':'')+'">'+(big?'&#9654; Matchs &agrave; lancer':'&#9201; File d\'attente')+' <span style="font-weight:400;color:var(--txt2);font-size:.85em">('+q.entries.length+' &agrave; jouer)</span></div>';
 h+='<div class="queue-tables">';
 for(let t=1;t<=q.nbTables;t++){
 const u=q.usedTables[t];
@@ -4284,16 +4294,16 @@ h+='</div>';
 const first=q.entries.find(e=>e.ready&&e.table!==null)||q.entries.find(e=>e.ready);
 if(first){
 const m=first.m;
-h+='<div class="queue-next"><div style="font-size:.78em;color:var(--txt2)">Prochain match libre &middot; '+escH(matchContextLabel(m))+'</div>'+
-'<div style="font-weight:700;font-size:1.05em;margin:2px 0">'+escH(playerName(m.p1))+' <span style="color:var(--txt2);font-weight:400">contre</span> '+escH(playerName(m.p2))+'</div>'+
-'<div style="font-size:.88em">'+(first.table!==null?'Table <b>T'+first.table+'</b>':'<span style="color:var(--err-txt)">Aucune table libre</span>')+
+h+='<div class="queue-next"><div class="qn-ctx" style="font-size:.78em;color:var(--txt2)">Prochain match libre &middot; '+escH(matchContextLabel(m))+'</div>'+
+'<div class="qn-names" style="font-weight:700;font-size:1.05em;margin:2px 0">'+escH(playerName(m.p1))+' <span style="color:var(--txt2);font-weight:400">contre</span> '+escH(playerName(m.p2))+'</div>'+
+'<div class="qn-info" style="font-size:.88em">'+(first.table!==null?'Table <b>T'+first.table+'</b>':'<span style="color:var(--err-txt)">Aucune table libre</span>')+
 (first.ref?' &middot; Arbitre : <b>'+escH(playerName(first.ref))+'</b>':'')+'</div>'+
-(first.table!==null?'<button class="btn-primary btn-sm" style="min-height:44px;margin-top:8px" onclick="launchQueued(\''+m.id+'\')">&#9654; Lancer ce match</button>':'')+
+(first.table!==null?'<button class="btn-primary btn-sm qn-btn" style="min-height:44px;margin-top:8px" onclick="launchQueued(\''+m.id+'\')">&#9654; Lancer ce match</button>':'')+
 '</div>';
 }else if(q.entries.length){
 h+='<div class="queue-next" style="color:var(--txt2)">Aucun match disponible : les joueurs restants sont en jeu ou arbitrent.</div>';
 }
-const rest=q.entries.filter(e=>e!==first);
+const rest=big?[]:q.entries.filter(e=>e!==first);
 if(rest.length){
 h+='<div style="margin-top:8px;font-size:.85em">';
 rest.slice(0,6).forEach((e,i)=>{
@@ -4305,6 +4315,23 @@ if(rest.length>6)h+='<div style="color:var(--txt2)">+ '+(rest.length-6)+' autre(
 h+='</div>';
 }
 h+='</div>';
+el.innerHTML=h;
+}
+// File d'attente de la poule affichée (onglet) : visible seulement dans la poule concernée
+function renderPoolQueue(){
+const el=document.getElementById('pool-queue');
+if(!el)return;
+const pool=T&&T.pools[curPoolIdx];
+if(!pool){el.innerHTML='';return;}
+const q=computeQueue('pool');
+const es=q.entries.filter(e=>e.m.poolId===pool.id);
+if(!es.length){el.innerHTML='';return;}
+let h='<div class="card queue-card"><div style="font-weight:700;margin-bottom:6px">&#9201; File d\'attente de la poule <span style="font-weight:400;color:var(--txt2);font-size:.85em">('+es.length+' &agrave; jouer)</span></div><div style="font-size:.9em">';
+es.forEach((e,i)=>{
+h+='<div class="queue-row"><span style="color:var(--txt2)">'+(i+1)+'.</span> '+escH(playerName(e.m.p1))+' / '+escH(playerName(e.m.p2))+
+(e.ready?' <span style="color:var(--ok-txt)">pr&ecirc;t</span>':' <span style="color:var(--txt2)">attend : '+escH(e.why.join(', '))+'</span>')+'</div>';
+});
+h+='</div></div>';
 el.innerHTML=h;
 }
 // Mise à jour ciblée après un changement sur un seul match : on remplace sa carte, on rafraîchit
@@ -4362,6 +4389,7 @@ reorderPoolCards();
 renderTools('tools-matches');
 renderMatchesHeader();
 renderQueue('queue-matches','pool');
+renderPoolQueue();
 }else if(m.phase==='final'){
 renderTools('tools-finals');
 renderFinalsProgress();
