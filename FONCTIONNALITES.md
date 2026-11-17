@@ -1,4 +1,4 @@
-# Fonctionnalités - Match Manager EPS (version 2.3)
+# Fonctionnalités - Match Manager EPS (version 2.6)
 
 Catalogue de ce que l'application fait aujourd'hui. Pour l'historique : [CHANGELOG.md](CHANGELOG.md). Pour l'architecture et les conventions de code : [CLAUDE.md](CLAUDE.md).
 
@@ -26,6 +26,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Saisie un par un, par liste collée, ou import `.csv` / `.txt` (`NOM;Niveau`, séparateurs `;` `,` tabulation).
 - Noms toujours en majuscules, niveau de 0 à 5.
 - Listes sauvegardées et rechargées d'un tournoi à l'autre.
+- **Régénération des poules protégée** (v2.4.2) : « Valider et générer les matchs » et « Créer les poules » demandent confirmation (et prennent un instantané pour « Annuler ») si des matchs de poule sont joués ou en cours ; « Retour » de l'écran des matchs mène à l'accueil dès qu'un match est joué.
 - **Dispensé / absent / rétablir** (v2.5) : un joueur en pause garde sa place et ses matchs (rien n'est supprimé ni regénéré) ; ses matchs non joués attendent (carte grisée « En pause », hors file d'attente, ni lancement ni validation). *Dispensé* (bouton **D** à l'inscription ou « Joueurs ») : arbitre toutes les poules quel que soit le réglage des arbitres ; *absent* : n'arbitre pas. « Rétablir » le remet en jeu. Classement : joueurs en pause en couleur (orange dispensé, gris absent) à leur rang réel, colonnes Moy (points par match) et J (joués / total), bandeau « Classement provisoire » et bascule du tri (points par match par défaut tant qu'un match est en pause, sinon points totaux). Réglage des arbitres (poule / tous) aussi dans « Joueurs ». Modèle : `player.away = 'absent' | 'dispense'`.
 - **Clôture sans eux** (v2.6) : quand il ne reste que des matchs en pause, choix « Attendre » ou « Clôturer sans eux » (`T.excluded`) : leurs matchs, joués ou non, sont ignorés du calcul pour tous ; non classés en bas ; finales du mode 2 possibles ; « Rouvrir » / « Annuler » / rétablir pour revenir en arrière. Exports XLSX et impression : statut, joués / à jouer, mention provisoire.
 - **Sauvegarde sur PC** (v2.5) : bandeau orange « n résultats non exportés » et avertissement de Chrome à la fermeture (navigateur seulement), nom de fichier JSON avec l'heure, import par glisser-déposer, stockage persistant demandé au navigateur.
@@ -71,7 +72,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - **XLSX** (fichier Excel fait main, sans dépendance) : onglet « Matchs » (poules, finales, tableau, arbitre, bonus ; en 2 manches gagnantes : manches gagnées, détail des 3 sets et total de points par joueur) et onglet « Classement final ». Nom : `MatchManagerEPS_Classe_Date.xlsx`.
 - **Impression / PDF** : A4 noir et blanc (classements, arbre du tableau en paysage, matchs et scores), au choix. APK : gestionnaire d'impression Android ; navigateur : `print()`.
 - **QR code des résultats** (préfixe `TENEPS|`, lu par l'app SCAN EPS) : coupé par ligne entière au-delà de 2000 caractères, avec `...+N obs`.
-- **Sauvegarde / transfert JSON** : un tournoi ou tous, en fichier ou par copier/coller, import avec contrôle des identifiants et des textes (id déjà présent : import en copie). Pas de transfert par QR : un tournoi dépasse la capacité d'un QR.
+- **Sauvegarde / transfert JSON** (nom `MatchManagerEPS_sauvegarde_<Classe>_<jj-mm-aaaa>_<HHhMM>.json`) : un tournoi ou tous, en fichier ou par copier/coller, import avec contrôle des identifiants et des textes (id déjà présent : import en copie). Pas de transfert par QR : un tournoi dépasse la capacité d'un QR.
 - Le fichier enregistré passe par `AndroidDownload` dans l'APK (Téléchargements), par un téléchargement classique dans le navigateur.
 
 ## 8. Écrans et réglages

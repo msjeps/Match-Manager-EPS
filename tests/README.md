@@ -26,6 +26,11 @@ Node 20 ou plus, aucune dépendance. Les tests tournent sans navigateur, sans r�
 | Mot de passe | empreinte, pas de mot de passe par défaut en clair dans le code |
 | Palmarès | classes sans casse, forfaits exclus, podium si tournoi terminé |
 | Re-rendu ciblé | `matchSig`, `rankingsSig`, `bracketShapeSig` : stables sans changement, différentes après un résultat ou un tour généré |
+| Régénération des poules | confirmation obligatoire avec résultats saisis, rien d'effacé avant, « Annuler » restaure |
+| Dispensés / absents | matchs et ordre conservés, matchs en pause (ni lancement ni validation, hors file d'attente), arbitres (dispensé partout, absent jamais), classement provisoire par match, import du statut |
+| Clôture sans eux | décision demandée seulement si tout le jouable est terminé, matchs exclus du calcul de tous, non classés en dernier, tournoi terminé, annuler et rétablir |
+| Sauvegarde sur PC | suivi du dernier export, résultats non exportés, nom de fichier avec l'heure |
+| Export avec statut | colonnes Statut, Joués, À jouer, titre « PROVISOIRE » |
 | Livraison | `index.html` = assets APK, `versionName` Gradle = `APP_VERSION` |
 
 ## Ce qui n'est pas couvert

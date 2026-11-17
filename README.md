@@ -19,11 +19,13 @@ Application PWA de gestion de tournois pour les cours d'EPS (collège & lycée) 
 - Impression / PDF A4 noir et blanc : classements, arbre du tableau, matchs et scores
 - Palmarès par classe : cumul des tournois d'une classe (victoires, % victoires, points, podiums)
 - Export XLSX (détail des sets et totaux en 2 manches gagnantes), QR code des résultats (lisible par [SCAN EPS](https://msjeps.github.io/scaneps/)), sauvegarde et transfert de tournoi en JSON
+- Dispensés et absents : matchs en pause sans rien supprimer, dispensé arbitre toutes les poules, classement provisoire (points par match), clôture « sans eux » ou attente de leurs matchs
+- Sauvegarde sur ordinateur : bandeau « résultats non exportés », avertissement à la fermeture, import JSON par glisser-déposer
 - Sauvegarde automatique continue (localStorage), résiste aux rotations d'écran et sorties d'app, 100 % hors ligne
 
 Tests : `npm test` (Node 20 ou plus, aucune dépendance), voir [tests/README.md](tests/README.md).
 
-Version actuelle : **2.4** (APK `versionCode 20`, publiée en Release GitHub, [téléchargement](https://github.com/msjeps/Match-Manager-EPS/releases/latest/download/MatchManagerEPS.apk)). Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md).
+Version actuelle : **2.6** (APK `versionCode 23`, publiée en Release GitHub, [téléchargement](https://github.com/msjeps/Match-Manager-EPS/releases/latest/download/MatchManagerEPS.apk)). Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md).
 
 ## Documentation du projet
 
