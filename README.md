@@ -25,7 +25,7 @@ Application PWA de gestion de tournois pour les cours d'EPS (collège & lycée) 
 
 Tests : `npm test` (Node 20 ou plus, aucune dépendance), voir [tests/README.md](tests/README.md).
 
-Version actuelle : **2.6** (APK `versionCode 23`, publiée en Release GitHub, [téléchargement](https://github.com/msjeps/Match-Manager-EPS/releases/latest/download/MatchManagerEPS.apk)). Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md).
+Version actuelle : **2.7.1** (APK `versionCode 28`, publiée en Release GitHub, [téléchargement](https://github.com/msjeps/Match-Manager-EPS/releases/latest/download/MatchManagerEPS.apk)). Détail : [FONCTIONNALITES.md](FONCTIONNALITES.md).
 
 ## Documentation du projet
 

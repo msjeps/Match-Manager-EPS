@@ -10,7 +10,7 @@ Contexte : tablettes Android (Lenovo TB-X606F, WebView figé) et iPad, 100 % hor
 
 | Mode | Principe |
 |---|---|
-| 1 - Poules de niveau | Poules indépendantes, un classement par poule, classement général croisé si plusieurs poules. |
+| 1 - Poules de niveau | Poules indépendantes, un classement et un podium par poule, pas de classement général (les poules sont indépendantes). |
 | 2 - Poules + finales | Phase de poules, puis finales croisées (les 1ers entre eux, les 2èmes entre eux...). Chaque poule envoie ses `qualifiés`. |
 | 3 - Tableau à élimination | Têtes de série selon le niveau, exemptions (byes), petite finale, consolantes en round-robin pour les perdants de chaque tour, tableau visuel. |
 
