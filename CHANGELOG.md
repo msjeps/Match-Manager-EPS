@@ -13,6 +13,7 @@ Poules par niveau : les poules sont independantes, plus de classement general.
 - **Podium** : un podium par poule (carte Podium et fenetre de fin de tournoi) quand il y a plusieurs poules.
 - **Export XLSX et impression** : un classement par poule, rang repart de 1 dans chaque poule.
 - **Palmares** : « 1ers » et « podiums » comptes dans la poule du joueur.
+- **Publication** : Release GitHub `v2.7.1` le 2026-11-17 (APK SHA-256 `948e16d7...c4770e051`, guide `match-manager-eps.pdf` joint). Guide : precision sur le podium par poule.
 
 ---
 
