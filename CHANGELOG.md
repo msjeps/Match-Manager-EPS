@@ -6,6 +6,13 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.4 (correctif) - 2026-11-17 (APK versionCode 21, cache v37)
+
+Correctif des resultats effaces : sur l'ecran des matchs, « Retour » menait a la repartition, et « Valider et generer les matchs » (ou « Creer les poules ») regenerait tous les matchs sans rien demander, ce qui supprimait les scores de la seance. Desormais :
+- **Confirmation obligatoire** (`guardResults`) si des matchs de poule sont joues ou en cours, avec le nombre de matchs concernes ; un instantane est pris avant (`pushUndo`), donc « Annuler » restaure les resultats.
+- **« Retour » de l'ecran des matchs** mene a l'accueil des qu'un match est joue ou en cours.
+- Tests de regression ajoutes (`npm test` : 29 tests). Release GitHub `v2.4.2`. Version affichee inchangee (2.4).
+
 ## 2.4 - 2026-11-11 (APK versionCode 19, cache v35)
 
 Retours du test en classe, mode 1 (poules, 12 eleves par poule) :

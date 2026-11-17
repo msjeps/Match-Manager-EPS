@@ -328,6 +328,30 @@ test('palmarès : classes rapprochées sans casse, forfaits exclus, podium si te
   assert.deepEqual([alice.w, alice.l, alice.first, alice.podium], [2, 0, 1, 1]);
 });
 
+test('regénérer les matchs avec des résultats saisis : confirmation obligatoire, rien d\'effacé avant (régression 2026-11-17)', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'g1', names: ['A', 'B', 'C', 'D'] });
+  app.T = t;
+  play(t.matches[0], 11, 5);
+  const idDone = t.matches[0].id;
+  app.fn('validateDistribution')();
+  assert.equal(t.matches.length, 6, 'aucun match supprimé sans confirmation');
+  assert.equal(t.matches[0].id, idDone);
+  assert.equal(t.matches[0].status, 'done', 'le résultat est conservé');
+  app.ctx.modalOk();
+  assert.notEqual(t.matches[0].id, idDone, 'après confirmation, les matchs sont regénérés');
+  assert.equal(t.matches.every(m => m.status === 'pending'), true);
+  app.fn('undoLast')();
+  assert.equal(app.T.matches.find(m => m.id === idDone).status, 'done', 'Annuler restaure le résultat');
+});
+test('regénérer les matchs sans résultat saisi : aucune confirmation demandée', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'g2', names: ['A', 'B', 'C', 'D'] });
+  app.T = t;
+  const old = t.matches[0].id;
+  app.fn('validateDistribution')();
+  assert.notEqual(t.matches[0].id, old);
+});
 test('version affichée et version Android alignées', () => {
   const app = createApp();
   const gradle = fs.readFileSync(path.join(__dirname, '..', 'android', 'app', 'build.gradle'), 'utf8');

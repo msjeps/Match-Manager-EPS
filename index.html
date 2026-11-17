@@ -1231,6 +1231,7 @@ toast('Répartition incomplète : '+placesTotal+' place(s) pour '+T.players.leng
 return;
 }
 }
+guardResults(()=>{
 T.pools=[];
 for(let i=0;i<nb;i++){
 const quali=T.mode===2?(+document.getElementById('quali-'+i)?.value||2):0;
@@ -1239,6 +1240,7 @@ T.pools.push({id:uid(),name:'Poule '+(i+1),playerIds:[],quali});
 distributePlayers('level');
 save();
 showScreen('scr-distribution');
+});
 }
 
 /* ===== DISTRIBUTION ===== */
@@ -1320,14 +1322,22 @@ selectedPlayerForMove=null;
 save();renderDistribution();toast('Joueur d\u00e9plac\u00e9');
 }
 
+// Regénérer les poules efface tous les résultats : on exige une confirmation (et on garde un « Annuler »)
+function guardResults(next){
+const played=T.matches.filter(m=>m.phase==='pool'&&(m.status==='done'||m.status==='playing')).length;
+if(!played){next();return;}
+askConfirm('Effacer les résultats ?','Cette action supprime les '+played+' match(s) déjà joué(s) ou en cours de cette phase. Les scores seront perdus (« Annuler » sur l\u2019écran des matchs permet de revenir en arrière).','Effacer et regénérer',()=>{pushUndo('Régénération des poules');next();},true);
+}
 function validateDistribution(){
 const empty=T.pools.filter(p=>p.playerIds.length<2);
 if(empty.length){toast('Chaque poule doit avoir au moins 2 joueurs');return;}
 const placed=T.pools.reduce((n,p)=>n+p.playerIds.length,0);
 if(placed!==T.players.length){toast('Tous les joueurs doivent être dans une poule ('+placed+'/'+T.players.length+')',5000);return;}
+guardResults(()=>{
 generateAllPoolMatches();
 T.phase='matches';save();
 showScreen('scr-matches');
+});
 }
 
 /* ===== ROUND ROBIN ===== */
@@ -1832,6 +1842,7 @@ renderTimerBar('bracket-timer',T?.settings?.duration);
 
 function backFromMatches(){
 if(T.mode===3)showScreen('scr-bracket');
+else if(T.matches.some(m=>m.phase==='pool'&&(m.status==='done'||m.status==='playing')))showScreen('scr-home');
 else showScreen('scr-distribution');
 }
 
