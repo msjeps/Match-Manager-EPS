@@ -26,6 +26,8 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Saisie un par un, par liste collée, ou import `.csv` / `.txt` (`NOM;Niveau`, séparateurs `;` `,` tabulation).
 - Noms toujours en majuscules, niveau de 0 à 5.
 - Listes sauvegardées et rechargées d'un tournoi à l'autre.
+- **Dispensé / absent / rétablir** (v2.5) : un joueur en pause garde sa place et ses matchs (rien n'est supprimé ni regénéré) ; ses matchs non joués attendent (carte grisée « En pause », hors file d'attente, ni lancement ni validation). *Dispensé* (bouton **D** à l'inscription ou « Joueurs ») : arbitre toutes les poules quel que soit le réglage des arbitres ; *absent* : n'arbitre pas. « Rétablir » le remet en jeu. Classement : joueurs en pause en couleur (orange dispensé, gris absent) à leur rang réel, colonnes Moy (points par match) et J (joués / total), bandeau « Classement provisoire » et bascule du tri (points par match par défaut tant qu'un match est en pause, sinon points totaux). Réglage des arbitres (poule / tous) aussi dans « Joueurs ». Modèle : `player.away = 'absent' | 'dispense'`.
+- **Sauvegarde sur PC** (v2.5) : bandeau orange « n résultats non exportés » et avertissement de Chrome à la fermeture (navigateur seulement), nom de fichier JSON avec l'heure, import par glisser-déposer, stockage persistant demandé au navigateur.
 - **Pendant le tournoi** (bouton « Joueurs ») :
   - retirer un joueur : *absent* (matchs annulés, sorti de la poule) ou *forfait* (matchs joués conservés, en bas de classement) ;
   - ajouter un joueur à une poule avant les finales ;

@@ -156,9 +156,21 @@ def contenu():
     s.append(B("<b>Mode tablette élève</b> (icône téléphone sur un match) : un match en grand avec gros boutons + et -, "
                "le joueur en tête s'affiche en vert, confirmation avant validation, puis match suivant. Utile pour "
                "laisser les élèves saisir le score."))
-    s.append(B("<b>Joueurs absents ou forfaits</b> (bouton « Joueurs ») : un joueur absent sort de la poule et ses "
-               "matchs sont supprimés ; un forfait reste classé en dernier, ses matchs joués sont conservés et, en "
-               "tableau, l'adversaire est qualifié. Un joueur peut aussi être ajouté en retard."))
+    s.append(B("<b>Dispensés et absents (matchs en pause)</b> : un élève qui ne peut pas jouer garde sa place dans la "
+               "poule et tous ses matchs, rien n'est recalculé. <b>Dispensé</b> : bouton D à l'inscription ou bouton "
+               "« Dispensé » dans « Joueurs » ; il ne joue pas et arbitre toutes les poules. <b>Absent</b> (bouton "
+               "« Joueurs ») : ses matchs non joués attendent la prochaine séance, il n'arbitre pas. Les matchs en "
+               "pause sont grisés et absents de la file d'attente. « Rétablir » remet le joueur en jeu dans l'ordre "
+               "d'origine. Le classement provisoire garde ces joueurs à leur rang, en couleur (orange dispensé, gris "
+               "absent), avec les colonnes Moy (points par match) et J (joués / total) ; un bouton choisit le tri "
+               "« Points par match » (par défaut tant que des matchs sont en pause) ou « Points totaux »."))
+    s.append(B("<b>Forfait ou retrait définitif</b> (bouton « Joueurs », « Retirer ») : un forfait reste classé en "
+               "dernier, ses matchs joués sont conservés et, en tableau, l'adversaire est qualifié. Un joueur peut "
+               "aussi être ajouté en retard. Le réglage des arbitres (poule ou tous) est aussi dans « Joueurs »."))
+    s.append(B("<b>Sauvegarde sur un ordinateur</b> : si la session efface les données du navigateur à la "
+               "déconnexion, exportez le fichier JSON (écran d'accueil, « Sauvegarde / transfert », ou bandeau "
+               "orange) avant de vous déconnecter et déposez-le dans votre Drive. À la séance suivante, téléchargez-le "
+               "et glissez-le dans la fenêtre d'import. Le fichier XLSX ne permet pas de reprendre un tournoi."))
     s.append(B("<b>Annuler</b> : revient à l'état d'avant la dernière action (8 niveaux par tournoi), y compris après "
                "la génération de finales."))
     s.append(B("<b>Modifier un résultat</b> : si des finales ou des tours suivants en dépendent, ils sont supprimés "

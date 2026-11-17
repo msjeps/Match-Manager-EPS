@@ -352,6 +352,103 @@ test('regénérer les matchs sans résultat saisi : aucune confirmation demandé
   app.fn('validateDistribution')();
   assert.notEqual(t.matches[0].id, old);
 });
+// ----- statuts « dispensé » / « absent » (matchs en pause, rien n'est supprimé) -----
+test('absent / dispensé : matchs conservés et inchangés, en pause, rétablissement', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'a1', names: ['A', 'B', 'C', 'D'] });
+  app.T = t;
+  play(t.matches[0], 11, 4);
+  const avant = JSON.stringify(t.matches.map(m => [m.id, m.p1, m.p2, m.matchNum]));
+  const pid = t.players[3].id;
+  app.fn('setAway')(pid, 'absent');
+  assert.equal(JSON.stringify(t.matches.map(m => [m.id, m.p1, m.p2, m.matchNum])), avant, 'ordre et composition inchangés');
+  assert.equal(t.pools[0].playerIds.includes(pid), true, 'reste dans la poule');
+  const mine = t.matches.filter(m => m.p1 === pid || m.p2 === pid);
+  assert.equal(mine.every(m => app.fn('isWaitingMatch')(m) || m.status === 'done'), true);
+  assert.equal(t.matches.filter(m => !mine.includes(m)).some(m => app.fn('isWaitingMatch')(m)), false);
+  app.fn('setAway')(pid, null);
+  assert.equal(t.players[3].away, undefined);
+  assert.equal(t.matches.some(m => app.fn('isWaitingMatch')(m)), false);
+});
+test('absent / dispensé : un match en pause ne peut ni être lancé ni validé', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'a2', names: ['A', 'B', 'C'] });
+  app.T = t;
+  const m = t.matches[0];
+  app.fn('setAway')(m.p1, 'dispense');
+  m.score1 = null; document_stub_noop();
+  app.fn('validateMatch')(m.id);
+  assert.equal(m.status, 'pending', 'pas de validation');
+  app.fn('launchQueued')(m.id);
+  assert.equal(m.status, 'pending', 'pas de lancement');
+  function document_stub_noop() {}
+});
+test('file d\'attente : les matchs d\'un absent ou d\'un dispensé ne sont pas proposés', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'a3', names: ['A', 'B', 'C', 'D'] });
+  app.T = t;
+  const away = t.players[0].id;
+  app.fn('setAway')(away, 'dispense');
+  const q = app.fn('computeQueue')('pool');
+  assert.equal(q.entries.length, 3, 'seuls les 3 matchs sans le dispensé');
+  assert.equal(q.entries.some(e => e.m.p1 === away || e.m.p2 === away), false);
+});
+test('arbitres : le dispensé arbitre toutes les poules, l\'absent jamais', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'a4', names: ['A', 'B', 'C', 'D', 'E', 'F'],
+    pools: [['a4p0', 'a4p1', 'a4p2'], ['a4p3', 'a4p4', 'a4p5']] });
+  t.settings.refScope = 'pool';
+  app.T = t;
+  const m = t.matches.find(x => x.poolId === t.pools[0].id);
+  const ids = () => app.fn('getRefereeCandidates')(m).map(p => p.id);
+  app.fn('setAway')('a4p3', 'dispense');
+  assert.equal(ids().includes('a4p3'), true, 'dispensé d\'une autre poule : arbitre');
+  assert.equal(ids().includes('a4p4'), false, 'joueur d\'une autre poule : non, réglage par poule');
+  app.fn('setAway')('a4p3', 'absent');
+  assert.equal(ids().includes('a4p3'), false, 'absent : n\'arbitre pas');
+});
+test('classement provisoire : par match par défaut, colonne joués / à jouer, absent classé selon ses résultats', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'a5', names: ['A', 'B', 'C', 'D'] });
+  app.T = t;
+  const get = (x, y) => t.matches.find(m => (m.p1 === x && m.p2 === y) || (m.p1 === y && m.p2 === x));
+  // D (absent) gagne son seul match joué ; A gagne 2 matchs sur 3
+  const D = 'a5p3';
+  play(get(D, 'a5p0'), 0, 0); // remplacé juste après
+  const m1 = get(D, 'a5p0'); play(m1, m1.p1 === D ? 11 : 3, m1.p1 === D ? 3 : 11);
+  play(get('a5p0', 'a5p1'), get('a5p0', 'a5p1').p1 === 'a5p0' ? 11 : 2, get('a5p0', 'a5p1').p1 === 'a5p0' ? 2 : 11);
+  app.fn('setAway')(D, 'absent');
+  assert.equal(app.fn('rankModeEff')(), 'avg');
+  const r = app.fn('calcPoolRanking')(t.pools[0].id);
+  const rd = r.find(x => x.id === D);
+  assert.equal(rd.played, 1); assert.equal(rd.left, 2); assert.equal(rd.away, 'absent');
+  assert.equal(r[0].id, D, 'avec 1 victoire sur 1, l\'absent est provisoirement en tête (points par match)');
+  t.settings.rankMode = 'total';
+  const r2 = app.fn('calcPoolRanking')(t.pools[0].id);
+  assert.notEqual(r2[0].id, D, 'en points totaux, il passe derrière');
+});
+test('import : le statut away est conservé s\'il est valide, sinon supprimé', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'a6', names: ['A', 'B', 'C'] });
+  t.players[0].away = 'dispense'; t.players[1].away = 'n\'importe quoi';
+  const out = app.fn('sanitizeImportedTournament')(JSON.parse(JSON.stringify(t)));
+  assert.equal(out.players[0].away, 'dispense');
+  assert.equal(out.players[1].away, undefined);
+});
+test('suivi de l\'export : résultats non exportés comptés, remis à zéro après export, nom avec l\'heure', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'e1', names: ['A', 'B', 'C'] });
+  app.state.tournaments = [t]; app.T = t;
+  assert.equal(app.fn('exportStatus')().never, true, 'jamais exporté');
+  play(t.matches[0], 11, 3);
+  app.fn('exportBackup')(0, 'file');
+  let st = app.fn('exportStatus')();
+  assert.equal(st.dirty, false);
+  play(t.matches[1], 11, 5);
+  st = app.fn('exportStatus')();
+  assert.equal(st.dirty, true); assert.equal(st.n, 1, 'un résultat saisi depuis l\'export');
+  assert.match(app.fn('backupFileName')(t), /^MatchManagerEPS_sauvegarde_.+_\d{2}-\d{2}-\d{4}_\d{2}h\d{2}\.json$/);
+});
 test('version affichée et version Android alignées', () => {
   const app = createApp();
   const gradle = fs.readFileSync(path.join(__dirname, '..', 'android', 'app', 'build.gradle'), 'utf8');

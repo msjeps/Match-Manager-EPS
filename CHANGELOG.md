@@ -6,6 +6,15 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.5 - 2026-11-17 (APK versionCode 22, cache v38)
+
+Retour du test en classe (2 dispensees, absents d'une seance a l'autre) : retirer un joueur apres la validation des poules supprimait ses matchs ou obligeait a tout regenerer.
+- **Dispense / absent / retablir** (`setAway`, `p.away`) : le joueur garde sa place et tous ses matchs. Les matchs non joues attendent (`isWaitingMatch` : carte « En pause », hors file d'attente, ni lancement ni validation). Dispense : arbitre toutes les poules ; absent : n'arbitre pas. Bouton **D** a l'inscription, boutons Absent / Dispense / Retablir dans « Joueurs ». Mode 3 : un dispense est exclu du tableau, pas de pause (forfait seulement).
+- **Classement provisoire** : joueurs en pause a leur rang reel, en couleur, colonnes Moy et J, bascule « Points par match » / « Points totaux » (`rankModeEff`, `T.settings.rankMode` ; par match par defaut des qu'un match est en pause).
+- **Arbitres** : le reglage poule / tous est aussi accessible depuis « Joueurs » (jusqu'ici seulement a la configuration des poules).
+- **Sauvegarde sur PC** (session qui efface le navigateur a la deconnexion) : bandeau « n resultats non exportes », avertissement a la fermeture, nom de fichier JSON avec l'heure, import par glisser-deposer, `navigator.storage.persist()`.
+- Reste pour le temps 2 (v2.6) : decision de cloture « attendre / cloturer sans eux », blocage des finales du mode 2, exports XLSX / impression avec statut et matchs joues.
+
 ## 2.4 (correctif) - 2026-11-17 (APK versionCode 21, cache v37)
 
 Correctif des resultats effaces : sur l'ecran des matchs, « Retour » menait a la repartition, et « Valider et generer les matchs » (ou « Creer les poules ») regenerait tous les matchs sans rien demander, ce qui supprimait les scores de la seance. Desormais :

@@ -211,6 +211,15 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 .tools-bar{display:flex;flex-wrap:wrap;margin:0 -4px 8px}
 .tools-bar button{margin:4px}
 .badge-out{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;font-size:.7em;font-weight:700;background:rgba(244,67,54,.2);color:#EF5350}
+.badge-away{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;font-size:.7em;font-weight:700;background:rgba(158,158,158,.3);color:var(--txt2)}
+.badge-away.dispense{background:rgba(255,143,0,.25);color:#FFB74D}
+body.light-mode .badge-away.dispense{color:#E65100}
+.ranking-table tr.row-away-dispense td{background:rgba(255,143,0,.22)!important}
+.ranking-table tr.row-away-absent td{background:rgba(158,158,158,.28)!important}
+.match-card.paused{opacity:.6;border-style:dashed}
+.match-pause-note{font-size:.85em;color:var(--txt2);padding:6px 2px}
+.btn-d{background:rgba(255,255,255,.1);border:2px solid transparent;color:var(--txt2);border-radius:50%;min-width:44px;min-height:44px;font-weight:700;cursor:pointer;margin-right:4px}
+.btn-d.on{background:#FF8F00;color:#fff}
 body.light-mode .badge-out{color:#C62828}
 .forfeit-note{font-size:.8em;color:var(--err-txt);font-weight:600;margin:2px 0 6px}
 .live-content{max-width:900px}
@@ -412,6 +421,7 @@ body.light-mode .badge-out{color:#C62828}
 <div id="queue-matches"></div>
 <div id="matches-tabs" class="tab-bar"></div>
 <div id="matches-progress"></div>
+<div id="export-banner"></div>
 <div id="matches-list"></div>
 <div class="btn-group" style="margin-top:20px">
 <button class="btn-secondary" onclick="showScreen('scr-rankings')">&#128202; Classements</button>
@@ -627,7 +637,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.4';
+const APP_VERSION='2.5';
 const LIGHT_MODE_KEY='mmeps_light_mode';
 const SOUND_KEY='mmeps_sound';
 const LS_BACKUP_KEY='teneps_data_illisible';
@@ -812,7 +822,7 @@ function openResults(id){
 T=state.tournaments.find(t=>t.id===id);
 if(T)showScreen('scr-rankings');
 }
-function pnameHtml(p){return p?escH(p.name)+(p.out?'<span class="badge-out">'+(p.out==='absent'?'Absent':'Forfait')+'</span>':''):'?';}
+function pnameHtml(p){return p?escH(p.name)+(p.out?'<span class="badge-out">'+(p.out==='absent'?'Absent':'Forfait')+'</span>':(p.away?'<span class="badge-away '+p.away+'">'+(p.away==='dispense'?'Dispens\u00e9':'Absent')+'</span>':'')):'?';}
 function toast(msg,ms){const d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),ms||2500)}
 
 /* ===== HOME ===== */
@@ -1013,8 +1023,9 @@ document.getElementById('player-count').textContent='Joueurs inscrits ('+T.playe
 if(!T.players.length){el.innerHTML='';empty.style.display='';return;}
 empty.style.display='none';
 el.innerHTML=T.players.map((p,i)=>`<div class="player-item" onclick="toggleLevelEditor('${p.id}',event)">
-<div class="num">${i+1}</div><div class="name">${escH(p.name)}</div>
+<div class="num">${i+1}</div><div class="name">${escH(p.name)}${p.away==='dispense'?'<span class="badge-away dispense">Dispens\u00e9</span>':''}</div>
 <div class="level-trophies">${trophyHtml(p.level)}</div>
+<button class="btn-d${p.away==='dispense'?' on':''}" title="Dispens\u00e9 : ne joue pas, arbitre" onclick="event.stopPropagation();togglePlayerDispense('${p.id}')">D</button>
 <button class="del" onclick="event.stopPropagation();removePlayer('${p.id}')">&times;</button></div>
 <div class="level-editor" id="lved-${p.id}" style="display:none"><div class="level-editor-inner">
 ${lvlBtnsHtml(p.id,p.level)}
@@ -1022,7 +1033,7 @@ ${lvlBtnsHtml(p.id,p.level)}
 }
 
 function toggleLevelEditor(pid,ev){
-if(ev&&ev.target.classList.contains('del'))return;
+if(ev&&(ev.target.classList.contains('del')||ev.target.classList.contains('btn-d')))return;
 const ed=document.getElementById('lved-'+pid);if(!ed)return;
 document.querySelectorAll('.level-editor').forEach(e=>{if(e.id!=='lved-'+pid)e.style.display='none';});
 ed.style.display=ed.style.display==='none'?'':'none';
@@ -1185,7 +1196,10 @@ document.getElementById('pool-config-info').innerHTML=T.mode===1?
 function setRefScope(v){
 if(!T)return;
 T.settings.refScope=v==='pool'?'pool':'all';
-save();updatePoolConfig();
+save();
+const a=document.querySelector('.screen.active');
+if(a&&a.id==='scr-pool-config')updatePoolConfig();
+else{showPlayersManager();if(a&&a.id==='scr-matches')renderMatches();}
 }
 
 function setPoolTables(idx,val){
@@ -1392,7 +1406,7 @@ document.getElementById('matches-list').innerHTML=sortedPoolMatches(matches).map
 }
 // Liste d'une poule : en cours d'abord, puis à jouer, puis terminés en bas (évite de défiler jusqu'au match à saisir)
 function sortedPoolMatches(ms){
-const k=m=>m.status==='playing'?0:m.status==='done'?2:1;
+const k=m=>m.status==='playing'?0:m.status==='done'?3:isWaitingMatch(m)?2:1;
 return ms.slice().sort((a,b)=>(k(a)-k(b))||((a.matchNum||0)-(b.matchNum||0)));
 }
 function reorderPoolCards(){
@@ -1413,13 +1427,15 @@ const matches=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool');
 const done=matches.filter(m=>m.status==='done').length;
 const playing=matches.filter(m=>m.status==='playing').length;
 const total=matches.length;
+const paused=matches.filter(isWaitingMatch).length;
 document.getElementById('matches-progress').innerHTML=`
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-<span style="font-weight:600">${done}/${total} termin\u00e9s${playing?' - <span style="color:var(--accent-txt)">'+playing+' en cours</span>':''}</span>
+<span style="font-weight:600">${done}/${total} termin\u00e9s${playing?' - <span style="color:var(--accent-txt)">'+playing+' en cours</span>':''}${paused?' - <span style="color:var(--txt2)">\u23f8 '+paused+' en pause</span>':''}</span>
 <span style="color:var(--txt2);font-size:.85em">${total?Math.round(100*done/total):0}%</span></div>
 <div class="progress-bar"><div class="progress-fill" style="width:${total?100*done/total:0}%"></div></div>`;
 
 // Next phase button
+const eb=document.getElementById('export-banner');if(eb)eb.innerHTML=exportBannerHtml();
 const btn=document.getElementById('btn-next-phase');
 const allDone=T.matches.filter(m=>m.phase==='pool').every(m=>m.status==='done');
 if(allDone&&T.mode===2&&T.phase!=='finals'){
@@ -1452,12 +1468,14 @@ T.matches.forEach(x=>{if(x.id!==m.id&&x.status!=='done'&&x.refereeId)excluded.ad
 // Plusieurs poules, arbitrage « par poule » : seuls les joueurs de la poule du match (poules uniquement)
 let scope=null;
 if(m.phase==='pool'&&T.settings.refScope==='pool'){const po=T.pools.find(x=>x.id===m.poolId);if(po)scope=new Set(po.playerIds);}
-return T.players.filter(p=>!excluded.has(p.id)&&!p.out&&(!scope||scope.has(p.id)));
+// Dispens\u00e9 : arbitre de toutes les poules ; absent : n'arbitre pas
+return T.players.filter(p=>!excluded.has(p.id)&&!p.out&&p.away!=='absent'&&(!scope||scope.has(p.id)||p.away==='dispense'));
 }
 
 function toggleMatchPlaying(mid,ev){
 if(ev.target.closest('input,select,button,label'))return;
 const m=T.matches.find(x=>x.id===mid);if(!m||m.status==='done')return;
+if(isWaitingMatch(m)){toast('Match en pause : '+waitingWho(m));return;}
 m.status=m.status==='playing'?'pending':'playing';save();
 refreshAfterChange(m);
 }
@@ -1480,14 +1498,16 @@ const p1=T.players.find(p=>p.id===m.p1);
 const p2=T.players.find(p=>p.id===m.p2);
 if(!p1||!p2)return'';
 const isDone=m.status==='done';
+const waiting=isWaitingMatch(m);
+const dis=(isDone||waiting)?'disabled':'';
 const isPlaying=m.status==='playing';
-const statusLabel=isDone?'\u2705 Termin\u00e9':isPlaying?'\u{1F3D3} En cours':'\u23f3 En attente';
+const statusLabel=waiting?'\u23f8 En pause':isDone?'\u2705 Termin\u00e9':isPlaying?'\u{1F3D3} En cours':'\u23f3 En attente';
 const tableBadge=m.table?`<span class="match-table-badge" onclick="editMatchTable('${m.id}',event)" title="Modifier la table">T${m.table}</span>`:`<span class="match-table-badge" onclick="editMatchTable('${m.id}',event)" title="Attribuer une table" style="opacity:.5;border-style:dashed">T?</span>`;
 const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
-const refSelectHtml='<select class="ref-input" id="ref-'+m.id+'" '+(isDone?'disabled':'')+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.85em">'+refOptionsHtml(m)+'</select>';
-const actionsHtml=`<div class="match-actions">
+const refSelectHtml='<select class="ref-input" id="ref-'+m.id+'" '+dis+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.85em">'+refOptionsHtml(m)+'</select>';
+const actionsHtml=waiting?'<div class="match-pause-note">\u23f8 En attente : '+escH(waitingWho(m))+'. Le match reprend quand le joueur est r\u00e9tabli (bouton Joueurs).</div>':`<div class="match-actions">
 ${refSelectHtml}
-<label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${(isDone?m.refBonus:draftValue('refbonus-'+m.id,m.refBonus))?'checked':''} ${isDone?'disabled':''}>+1 pt arb.</label>
+<label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${(isDone?m.refBonus:draftValue('refbonus-'+m.id,m.refBonus))?'checked':''} ${dis}>+1 pt arb.</label>
 ${isDone?(m.forfeit?'':'<button class="btn-secondary btn-sm" onclick="unlockMatch(\''+m.id+'\')">&#9998; Modifier</button>'):
 '<button class="btn-secondary btn-sm" style="min-height:44px" title="Mode tablette \u00e9l\u00e8ve" onclick="openLive(\''+m.id+'\',event)">&#128241;</button><button class="match-validate" onclick="validateMatch(\''+m.id+'\')">&#10003; Valider</button>'}
 </div>`;
@@ -1496,14 +1516,14 @@ const s1=isDone?(m.score1!==null?m.score1:''):draftValue('s1-'+m.id,m.score1!==n
 const s2=isDone?(m.score2!==null?m.score2:''):draftValue('s2-'+m.id,m.score2!==null?m.score2:'');
 const w1=isDone&&m.score1>m.score2;
 const w2=isDone&&m.score2>m.score1;
-return`<div class="match-card ${m.status}" id="mc-${m.id}" data-sig="${matchSig(m)}" onclick="toggleMatchPlaying('${m.id}',event)">
+return`<div class="match-card ${m.status}${waiting?' paused':''}" id="mc-${m.id}" data-sig="${matchSig(m)}" onclick="toggleMatchPlaying('${m.id}',event)">
 <div class="match-header"><span class="match-num">Match ${m.matchNum||''}</span>${tableBadge}
 <span class="match-status ${m.status}">${statusLabel}</span></div>
 ${m.forfeit?forfeitNote(m):''}
 <div class="match-row"><span class="pname"${w1?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p1)}${escH(p1.name)}</span>
-<input type="number" id="s1-${m.id}" value="${s1}" min="0" max="99" class="${w1?'winner':w2?'loser':''}" ${isDone?'disabled':''}></div>
+<input type="number" id="s1-${m.id}" value="${s1}" min="0" max="99" class="${w1?'winner':w2?'loser':''}" ${dis}></div>
 <div class="match-row"><span class="pname"${w2?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p2)}${escH(p2.name)}</span>
-<input type="number" id="s2-${m.id}" value="${s2}" min="0" max="99" class="${w2?'winner':w1?'loser':''}" ${isDone?'disabled':''}></div>
+<input type="number" id="s2-${m.id}" value="${s2}" min="0" max="99" class="${w2?'winner':w1?'loser':''}" ${dis}></div>
 ${T.settings.matchFamily==='time'?renderMatchTimerWidget(m):''}
 ${actionsHtml}</div>`;
 }
@@ -1519,20 +1539,20 @@ const showS3=isDone?(sets[2]&&sets[2].s1!==''):(sw1===1&&sw2===1);
 const s3d=showS3?'':'display:none';
 const isW1=isDone&&(m.score1||0)>(m.score2||0);
 const isW2=isDone&&(m.score2||0)>(m.score1||0);
-return`<div class="match-card ${m.status}" id="mc-${m.id}" data-sig="${matchSig(m)}" onclick="toggleMatchPlaying('${m.id}',event)">
+return`<div class="match-card ${m.status}${waiting?' paused':''}" id="mc-${m.id}" data-sig="${matchSig(m)}" onclick="toggleMatchPlaying('${m.id}',event)">
 <div class="match-header"><span class="match-num">Match ${m.matchNum||''}</span>${tableBadge}
 <span class="match-status ${m.status}">${statusLabel}</span></div>
 ${m.forfeit?forfeitNote(m):''}
 <div class="set-scores">
 <div class="set-header"><div class="pname-col"></div><div class="set-col">S1</div><div class="set-col">S2</div><div class="set-col set3-${m.id}" style="${s3d}">S3</div></div>
 <div class="set-row"><div class="pname-col"${isW1?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p1)}${escH(p1.name)}</div>
-<div class="set-col"><input type="number" id="s1a-${m.id}" value="${sets[0].s1}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
-<div class="set-col"><input type="number" id="s2a-${m.id}" value="${sets[1].s1}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
-<div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3a-${m.id}" value="${sets[2]?sets[2].s1:''}" min="0" max="99" ${isDone?'disabled':''}></div></div>
+<div class="set-col"><input type="number" id="s1a-${m.id}" value="${sets[0].s1}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col"><input type="number" id="s2a-${m.id}" value="${sets[1].s1}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3a-${m.id}" value="${sets[2]?sets[2].s1:''}" min="0" max="99" ${dis}></div></div>
 <div class="set-row"><div class="pname-col"${isW2?' style="color:var(--ok-txt);font-weight:700"':''}>${avatarHtml(p2)}${escH(p2.name)}</div>
-<div class="set-col"><input type="number" id="s1b-${m.id}" value="${sets[0].s2}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
-<div class="set-col"><input type="number" id="s2b-${m.id}" value="${sets[1].s2}" min="0" max="99" ${isDone?'disabled':''} onchange="checkBo3('${m.id}')"></div>
-<div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3b-${m.id}" value="${sets[2]?sets[2].s2:''}" min="0" max="99" ${isDone?'disabled':''}></div></div>
+<div class="set-col"><input type="number" id="s1b-${m.id}" value="${sets[0].s2}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col"><input type="number" id="s2b-${m.id}" value="${sets[1].s2}" min="0" max="99" ${dis} onchange="checkBo3('${m.id}')"></div>
+<div class="set-col set3-${m.id}" style="${s3d}"><input type="number" id="s3b-${m.id}" value="${sets[2]?sets[2].s2:''}" min="0" max="99" ${dis}></div></div>
 </div>${actionsHtml}</div>`;
 }
 
@@ -1549,6 +1569,7 @@ document.querySelectorAll('.set3-'+mid).forEach(el=>{el.style.display=show?'':'n
 
 function validateMatch(mid){
 const m=T.matches.find(x=>x.id===mid);if(!m)return;
+if(isWaitingMatch(m)){toast('Match en pause : '+waitingWho(m));return;}
 const ref=(m.refereeId||'').trim();
 const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
 const drawAllowed=T.settings.matchFamily==='time'&&m.phase!=='bracket';
@@ -1903,17 +1924,28 @@ if(refId&&stats[refId]){stats[refId].refBonus+=refBP;stats[refId].pts+=refBP;}
 }
 }
 const arr=Object.values(stats);
-arr.forEach(r=>{const pl=T.players.find(x=>x.id===r.id);r.out=pl&&pl.out?pl.out:null;});
+arr.forEach(r=>{const pl=T.players.find(x=>x.id===r.id);r.out=pl&&pl.out?pl.out:null;r.away=pl&&pl.away?pl.away:null;r.played=r.w+r.l+r.d;
+r.left=T.matches.filter(m=>m.phase==='pool'&&m.poolId===poolId&&m.status!=='done'&&(m.p1===r.id||m.p2===r.id)).length;});
 return sortPoolRanking(arr,matches,{wPts,l3Pts,lPts,drawPts},T.settings.h2hTiebreak===true);
 }
 
 // Tri d'un classement de poule : forfaits en dernier, points, puis (si activé) confrontation
 // directe entre les joueurs à égalité (mini-classement : points puis différence), puis
 // différence générale et points marqués.
+/* Tri du classement : « par match » (points / matchs jou\u00e9s) ou « total ». Par d\u00e9faut, par match d\u00e8s qu'un match est en pause
+   (les joueurs n'ont plus le m\u00eame nombre de matchs), sinon total. R\u00e9glable (T.settings.rankMode). */
+function rankModeEff(){
+const m=T&&T.settings.rankMode;
+if(m==='avg'||m==='total')return m;
+return T&&T.matches.some(x=>x.phase==='pool'&&isWaitingMatch(x))?'avg':'total';
+}
+function rankKey(r,mode){const n=r.played!==undefined?r.played:(r.w||0)+(r.l||0)+(r.d||0);return mode==='avg'?(n?r.pts/n:0):r.pts;}
+function cmpRank(a,b){const mode=rankModeEff();return (a.out?1:0)-(b.out?1:0)||rankKey(b,mode)-rankKey(a,mode)||b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf;}
 function sortPoolRanking(arr,matches,cfg,h2h){
+const mode=rankModeEff();
 if(h2h){
 const groups={};
-arr.forEach(r=>{if(!r.out)(groups[r.pts]=groups[r.pts]||[]).push(r);});
+arr.forEach(r=>{if(!r.out){const k=rankKey(r,mode).toFixed(6);(groups[k]=groups[k]||[]).push(r);}});
 Object.keys(groups).forEach(k=>{
 const g=groups[k];
 if(g.length<2)return;
@@ -1922,7 +1954,7 @@ const mini=statsFromMatches(matches,ids,cfg);
 g.forEach(r=>{const m=mini[r.id];r.h2hPts=m.pts;r.h2hDiff=m.pf-m.pa;});
 });
 }
-return arr.sort((a,b)=>(a.out?1:0)-(b.out?1:0)||b.pts-a.pts
+return arr.sort((a,b)=>(a.out?1:0)-(b.out?1:0)||rankKey(b,mode)-rankKey(a,mode)||b.pts-a.pts
 ||(b.h2hPts||0)-(a.h2hPts||0)||(b.h2hDiff||0)-(a.h2hDiff||0)
 ||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
 }
@@ -1951,7 +1983,7 @@ function rankingsSig(){
 return [T.id,T.mode,T.phase,T.name,T.classe,T.date,(T.finals||[]).length,T.bracket?T.bracket.rounds.length:0,
 JSON.stringify(T.settings),state.settings.refBonusEnabled?1:0,
 T.pools.map(p=>p.playerIds.join(',')+':'+p.quali).join(';'),
-T.players.map(p=>p.name+(p.out||'')).join(','),
+T.players.map(p=>p.name+(p.out||'')+(p.away||'')).join(','),
 T.matches.map(matchSig).join(';')].join('#');
 }
 function renderRankings(){
@@ -1989,6 +2021,7 @@ container.appendChild(p);
 }
 
 function showRankTab(idx,btn){
+rankTabIdx=idx;
 if(btn)btn.parentElement.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',b===btn));
 const content=document.getElementById('rankings-content');
 if(idx===-1){
@@ -2006,18 +2039,34 @@ if(ranking&&!ranking.some(r=>(r.w||0)+(r.l||0)+(r.d||0)+(r.totalW||0)+(r.totalL|
 return ['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'][n-1]+' '+n;
 }
 function podiumCls(n,ranking){return typeof medal(n,ranking)==='string'?' class="podium-'+n+'"':'';}
+let rankTabIdx=0;
+function setRankMode(v){
+if(!T)return;
+T.settings.rankMode=v==='total'?'total':'avg';
+save();rankingsSigLast='';showRankTab(rankTabIdx);
+}
+// Bandeau « classement provisoire » + bouton de bascule du tri (seulement si des matchs sont en pause)
+function rankProvisionalHtml(){
+const paused=T.matches.filter(m=>m.phase==='pool'&&isWaitingMatch(m)).length;
+if(!paused)return '';
+const mode=rankModeEff();
+return '<div class="info-box" style="margin-bottom:10px"><b>Classement provisoire</b> : '+paused+' match(s) en pause (absents ou dispens\u00e9s).<div style="display:flex;gap:8px;margin-top:8px"><button class="family-btn'+(mode==='avg'?' selected':'')+'" onclick="setRankMode(\'avg\')">Points par match</button><button class="family-btn'+(mode==='total'?' selected':'')+'" onclick="setRankMode(\'total\')">Points totaux</button></div></div>';
+}
+function rowAwayCls(r){return r.away?' class="row-away-'+r.away+'"':'';}
 function renderRankingTable(ranking,title,qualiCount){
+const showJ=T.matches.some(m=>m.phase==='pool'&&isWaitingMatch(m));
+const avg=rankModeEff()==='avg';
 const hasAnyBonus=ranking.some(r=>r.refBonus>0);
 const hasAnyL3=ranking.some(r=>r.l3>0);
 const hasAnyD=ranking.some(r=>r.d>0);
-let html=`<h3 style="margin-bottom:10px;color:var(--pri-lt)">${escH(title)}</h3>`;
-html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Pts</th><th>V</th>${hasAnyD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasAnyL3?'<th title="D\u00e9faites en 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence de points (PF\u2212PC)">Diff</th>${hasAnyBonus?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
+let html=`<h3 style="margin-bottom:10px;color:var(--pri-lt)">${escH(title)}</h3>`+rankProvisionalHtml();
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th>Pts</th>${avg?'<th title="Points par match jou\u00e9">Moy</th>':''}${showJ?'<th title="Matchs jou\u00e9s / total">J</th>':''}<th>V</th>${hasAnyD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasAnyL3?'<th title="D\u00e9faites en 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence de points (PF\u2212PC)">Diff</th>${hasAnyBonus?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
 ranking.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const quali=qualiCount&&i<qualiCount;
-html+=`<tr${quali?' style="background:rgba(76,175,80,.08)"':podiumCls(i+1,ranking)}>
+html+=`<tr${r.away?rowAwayCls(r):quali?' style="background:rgba(76,175,80,.08)"':podiumCls(i+1,ranking)}>
 <td class="rank">${medal(i+1,ranking)}${quali?' \u2705':''}</td><td class="pname">${pnameHtml(p)}</td>
-<td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasAnyD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasAnyL3?`<td>${r.l3||0}</td>`:''}
+<td><strong>${r.pts}</strong></td>${avg?'<td>'+(r.played?(r.pts/r.played).toFixed(2):'-')+'</td>':''}${showJ?'<td>'+r.played+(r.left?'/'+(r.played+r.left):'')+'</td>':''}<td>${r.w}</td>${hasAnyD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasAnyL3?`<td>${r.l3||0}</td>`:''}
 <td>${r.pf}</td><td>${r.pa}</td><td>${r.pf-r.pa>=0?'+':''}${r.pf-r.pa}</td>${hasAnyBonus?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
 html+='</tbody></table>';
@@ -2108,17 +2157,19 @@ for(const pool of T.pools){
 const rk=calcPoolRanking(pool.id);
 for(const r of rk)all.push({...r,poolName:pool.name});
 }
-all.sort((a,b)=>(a.out?1:0)-(b.out?1:0)||b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+all.sort(cmpRank);
 const hasD3=all.some(r=>r.l3>0);
 const hasD=all.some(r=>r.d>0);
 const hasArb=all.some(r=>r.refBonus>0);
 let html=`<h3 style="color:var(--pri-lt);margin-bottom:6px">Classement g\u00e9n\u00e9ral</h3>`;
-html+=`<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Tous les joueurs - tri par points totaux${refEnabled?' (V + D + bonus arb)':' (V + D)'}</p>`;
-html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.75em">Poule</th><th title="Points totaux">Pts</th><th>V</th>${hasD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence">Diff</th>${hasArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
+const avg1=rankModeEff()==='avg',showJ1=all.some(r=>r.away||r.left)&&T.matches.some(m=>m.phase==='pool'&&isWaitingMatch(m));
+html+=rankProvisionalHtml();
+html+=`<p style="font-size:.8em;color:var(--txt2);margin-bottom:12px">Tous les joueurs - tri par ${avg1?'points par match jou\u00e9':'points totaux'}${refEnabled?' (V + D + bonus arb)':' (V + D)'}</p>`;
+html+=`<table class="ranking-table"><thead><tr><th>#</th><th style="text-align:left">Joueur</th><th style="text-align:left;font-size:.75em">Poule</th><th title="Points totaux">Pts</th>${avg1?'<th title="Points par match jou\u00e9">Moy</th>':''}${showJ1?'<th title="Matchs jou\u00e9s / total">J</th>':''}<th>V</th>${hasD?'<th title="Matchs nuls">N</th>':''}<th>D</th>${hasD3?'<th title="D\u00e9faites 3 sets">D3</th>':''}<th title="Points marqu\u00e9s">PF</th><th title="Points encaiss\u00e9s">PC</th><th title="Diff\u00e9rence">Diff</th>${hasArb?'<th title="Bonus arbitre">Arb</th>':''}</tr></thead><tbody>`;
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
 const diff=r.pf-r.pa;
-html+=`<tr${podiumCls(i+1,all)}><td class="rank">${medal(i+1,all)}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td><td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
+html+=`<tr${r.away?rowAwayCls(r):podiumCls(i+1,all)}><td class="rank">${medal(i+1,all)}</td><td class="pname">${pnameHtml(p)}</td><td style="font-size:.78em;color:var(--txt2)">${escH(r.poolName)}</td><td><strong>${r.pts}</strong></td>${avg1?'<td>'+(r.played?(r.pts/r.played).toFixed(2):'-')+'</td>':''}${showJ1?'<td>'+r.played+(r.left?'/'+(r.played+r.left):'')+'</td>':''}<td>${r.w}</td>${hasD?`<td>${r.d||0}</td>`:''}<td>${r.l}</td>${hasD3?`<td>${r.l3||0}</td>`:''}<td>${r.pf}</td><td>${r.pa}</td><td>${diff>=0?'+':''}${diff}</td>${hasArb?'<td>'+(r.refBonus||0)+'</td>':''}</tr>`;
 });
 html+='</tbody></table>';
 el.innerHTML=html;
@@ -2216,7 +2267,7 @@ return result;
 }
 
 function generateBracket(){
-let players=T.players.filter(p=>!p.out);
+let players=T.players.filter(p=>!p.out&&p.away!=='dispense');
 // Tri par niveau d\u00e9croissant (meilleurs en premier = meilleures t\u00eates de s\u00e9rie)
 players.sort((a,b)=>(b.level||0)-(a.level||0)||(a.name<b.name?-1:1));
 let size=1;while(size<players.length)size*=2;
@@ -2817,7 +2868,7 @@ s2rows.push([sh('Classement g\u00e9n\u00e9ral - toutes poules'+(hasRefBonus?' (v
 s2rows.push([]);
 const all=[];
 for(const pool of T.pools){const rk=calcPoolRanking(pool.id);for(const r of rk)all.push({...r,poolName:pool.name});}
-all.sort((a,b)=>(a.out?1:0)-(b.out?1:0)||b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+all.sort(cmpRank);
 const hasL3_m1=all.some(r=>r.l3>0);
 const hasD_m1=all.some(r=>r.d>0);
 const hdr1=[sh('Rang',true),sh('Joueur',true),sh('Poule',true),sh('Points',true),sh('Victoires',true)];
@@ -2829,7 +2880,7 @@ if(hasRefBonus)hdr1.push(sh('Bonus.Arb',true));
 s2rows.push(hdr1);
 all.forEach((r,i)=>{
 const p=T.players.find(x=>x.id===r.id);
-const row=[nm(i+1),sh(p?p.name+(p.out?' ('+(p.out==='absent'?'absent':'forfait')+')':''):'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
+const row=[nm(i+1),sh(p?p.name+outLabel(p):'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
 if(hasD_m1)row.push(nm(r.d||0));
 row.push(nm(r.l));
 if(hasL3_m1)row.push(nm(r.l3||0));
@@ -2873,7 +2924,7 @@ if(hasRefBonus)hdr2.push(sh('Bonus.Arb',true));
 s2rows.push(hdr2);
 for(const r of ranked){
 const p=T.players.find(x=>x.id===r.id);
-const row=[nm(globalRank),sh(p?p.name+(p.out?' ('+(p.out==='absent'?'absent':'forfait')+')':''):'?'),nm(r.totalPts),nm(r.totalW)];
+const row=[nm(globalRank),sh(p?p.name+outLabel(p):'?'),nm(r.totalPts),nm(r.totalW)];
 if(hasD_m2)row.push(nm(r.totalD||0));
 row.push(nm(r.totalL));
 if(hasL3_m2)row.push(nm(r.totalL3||0));
@@ -2897,7 +2948,7 @@ if(hasRefBonus)hdr3.push(sh('Bonus.Arb',true));
 s2rows.push(hdr3);
 for(const r of hors){
 const p=T.players.find(x=>x.id===r.id);
-const row=[nm(globalRank),sh(p?p.name+(p.out?' ('+(p.out==='absent'?'absent':'forfait')+')':''):'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
+const row=[nm(globalRank),sh(p?p.name+outLabel(p):'?'),sh(r.poolName),nm(r.pts),nm(r.w)];
 if(hD)row.push(nm(r.d||0));
 row.push(nm(r.l));
 if(hL3)row.push(nm(r.l3||0));
@@ -3170,7 +3221,18 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <p>Configurez les points de victoire/d\u00e9faite, le bonus arbitre, et le format par d\u00e9faut. Ces r\u00e9glages s'appliquent aux nouveaux tournois.</p>
 <p>Le bouton <b>"Supprimer toutes les donn\u00e9es"</b> r\u00e9initialise l'application \u00e0 son \u00e9tat d'origine : tous les param\u00e8tres personnalis\u00e9s (format, points, bonus) sont remis aux valeurs par d\u00e9faut et tous les tournois cr\u00e9\u00e9s sont supprim\u00e9s.</p>
 
-<h3 style="color:var(--pri-lt);margin:12px 0 6px">Absents, forfaits et nouveaux joueurs</h3>
+<h3 style="color:var(--pri-lt);margin:12px 0 6px">Dispens&eacute;s et absents (matchs en pause)</h3>
+<p>Un &eacute;l&egrave;ve qui ne peut pas jouer ne doit pas &ecirc;tre supprim&eacute; : il garde sa place dans la poule et tous ses matchs, rien n'est recalcul&eacute;.</p>
+<ul style="margin:4px 0 4px 20px">
+<li><b>Dispens&eacute;</b> : touchez <b>D</b> &agrave; c&ocirc;t&eacute; de son nom lors de l'inscription (ou le bouton <b>Dispens&eacute;</b> dans &#128101; Joueurs). Il ne joue pas, ses matchs attendent, et il peut <b>arbitrer toutes les poules</b>.</li>
+<li><b>Absent</b> (bouton &#128101; Joueurs) : ses matchs non jou&eacute;s attendent la prochaine s&eacute;ance (carte grise &laquo; En pause &raquo;, absente de la file d'attente) ; il n'arbitre pas.</li>
+<li><b>R&eacute;tablir</b> : le joueur rejoue ses matchs, dans l'ordre d'origine.</li>
+<li><b>Classement provisoire</b> : les joueurs en pause restent dans le tableau, en couleur (orange = dispens&eacute;, gris = absent), avec les colonnes Moy (points par match) et J (jou&eacute;s / total). Un bouton permet de choisir le tri : <i>Points par match</i> (par d&eacute;faut tant que des matchs sont en pause) ou <i>Points totaux</i>.</li>
+<li>Le r&eacute;glage <b>Arbitres</b> (joueurs de la poule ou tous) est aussi dans &#128101; Joueurs. Les dispens&eacute;s arbitrent toujours toutes les poules.</li>
+</ul>
+<h3 style="color:var(--pri-lt);margin:12px 0 6px">Sauvegarde sur un ordinateur</h3>
+<p>Sur un ordinateur dont la session efface les donn&eacute;es du navigateur &agrave; la d&eacute;connexion, <b>exportez le fichier JSON</b> (bouton de l'&eacute;cran d'accueil &laquo; Sauvegarde / transfert &raquo;, ou le bandeau orange) avant de vous d&eacute;connecter, puis d&eacute;posez-le dans votre Drive. &Agrave; la s&eacute;ance suivante, t&eacute;l&eacute;chargez-le depuis le Drive et <b>glissez-le</b> dans la fen&ecirc;tre d'import. Le fichier XLSX est un fichier de r&eacute;sultats : il ne permet pas de reprendre un tournoi.</p>
+<h3 style="color:var(--pri-lt);margin:12px 0 6px">Retirer d&eacute;finitivement, forfaits et nouveaux joueurs</h3>
 <p>Pendant le tournoi, le bouton <b>&#128101; Joueurs</b> (en haut de la liste des matchs) permet de :</p>
 <ul style="margin:4px 0 4px 20px">
 <li><b>Retirer un joueur</b> : <i>Absent</i> (retir&eacute; de la poule, tous ses matchs sont annul&eacute;s) ou <i>Forfait</i> (ses matchs jou&eacute;s restent compt&eacute;s, les autres sont annul&eacute;s, il est class&eacute; en bas de poule). En tableau &agrave; &eacute;limination, l'adversaire est qualifi&eacute;.</li>
@@ -3512,6 +3574,34 @@ el.innerHTML='<div class="tools-bar">'+
 
 /* ===== JOUEURS : absent / forfait / ajout tardif ===== */
 function isOut(pid){const p=T.players.find(x=>x.id===pid);return!!(p&&p.out);}
+/* Statut « en pause » (p.away) : 'absent' (ne joue pas cette séance) ou 'dispense' (ne joue pas, arbitre toutes les poules).
+   Le joueur garde sa place dans la poule et tous ses matchs ; ceux qui ne sont pas joués attendent, rien n'est supprimé ni regénéré. */
+function awayOf(pid){const p=T&&T.players.find(x=>x.id===pid);return p&&p.away?p.away:null;}
+function isAway(pid){return !!awayOf(pid);}
+function isWaitingMatch(m){return !!m&&m.status!=='done'&&m.p1&&m.p2&&(isAway(m.p1)||isAway(m.p2));}
+function waitingWho(m){return [m.p1,m.p2].filter(isAway).map(id=>playerName(id)+' ('+(awayOf(id)==='dispense'?'dispens\u00e9':'absent')+')').join(', ');}
+function outLabel(p){return p.out?' ('+(p.out==='absent'?'absent':'forfait')+')':(p.away?' ('+(p.away==='dispense'?'dispens\u00e9':'absent')+')':'');}
+function setAway(pid,kind){
+const p=T.players.find(x=>x.id===pid);if(!p||p.out)return;
+if(kind&&p.away===kind)return;
+const mine=T.matches.filter(m=>m.p1===pid||m.p2===pid);
+pushUndo((kind==='dispense'?'Dispens\u00e9 : ':kind==='absent'?'Absent : ':'R\u00e9tabli : ')+p.name,mine.map(m=>m.id));
+if(kind)p.away=kind;else delete p.away;
+if(kind){
+mine.forEach(m=>{if(m.status==='playing'){m.status='pending';m.table=null;detachMatchTimerTick(m.id);}});
+if(kind==='absent')T.matches.forEach(m=>{if(m.refereeId===pid&&m.status!=='done'){m.refereeId='';m.referee='';}});
+}
+save();
+showPlayersManager();
+const a=document.querySelector('.screen.active');
+if(a&&a.id==='scr-matches')renderMatches();
+toast(p.name+' : '+(kind==='dispense'?'dispens\u00e9 (arbitre)':kind==='absent'?'absent, matchs en pause':'r\u00e9tabli'));
+}
+function togglePlayerDispense(pid){
+const p=T.players.find(x=>x.id===pid);if(!p)return;
+if(p.away)delete p.away;else p.away='dispense';
+save();renderPlayerList();
+}
 function autoForfeitIfOut(m){
 const o1=isOut(m.p1),o2=isOut(m.p2);
 if(!o1&&!o2)return;
@@ -3524,9 +3614,19 @@ m.status='done';m.table=null;
 }
 function showPlayersManager(){
 if(!T)return;
-const row=p=>'<div style="display:flex;align-items:center;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px"><span style="flex:1;font-weight:600">'+pnameHtml(p)+'</span>'+
-(p.out?'':'<button class="btn-danger btn-sm" onclick="askWithdraw(\''+p.id+'\')">Retirer</button>')+'</div>';
+const canAway=T.mode!==3&&!T.matches.some(m=>m.phase==='final');
+const row=p=>'<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px"><span style="flex:1;font-weight:600;min-width:120px">'+pnameHtml(p)+'</span>'+
+(p.out?'':(p.away?'<button class="btn-success btn-sm" onclick="setAway(\''+p.id+'\',null)">R\u00e9tablir</button>'+(p.away==='absent'?'<button class="btn-secondary btn-sm" onclick="setAway(\''+p.id+'\',\'dispense\')">Dispens\u00e9</button>':'<button class="btn-secondary btn-sm" onclick="setAway(\''+p.id+'\',\'absent\')">Absent</button>'):
+(canAway?'<button class="btn-secondary btn-sm" onclick="setAway(\''+p.id+'\',\'absent\')">Absent</button><button class="btn-secondary btn-sm" onclick="setAway(\''+p.id+'\',\'dispense\')">Dispens\u00e9</button>':''))+
+'<button class="btn-danger btn-sm" onclick="askWithdraw(\''+p.id+'\')">Retirer</button>')+'</div>';
 let html='';
+if(T.mode!==3)html+='<p class="info-box" style="margin-bottom:10px"><b>Absent</b> : ses matchs attendent la prochaine s\u00e9ance, rien n\'est supprim\u00e9. <b>Dispens\u00e9</b> : pareil, et il arbitre toutes les poules. <b>R\u00e9tablir</b> : il rejoue ses matchs. <b>Retirer</b> : sortie d\u00e9finitive (forfait).</p>';
+if(T.pools.length>1&&T.mode!==3){
+const rs=T.settings.refScope==='pool'?'pool':'all';
+html+='<div class="section-title" style="font-size:.95em;margin:6px 0">&#9999; Arbitres (hors dispens\u00e9s)</div><div style="display:flex;gap:8px;margin-bottom:10px">'+
+'<button class="family-btn'+(rs==='pool'?' selected':'')+'" onclick="setRefScope(\'pool\')">Joueurs de la poule</button>'+
+'<button class="family-btn'+(rs==='all'?' selected':'')+'" onclick="setRefScope(\'all\')">Tous les joueurs</button></div>';
+}
 if(T.pools.length){
 T.pools.forEach(pool=>{
 html+='<div class="section-title" style="font-size:.95em;margin:12px 0 6px">'+escH(pool.name)+'</div>';
@@ -3638,8 +3738,10 @@ toast(name+' ajouté');
 const BACKUP_APP='MatchManagerEPS';
 function backupFileName(t){
 const safe=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40);
-const date=new Date().toLocaleDateString('fr-FR').replace(/\//g,'-');
-return 'MatchManagerEPS_sauvegarde_'+(t?(safe(t.classe)||safe(t.name)||'Tournoi'):'complete')+'_'+date+'.json';
+const now=new Date();
+const date=now.toLocaleDateString('fr-FR').replace(/\//g,'-');
+const hm=String(now.getHours()).padStart(2,'0')+'h'+String(now.getMinutes()).padStart(2,'0');
+return 'MatchManagerEPS_sauvegarde_'+(t?(safe(t.classe)||safe(t.name)||'Tournoi'):'complete')+'_'+date+'_'+hm+'.json';
 }
 function buildBackup(idx){
 const list=idx<0?state.tournaments:[state.tournaments[idx]].filter(Boolean);
@@ -3674,10 +3776,43 @@ return;
 }
 toast(ok?'Copié ✓ : collez-le dans un message ou sur l\'autre tablette':'Copie impossible : utilisez le fichier',4000);
 }
+/* Suivi du dernier export JSON : sur un PC dont la session efface les donn\u00e9es du navigateur \u00e0 la d\u00e9connexion, le fichier export\u00e9
+   est la seule vraie sauvegarde. On compte donc ce qui a \u00e9t\u00e9 saisi depuis (banni\u00e8re + avertissement \u00e0 la fermeture). */
+const LS_EXPORT_KEY='mmeps_export';
+function stateSig(){
+const str=JSON.stringify(state.tournaments);let h=5381;
+for(let i=0;i<str.length;i++)h=((h<<5)+h+str.charCodeAt(i))|0;
+return h+':'+str.length;
+}
+function doneCount(){return state.tournaments.reduce((n,t)=>n+t.matches.filter(m=>m.status==='done').length,0);}
+function markExported(){
+try{localStorage.setItem(LS_EXPORT_KEY,JSON.stringify({sig:stateSig(),done:doneCount(),at:Date.now()}));}catch(e){}
+}
+function exportStatus(){
+if(!state.tournaments.length)return {dirty:false,n:0};
+let last=null;
+try{last=JSON.parse(localStorage.getItem(LS_EXPORT_KEY)||'null');}catch(e){}
+const dirty=!last||last.sig!==stateSig();
+const n=Math.max(0,doneCount()-(last?last.done:0));
+return {dirty,n,never:!last,at:last?last.at:0};
+}
+// Bandeau (navigateur seulement : l'APK garde ses donn\u00e9es entre les s\u00e9ances)
+function exportBannerHtml(){
+if(typeof AndroidDownload!=='undefined')return '';
+const st=exportStatus();
+if(!st.dirty||(!st.n&&!st.never))return '';
+const when=st.at?new Date(st.at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+return '<div class="info-box" style="margin-top:8px;border-left-color:#FF8F00">&#9888; <b>'+(st.n?st.n+' r\u00e9sultat(s) non export\u00e9(s)':'Rien n\'a encore \u00e9t\u00e9 export\u00e9')+'</b>'+(when?' depuis le dernier export ('+when+')':'')+'. Les donn\u00e9es de ce navigateur peuvent dispara\u00eetre \u00e0 la d\u00e9connexion de l\'ordinateur.<br><button class="btn-secondary btn-sm" style="margin-top:6px" onclick="exportCurrentBackup()">&#128190; Exporter la sauvegarde (JSON)</button></div>';
+}
+function exportCurrentBackup(){
+const i=T?state.tournaments.indexOf(T):-1;
+exportBackup(i,'file');
+const b=document.getElementById('export-banner');if(b)b.innerHTML=exportBannerHtml();
+}
 function exportBackup(idx,how){
 const text=buildBackup(idx);
 if(how==='copy')copyTextToClipboard(text);
-else saveTextFile(backupFileName(idx<0?null:state.tournaments[idx]),text,'application/json');
+else{saveTextFile(backupFileName(idx<0?null:state.tournaments[idx]),text,'application/json');if(idx<0||state.tournaments.length===1)markExported();}
 }
 function showBackupModal(){
 let html='<p style="font-size:.85em;color:var(--txt2);margin-bottom:10px">Pour déplacer un tournoi vers une autre tablette ou en garder une copie : enregistrez un fichier, ou copiez le texte et collez-le sur l\'autre appareil.</p>';
@@ -3691,11 +3826,22 @@ if(state.tournaments.length>1){
 html+='<button class="btn-secondary" style="width:100%;margin-bottom:6px" onclick="exportBackup(-1,\'file\')">&#128190; Tout exporter (fichier)</button>';
 }
 html+='<div class="section-title" style="font-size:.95em;margin:16px 0 6px">&#128229; Importer</div>'+
+'<div ondragover="event.preventDefault();this.style.borderColor=\'var(--pri)\'" ondragleave="this.style.borderColor=\'\'" ondrop="dropBackup(event)" style="border:2px dashed var(--txt2);border-radius:12px;padding:16px;text-align:center;color:var(--txt2);margin-bottom:8px">Glissez ici le fichier .json t\u00e9l\u00e9charg\u00e9 depuis votre Drive</div>'+
 '<input type="file" id="bk-file" accept=".json,.txt,application/json" onchange="importBackupFile(this)" style="margin-bottom:8px">'+
 '<textarea id="bk-paste" placeholder="ou collez ici le texte copié" style="min-height:70px"></textarea>'+
 '<button class="btn-primary" style="margin-top:8px" onclick="importBackupText(document.getElementById(\'bk-paste\').value)">Importer le texte</button>'+
 '<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Fermer</button></div>';
 showModal('&#128190; Sauvegarde / transfert',html);
+}
+function dropBackup(ev){
+ev.preventDefault();
+const f=ev.dataTransfer&&ev.dataTransfer.files&&ev.dataTransfer.files[0];
+if(!f){toast('Aucun fichier d\u00e9pos\u00e9');return;}
+if(f.size>8*1024*1024){toast('Fichier trop volumineux');return;}
+const r=new FileReader();
+r.onload=e=>importBackupText(String(e.target.result||''));
+r.onerror=()=>toast('Lecture du fichier impossible');
+r.readAsText(f);
 }
 function importBackupFile(input){
 const f=input.files&&input.files[0];if(!f)return;
@@ -3718,7 +3864,7 @@ if(!ok(t.id)||!Array.isArray(t.players)||!Array.isArray(t.matches))return null;
 if(t.players.length>500||t.matches.length>5000)return null;
 if(!Array.isArray(t.pools))t.pools=[];
 if(!Array.isArray(t.finals))t.finals=[];
-for(const p of t.players){if(!p||!ok(p.id))return null;p.name=clean(p.name);p.level=Math.max(0,Math.min(5,+p.level||0));if(p.out&&p.out!=='absent')p.out='forfait';}
+for(const p of t.players){if(!p||!ok(p.id))return null;p.name=clean(p.name);p.level=Math.max(0,Math.min(5,+p.level||0));if(p.out&&p.out!=='absent')p.out='forfait';if(p.away!=='absent'&&p.away!=='dispense')delete p.away;}
 for(const pl of t.pools){if(!pl||!ok(pl.id)||!Array.isArray(pl.playerIds)||!pl.playerIds.every(ok))return null;pl.name=clean(pl.name);}
 for(const f of t.finals){if(!f||!ok(f.id)||!Array.isArray(f.playerIds)||!f.playerIds.every(ok))return null;f.name=clean(f.name);}
 for(const m of t.matches){
@@ -3744,6 +3890,7 @@ migrateSettings(t.settings);
 return t;
 }
 function importBackupText(text){
+const wasEmpty=!state.tournaments.length;
 let d=null;
 try{d=JSON.parse(String(text).trim());}catch(e){}
 if(!d||d.app!==BACKUP_APP||!Array.isArray(d.tournaments)){toast('Ce texte n\'est pas une sauvegarde Match Manager EPS',5000);return;}
@@ -3768,7 +3915,7 @@ state.savedLists.push({name:String(l.name).replace(/[<>"'`&\\]/g,'').slice(0,80)
 players:l.players.filter(p=>p&&typeof p.name==='string').slice(0,500).map(p=>({name:String(p.name).replace(/[<>"'`&\\]/g,'').slice(0,80).toUpperCase(),level:Math.max(0,Math.min(5,+p.level||0))}))});
 });
 }
-save();
+save();if(wasEmpty&&added)markExported();
 closeModal();
 renderHome();
 toast(added?(added+' tournoi(s) importé(s)'+(skipped?' - '+skipped+' ignoré(s) (données invalides)':'')):'Aucun tournoi importé'+(skipped?' (données invalides)':''),4500);
@@ -3781,6 +3928,7 @@ function openLive(mid,ev){
 if(ev)ev.stopPropagation();
 const m=T.matches.find(x=>x.id===mid);
 if(!m||m.status==='done')return;
+if(isWaitingMatch(m)){toast('Match en pause : '+waitingWho(m));return;}
 const a=document.querySelector('.screen.active');
 if(a&&a.id!=='scr-live')liveReturn=a.id;
 liveMid=mid;
@@ -4001,7 +4149,7 @@ if(m.table)usedTables[m.table]=m;
 });
 const freeTables=[];
 for(let t=1;t<=nbTables;t++)if(!usedTables[t])freeTables.push(t);
-const pending=T.matches.filter(m=>m.phase===phase&&m.status!=='done'&&m.status!=='playing'&&m.p1&&m.p2&&!isOut(m.p1)&&!isOut(m.p2));
+const pending=T.matches.filter(m=>m.phase===phase&&m.status!=='done'&&m.status!=='playing'&&m.p1&&m.p2&&!isOut(m.p1)&&!isOut(m.p2)&&!isAway(m.p1)&&!isAway(m.p2));
 const stillToPlay=new Set();
 pending.forEach(m=>{stillToPlay.add(m.p1);stillToPlay.add(m.p2);});
 const entries=pending.map(m=>{
@@ -4098,7 +4246,7 @@ el.innerHTML=h;
 // brouillons) : sert à ne remplacer que les cartes dont le contenu a réellement changé.
 function matchSig(m){
 return [m.status,m.score1,m.score2,m.table,m.refereeId,m.refBonus?1:0,m.forfeit||'',m.p1,m.p2,
-m.sets?m.sets.map(x=>x.s1+':'+x.s2).join(','):''].join('|');
+m.sets?m.sets.map(x=>x.s1+':'+x.s2).join(','):'',isWaitingMatch(m)?'w':''].join('|');
 }
 function refreshDisplayedCards(){
 document.querySelectorAll('.match-card[id^="mc-"]').forEach(el=>{
@@ -4155,7 +4303,7 @@ function rerenderFor(m){
 refreshAfterChange(m);
 }
 function launchQueued(mid){
-const m=T.matches.find(x=>x.id===mid);if(!m||m.status==='done'||m.status==='playing')return;
+const m=T.matches.find(x=>x.id===mid);if(!m||m.status==='done'||m.status==='playing'||isWaitingMatch(m))return;
 const q=computeQueue(m.phase);
 const e=q.entries.find(x=>x.m.id===mid);
 if(!e||!e.ready||e.table===null)return toast('Aucune table libre');
@@ -4208,6 +4356,7 @@ return '@page{size:A4 '+(landscape?'landscape':'portrait')+';margin:10mm}'+
 'th{background:#e8e8e8;color:#000;border:1px solid #777;padding:2mm;text-align:center;font-size:10pt}'+
 'td{border:1px solid #aaa;padding:1.6mm 2mm;text-align:center}td.pname{text-align:left}td.rank{font-weight:700}'+
 '.badge-out{margin-left:6px;font-size:.75em;border:1px solid #777;border-radius:8px;padding:0 5px}'+
+'.badge-away{margin-left:6px;font-size:.75em;border:1px dashed #777;border-radius:8px;padding:0 5px}.row-away-absent td,.row-away-dispense td{font-style:italic;background:#eee}'+
 '.pied{margin-top:6mm;font-size:9pt;color:#555}';
 }
 function buildPrintDoc(opt){
@@ -4297,7 +4446,7 @@ return {ids:getBracketFullRanking().map(e=>e.id),finished:!!(allDone&&last&&last
 if(T.mode===1){
 const all=[];
 for(const pool of T.pools)for(const r of calcPoolRanking(pool.id))all.push(r);
-all.sort((a,b)=>(a.out?1:0)-(b.out?1:0)||b.pts-a.pts||(b.pf-b.pa)-(a.pf-a.pa)||b.pf-a.pf);
+all.sort(cmpRank);
 return {ids:all.filter(r=>!r.out).map(r=>r.id),finished:allDone};
 }
 // mode 2 : groupes de finale (rang de finale, puis points cumulés), puis joueurs hors finales
@@ -4427,7 +4576,11 @@ return 'handled';
 };
 
 /* ===== AUTO-SAVE ===== */
-window.addEventListener('beforeunload',()=>save());
+window.addEventListener('beforeunload',e=>{
+save();
+if(typeof AndroidDownload==='undefined'){const st=exportStatus();if(st.n>0){e.preventDefault();e.returnValue='';}}
+});
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 document.addEventListener('visibilitychange',()=>{
 if(document.hidden)save();
 else ensureWakeLock();
