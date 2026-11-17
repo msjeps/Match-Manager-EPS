@@ -33,13 +33,12 @@ Version actuelle : **2.6** (APK `versionCode 23`, publiée en Release GitHub, [t
 |---|---|
 | [FONCTIONNALITES.md](FONCTIONNALITES.md) | Catalogue des fonctions de l'application |
 | [CHANGELOG.md](CHANGELOG.md) | Historique des versions (ajouts, corrections, modifications) |
-| [CLAUDE.md](CLAUDE.md) | Architecture, structure de données, conventions de code |
 | [android/README.md](android/README.md) | Wrapper APK : contenu, build, signature |
 | [tests/README.md](tests/README.md) | Tests Node de la logique (`npm test`) |
 
 ## Déploiement
 
-Le fichier suivi par git est `index.html` (voir [CLAUDE.md](CLAUDE.md) pour le détail de l'architecture et des conventions du projet). C'est la source unique : on l'édite directement, l'APK le recopie automatiquement à chaque build.
+Le fichier suivi par git est `index.html`. C'est la source unique : on l'édite directement, l'APK le recopie automatiquement à chaque build.
 
 Démo en ligne : https://apps.outils-eps.fr/Match-Manager-EPS/
 

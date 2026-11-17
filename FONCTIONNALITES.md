@@ -1,6 +1,6 @@
 # Fonctionnalités - Match Manager EPS (version 2.6)
 
-Catalogue de ce que l'application fait aujourd'hui. Pour l'historique : [CHANGELOG.md](CHANGELOG.md). Pour l'architecture et les conventions de code : [CLAUDE.md](CLAUDE.md).
+Catalogue de ce que l'application fait aujourd'hui. Pour l'historique : [CHANGELOG.md](CHANGELOG.md).
 
 Contexte : tablettes Android (Lenovo TB-X606F, WebView figé) et iPad, 100 % hors ligne, données élèves uniquement sur l'appareil.
 
