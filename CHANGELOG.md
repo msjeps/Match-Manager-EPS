@@ -6,6 +6,15 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.7.5 - 2026-11-18 (APK versionCode 32, cache v49)
+
+Retour iPad : en validant un nom au clavier (coche bleue), le champ se vidait et la personne croyait le nom perdu. Il etait bien ajoute a la liste, sans aucun signe visible.
+- **Confirmation a l'ajout** : message « ✓ NOM ajoute (n joueurs) » et ligne du nouveau joueur surlignee en vert 2 secondes.
+- **Messages en haut de l'ecran** : tous les messages (confirmations, erreurs de saisie) etaient affiches en bas, donc caches par le clavier sur tablette.
+- **Niveau = ajout** : ecrire le nom, puis toucher un niveau (« - » a 5) ajoute le joueur avec ce niveau, le clavier reste ouvert pour le suivant. Entree ajoute sans niveau. Toucher un niveau sans nom affiche « Ecrivez d'abord le nom ». Le niveau revient a « - » apres chaque ajout (avant, le dernier niveau choisi restait memorise et s'appliquait en silence aux joueurs suivants).
+- **Legende** au-dessus de « Joueurs inscrits » (a droite) : trophee = niveau, « Non classe » = sans niveau, D = dispense.
+- Touche du clavier du champ « nom » : fleche « suivant » (au lieu de la coche « terminer », trompeuse : elle ajoute le joueur et garde le clavier ouvert pour le suivant).
+
 ## 2.7.4 - 2026-11-18 (APK versionCode 31, cache v48)
 
 Retour iPad : dans le champ « NOM ou PRENOM en MAJUSCULES », le texte indicatif etait presque blanc et le curseur invisible au toucher.

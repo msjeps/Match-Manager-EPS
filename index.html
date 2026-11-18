@@ -143,8 +143,8 @@ body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
 .pool-nav .pool-name{font-size:1.1em;font-weight:700;color:var(--pri-lt)}
 .empty-state{text-align:center;padding:40px 20px;color:var(--txt2)}
 .empty-state .icon{font-size:3em;margin-bottom:12px}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2A3F6F;color:#fff;padding:12px 24px;border-radius:var(--rad);font-weight:500;z-index:1000;animation:toastIn .3s ease;border:1px solid var(--brd)}
-@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.toast{position:fixed;top:76px;max-width:90vw;text-align:center;left:50%;transform:translateX(-50%);background:#2A3F6F;color:#fff;padding:12px 24px;border-radius:var(--rad);font-weight:500;z-index:1000;animation:toastIn .3s ease;border:1px solid var(--brd)}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .bracket-round{margin-bottom:20px}
 .bracket-round h3{color:var(--pri-lt);margin-bottom:10px;font-size:1em}
 .qr-container{text-align:center;padding:20px}
@@ -180,7 +180,12 @@ input:focus::placeholder,textarea:focus::placeholder{color:transparent}
 .toggle.on{background:var(--ok)}
 .toggle::after{content:'';position:absolute;width:28px;height:28px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .toggle.on::after{left:28px}
+.list-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 14px;margin:16px 0 8px}
+.list-head h3{margin:0}
+.legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 12px;margin-left:auto;font-size:.875em;color:var(--txt2);text-align:right}
+.legend-d{display:inline-block;min-width:22px;padding:0 5px;border-radius:11px;background:#FF8F00;color:#fff;text-align:center}
 .player-item{cursor:pointer;transition:background .15s}
+.player-item.new{border-color:var(--ok);background:rgba(76,175,80,.22)}
 .player-item:active{background:rgba(243,193,70,.08)}
 .level-editor{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:8px;margin:-2px 0 6px 0;animation:slideDown .2s ease}
 .level-editor-inner{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
@@ -391,8 +396,8 @@ body.light-mode .badge-out{color:#C62828}
 </div>
 <div id="player-tab-0">
 <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;align-items:flex-start">
-<input type="text" id="inp-pname" enterkeyhint="done" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="NOM ou PR&Eacute;NOM en MAJUSCULES" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')addPlayer()">
-<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="level-select" id="level-btns"></div><span style="font-size:.875em;color:var(--txt2)">Niveau (- = inconnu, 1 = d&eacute;butant, 5 = expert)</span></div>
+<input type="text" id="inp-pname" enterkeyhint="next" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="NOM ou PR&Eacute;NOM en MAJUSCULES" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')addPlayer()">
+<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="level-select" id="level-btns"></div><span style="font-size:.875em;color:var(--txt2);text-align:center;max-width:300px">Touchez le niveau pour ajouter (- = sans niveau, 1 = d&eacute;butant, 5 = expert)</span></div>
 <button class="btn-success" onclick="addPlayer()">+ Ajouter</button>
 </div>
 </div>
@@ -408,7 +413,7 @@ body.light-mode .badge-out{color:#C62828}
 <input type="file" id="csv-file" accept=".csv,.txt" onchange="importCSV(this)">
 </div>
 </div>
-<h3 style="margin:16px 0 8px" id="player-count">Joueurs inscrits (0)</h3>
+<div class="list-head"><h3 id="player-count">Joueurs inscrits (0)</h3><div class="legend" id="player-legend" style="display:none"><span>&#127942; = niveau (1 &agrave; 5)</span><span>Non class&eacute; = sans niveau</span><span><b class="legend-d">D</b> = dispens&eacute; (ne joue pas, peut arbitrer)</span></div></div>
 <div id="player-list"></div>
 <div id="player-clear" class="danger-zone" style="display:none"><button class="btn-danger btn-sm" onclick="clearAllPlayers()">&#128465; Supprimer tous les joueurs</button></div>
 <div id="player-empty" class="empty-state"><div class="icon">&#128101;</div><p>Aucun joueur inscrit pour le moment</p></div>
@@ -683,7 +688,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.7.4';
+const APP_VERSION='2.7.5';
 /* Accessibilite clavier (PC/Mac) et saisie : Entree/Espace activent un element role=button|switch, Echap ferme une modale, un champ numerique se selectionne au focus */
 document.addEventListener('keydown',function(e){
 const t=e.target;
@@ -1042,7 +1047,11 @@ const b=document.createElement('button');
 b.textContent=i===0?'-':i;
 b.title=i===0?'Sans niveau':'Niveau '+i;
 b.className=i===0?'active':'';
-b.onclick=()=>{el.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active')};
+b.onclick=()=>{
+// Toucher un niveau ajoute le joueur dont le nom est saisi (un seul geste : nom puis niveau)
+if(!document.getElementById('inp-pname').value.trim()){badField('inp-pname','\u00c9crivez d\u2019abord le nom, puis touchez son niveau');return;}
+el.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');addPlayer();
+};
 el.appendChild(b);
 }}
 
@@ -1058,7 +1067,11 @@ const name=inp.value.trim().toUpperCase();
 if(!name){badField('inp-pname','Entrez le nom du joueur');return;}
 const level=getSelectedLevel();
 T.players.push({id:uid(),name,level});
-save();inp.value='';renderPlayerList();inp.focus();
+save();inp.value='';renderPlayerList();renderLevelBtns();inp.focus();
+const items=document.querySelectorAll('#player-list .player-item');
+const last=items[items.length-1];
+if(last){last.classList.add('new');setTimeout(function(){last.classList.remove('new');},1800);}
+toast('\u2713 '+name+' ajout\u00e9 ('+T.players.length+' joueur'+(T.players.length>1?'s':'')+')',2200);
 if(navigator.vibrate)navigator.vibrate(30);
 }
 
@@ -1113,6 +1126,7 @@ function renderPlayerList(){
 const el=document.getElementById('player-list');
 const empty=document.getElementById('player-empty');
 document.getElementById('player-count').textContent='Joueurs inscrits ('+T.players.length+')';
+const lg=document.getElementById('player-legend');if(lg)lg.style.display=T.players.length?'':'none';
 const clr=document.getElementById('player-clear');if(clr)clr.style.display=T.players.length?'':'none';
 if(!T.players.length){el.innerHTML='';empty.style.display='';return;}
 empty.style.display='none';
@@ -3291,7 +3305,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">2. Inscrire les joueurs</h3>
 <p>Trois m\u00e9thodes d'inscription :</p>
 <ul style="margin:4px 0 4px 20px">
-<li><b>Un par un</b> : saisissez le NOM ou le PR\u00c9NOM <b>en MAJUSCULES</b> et s\u00e9lectionnez le niveau (\u00ab - \u00bb = inconnu, 1 = d\u00e9butant, 5 = expert).</li>
+<li><b>Un par un</b> : saisissez le NOM ou le PR\u00c9NOM <b>en MAJUSCULES</b>, puis <b>touchez son niveau</b> (\u00ab - \u00bb = inconnu, 1 = d\u00e9butant, 5 = expert) : le joueur est ajout\u00e9 aussit\u00f4t et le clavier reste ouvert pour le suivant. La touche Entr\u00e9e du clavier l\u2019ajoute sans niveau. Une l\u00e9gende au-dessus de la liste rappelle les troph\u00e9es (niveau) et le D (dispens\u00e9).</li>
 <li><b>Liste</b> : collez une liste, un joueur par ligne, en <b>MAJUSCULES</b>. Niveau facultatif apr\u00e8s un point-virgule : <code>DUPONT L\u00c9A;3</code>.</li>
 <li><b>Import CSV</b> : importez un fichier .csv ou .txt (s\u00e9parateur ; , ou tabulation).</li>
 </ul>

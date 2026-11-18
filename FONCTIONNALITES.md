@@ -24,6 +24,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 ## 3. Joueurs
 
 - Saisie un par un, par liste collée, ou import `.csv` / `.txt` (`NOM;Niveau`, séparateurs `;` `,` tabulation).
+- Ajout en un geste : nom puis toucher un niveau (« - » à 5) ajoute le joueur et garde le clavier ouvert ; Entrée l'ajoute sans niveau ; le niveau revient à « - » après chaque ajout. Légende au-dessus de la liste (trophées = niveau, Non classé, D = dispensé).
 - Noms toujours en majuscules (les champs affichent la saisie en majuscules et le placeholder demande « NOM ou PRÉNOM en MAJUSCULES »), niveau de 0 à 5 (« - » = inconnu, 1 = débutant, 5 = expert).
 - Listes sauvegardées et rechargées d'un tournoi à l'autre.
 - **Régénération des poules protégée** (v2.4.2) : « Valider et générer les matchs » et « Créer les poules » demandent confirmation (et prennent un instantané pour « Annuler ») si des matchs de poule sont joués ou en cours ; « Retour » de l'écran des matchs mène à l'accueil dès qu'un match est joué.
