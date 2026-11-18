@@ -109,6 +109,7 @@ body.light-mode .badge-red{color:#C62828}
 .match-row input.winner{border-color:var(--ok);background:rgba(76,175,80,.1);color:#66BB6A}
 body.light-mode .match-row input.winner{color:#2E7D32}
 .match-row input.loser{border-color:var(--brd);background:var(--surf);color:var(--txt2)}
+.ref-help{margin-top:8px;font-size:.875em;color:var(--txt2);line-height:1.4}
 .match-actions{display:flex;align-items:center;gap:8px;margin-top:8px}
 .match-actions .ref-input{flex:1;padding:8px;border:1px solid var(--brd);border-radius:8px;font-size:.875em;background:var(--surf2);color:var(--txt)}
 .match-actions .ref-input::placeholder{color:var(--txt2)}
@@ -165,7 +166,8 @@ body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
 .stat-item{text-align:center}
 .stat-item .val{font-size:1.4em;font-weight:700;color:var(--pri-lt)}
 .stat-item .lbl{font-size:.875em;color:var(--txt2)}
-#inp-pname::placeholder,#inp-plist::placeholder{color:#f4eac5}
+#inp-pname,#inp-plist{text-transform:uppercase}
+#inp-pname::placeholder,#inp-plist::placeholder{color:#f4eac5;text-transform:none}
 body.light-mode #inp-pname::placeholder,body.light-mode #inp-plist::placeholder{color:var(--txt2)}
 .level-select{display:flex;gap:8px}
 .level-select button{width:44px;height:44px;border-radius:50%;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-weight:700;font-size:.875em;cursor:pointer}
@@ -227,7 +229,7 @@ body.light-mode .badge-away.dispense{color:#E65100}
 .ranking-table tr.row-away-absent td{background:rgba(158,158,158,.28)!important}
 .match-card.paused{opacity:.6;border-style:dashed}
 .match-pause-note{font-size:.875em;color:var(--txt2);padding:6px 2px}
-.btn-d{background:rgba(255,255,255,.1);border:2px solid transparent;color:var(--txt2);border-radius:50%;min-width:44px;min-height:44px;font-weight:700;cursor:pointer;margin-right:4px}
+.btn-d{background:rgba(255,255,255,.1);border:2px solid transparent;color:var(--txt2);border-radius:50%;min-width:44px;min-height:44px;font-weight:700;cursor:pointer;margin:0 8px}
 .btn-d.on{background:#FF8F00;color:#fff}
 body.light-mode .badge-out{color:#C62828}
 .forfeit-note{font-size:.875em;color:var(--err-txt);font-weight:600;margin:2px 0 6px}
@@ -385,13 +387,13 @@ body.light-mode .badge-out{color:#C62828}
 </div>
 <div id="player-tab-0">
 <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;align-items:flex-start">
-<input type="text" id="inp-pname" enterkeyhint="done" autocomplete="off" placeholder="Nom du joueur" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')addPlayer()">
+<input type="text" id="inp-pname" enterkeyhint="done" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="NOM ou PR&Eacute;NOM en MAJUSCULES" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')addPlayer()">
 <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="level-select" id="level-btns"></div><span style="font-size:.875em;color:var(--txt2)">Niveau (- = inconnu, 1 = d&eacute;butant, 5 = expert)</span></div>
 <button class="btn-success" onclick="addPlayer()">+ Ajouter</button>
 </div>
 </div>
 <div id="player-tab-1" style="display:none">
-<textarea id="inp-plist" placeholder="Un joueur par ligne, niveau facultatif apr&egrave;s un point-virgule :&#10;DUPONT L&eacute;a;3&#10;MARTIN Tom&#10;..." rows="8"></textarea>
+<textarea id="inp-plist" autocapitalize="characters" spellcheck="false" placeholder="Un joueur par ligne, en MAJUSCULES (NOM ou PR&Eacute;NOM). Niveau facultatif apr&egrave;s un point-virgule :&#10;DUPONT L&Eacute;A;3&#10;MARTIN TOM&#10;..." rows="8"></textarea>
 <button class="btn-secondary" onclick="addFromList()" style="margin-top:8px;width:100%">Ajouter la liste</button>
 </div>
 <div id="player-tab-2" style="display:none">
@@ -565,13 +567,13 @@ body.light-mode .badge-out{color:#C62828}
 <div class="card">
 <h3>&#127912; Affichage</h3>
 <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-<div class="toggle" id="set-lightmode" role="switch" tabindex="0" onclick="toggleLightMode()"></div>
+<div class="toggle" id="set-lightmode" role="switch" aria-checked="false" aria-label="Mode clair" tabindex="0" onclick="toggleLightMode()"></div>
 <span>&#9728;&#65039; Mode clair</span></div>
 </div>
 <div class="card">
 <h3>&#128266; Sons</h3>
 <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-<div class="toggle" id="set-sound" role="switch" tabindex="0" onclick="toggleSound()"></div>
+<div class="toggle" id="set-sound" role="switch" aria-checked="false" aria-label="Son &agrave; la validation d'un match" tabindex="0" onclick="toggleSound()"></div>
 <span>&#128276; Son &agrave; la validation d'un match</span></div>
 <p style="font-size:.875em;color:var(--txt2);margin-top:8px">D&eacute;sactiv&eacute; par d&eacute;faut. Un petit &laquo; ding &raquo; &agrave; chaque r&eacute;sultat valid&eacute;, une m&eacute;lodie plus longue &agrave; la fin du tournoi. La sonnerie du chronom&egrave;tre reste toujours active.</p>
 </div>
@@ -628,14 +630,14 @@ body.light-mode .badge-out{color:#C62828}
 <div class="card">
 <h3>&#129309; D&eacute;partage</h3>
 <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-<div class="toggle" id="adm-h2h" role="switch" tabindex="0" onclick="toggleH2H()"></div>
+<div class="toggle" id="adm-h2h" role="switch" aria-checked="false" aria-label="D&eacute;partage par confrontation directe" tabindex="0" onclick="toggleH2H()"></div>
 <span>Confrontation directe avant la diff&eacute;rence de points</span></div>
 <p style="font-size:.875em;color:var(--txt2);margin-top:6px">&#9432; S'applique aux nouveaux tournois (poules). &Agrave; &eacute;galit&eacute; de points : r&eacute;sultat entre les joueurs &agrave; &eacute;galit&eacute;, puis diff&eacute;rence de points, puis points marqu&eacute;s.</p>
 </div>
 <div class="card">
 <h3>&#9989; Bonus arbitre</h3>
 <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-<div class="toggle" id="adm-refbonus" role="switch" tabindex="0" onclick="toggleRefBonus()"></div>
+<div class="toggle" id="adm-refbonus" role="switch" aria-checked="false" aria-label="Bonus arbitre" tabindex="0" onclick="toggleRefBonus()"></div>
 <span>Attribuer un bonus &agrave; l'arbitre</span></div>
 <div style="margin-top:8px"><div class="form-group"><label>Points bonus arbitre</label>
 <input type="number" inputmode="numeric" pattern="[0-9]*" id="adm-refbonuspts" value="1" min="0" max="5" onchange="saveSettings()"></div></div>
@@ -677,7 +679,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.7.2';
+const APP_VERSION='2.7.3';
 /* Accessibilite clavier (PC/Mac) et saisie : Entree/Espace activent un element role=button|switch, Echap ferme une modale, un champ numerique se selectionne au focus */
 document.addEventListener('keydown',function(e){
 const t=e.target;
@@ -685,6 +687,11 @@ if((e.key==='Enter'||e.key===' ')&&t&&t.getAttribute&&(t.getAttribute('role')===
 if(e.key==='Tab'){const mo=document.querySelector('#modal-container .modal, #modal-container [style*="fixed"] > div');if(mo){const f=mo.querySelectorAll('button,input,select,textarea,[tabindex="0"]');if(f.length){const a=f[0],z=f[f.length-1];if(!mo.contains(document.activeElement)){e.preventDefault();a.focus();}else if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();}}}}
 if(e.key==='Escape'){const mc=document.getElementById('modal-container');if(mc&&mc.firstElementChild){modalCb=null;closeModal();}}
 });
+/* aria-checked des interrupteurs : recopie de la classe .on a chaque changement (une seule source de verite, les fonctions toggle*) */
+function syncSwitch(el){el.setAttribute('aria-checked',el.classList.contains('on')?'true':'false');}
+function syncSwitches(){document.querySelectorAll('[role=switch]').forEach(syncSwitch);}
+if(window.MutationObserver){new MutationObserver(function(ms){ms.forEach(function(m){if(m.target.getAttribute&&m.target.getAttribute('role')==='switch')syncSwitch(m.target);});}).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['class']});}
+document.addEventListener('DOMContentLoaded',syncSwitches);
 function badField(ids,msg){
 ids=[].concat(ids);let first=null;
 ids.forEach(function(id){const el=document.getElementById(id);if(el){el.classList.add('inp-err');if(!first)first=el;}});
@@ -1541,7 +1548,7 @@ refreshAfterChange(m);
 
 function refOptionsHtml(m){
 const refVal=m.refereeId||'';
-return '<option value="">&#9999; Arbitre</option>'+getRefereeCandidates(m).map(p=>'<option value="'+p.id+'"'+(refVal===p.id?' selected':'')+'>'+escH(p.name)+'</option>').join('');
+return '<option value="">&#9999; Choisir l&rsquo;arbitre</option>'+getRefereeCandidates(m).map(p=>'<option value="'+p.id+'"'+(refVal===p.id?' selected':'')+'>'+escH(p.name)+'</option>').join('');
 }
 
 function getRefereeCandidates(m){
@@ -1591,7 +1598,8 @@ const statusLabel=waiting?'\u23f8 En pause':isDone?'\u2705 Termin\u00e9':isPlayi
 const tableBadge=m.table?`<span class="match-table-badge" role="button" tabindex="0" onclick="editMatchTable('${m.id}',event)" title="Modifier la table">Table ${m.table} &#9998;</span>`:`<span class="match-table-badge" role="button" tabindex="0" onclick="editMatchTable('${m.id}',event)" title="Attribuer une table" style="opacity:.75;border-style:dashed">Table ? &#9998;</span>`;
 const isBo3=T.settings.matchFamily==='score'&&T.settings.winningSets===2;
 const refSelectHtml='<select class="ref-input" aria-label="Arbitre du match" id="ref-'+m.id+'" '+dis+' onchange="saveReferee(\''+m.id+'\',this.value)" style="font-size:.875em">'+refOptionsHtml(m)+'</select>';
-const actionsHtml=waiting?(involvesExcluded(m)?'<div class="match-pause-note">\u23f8 Exclu du classement (cl\u00f4ture sans '+escH(waitingWho(m))+').</div>':'<div class="match-pause-note">\u23f8 En attente : '+escH(waitingWho(m))+'. Le match reprend quand le joueur est r\u00e9tabli (bouton Joueurs).</div>'):`<div class="match-actions">
+const actionsHtml=waiting?(involvesExcluded(m)?'<div class="match-pause-note">\u23f8 Exclu du classement (cl\u00f4ture sans '+escH(waitingWho(m))+').</div>':'<div class="match-pause-note">\u23f8 En attente : '+escH(waitingWho(m))+'. Le match reprend quand le joueur est r\u00e9tabli (bouton Joueurs).</div>'):`<div class="ref-help">&#9999; <b>Arbitre</b> : un joueur libre qui arbitre ce match (facultatif). Cochez <b>+1 pt arb.</b> pour lui donner le bonus d'arbitrage.</div>
+<div class="match-actions">
 ${refSelectHtml}
 <label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${(isDone?m.refBonus:draftValue('refbonus-'+m.id,m.refBonus))?'checked':''} ${dis}>+1 pt arb.</label>
 ${isDone?(m.forfeit?'':'<button class="btn-secondary btn-sm" onclick="unlockMatch(\''+m.id+'\')">&#9998; Modifier</button>'):
@@ -3267,6 +3275,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 </div>
 <div style="font-size:.9em;line-height:1.6">
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">1. Cr\u00e9er un tournoi</h3>
+<p>Le bouton <b>?</b> de l\u2019\u00e9cran d\u2019accueil ouvre cette aide \u00e0 tout moment. En haut des \u00e9crans d\u2019un tournoi, le <b>fil d\u2019\u00e9tapes</b> (Joueurs, Poules, R\u00e9partition, Matchs, Classement) indique o\u00f9 vous en \u00eates : l\u2019\u00e9tape en cours est en or, les \u00e9tapes d\u00e9j\u00e0 faites sont coch\u00e9es.</p>
 <p>Depuis l'\u00e9cran d'accueil, appuyez sur <b>+ Nouveau tournoi</b>. Renseignez le nom, la classe, le nombre de tables ou terrains disponibles, le format de match et la dur\u00e9e optionnelle du chronometre.</p>
 <p>Choisissez le mode de tournoi :</p>
 <ul style="margin:4px 0 4px 20px">
@@ -3278,14 +3287,14 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">2. Inscrire les joueurs</h3>
 <p>Trois m\u00e9thodes d'inscription :</p>
 <ul style="margin:4px 0 4px 20px">
-<li><b>Un par un</b> : saisissez le nom et s\u00e9lectionnez le niveau (0 \u00e0 5 troph\u00e9es).</li>
-<li><b>Liste</b> : collez une liste (un joueur par ligne). Format : <code>NOM Pr\u00e9nom</code> ou <code>NOM;Niveau</code>.</li>
+<li><b>Un par un</b> : saisissez le NOM ou le PR\u00c9NOM <b>en MAJUSCULES</b> et s\u00e9lectionnez le niveau (\u00ab - \u00bb = inconnu, 1 = d\u00e9butant, 5 = expert).</li>
+<li><b>Liste</b> : collez une liste, un joueur par ligne, en <b>MAJUSCULES</b>. Niveau facultatif apr\u00e8s un point-virgule : <code>DUPONT L\u00c9A;3</code>.</li>
 <li><b>Import CSV</b> : importez un fichier .csv ou .txt (s\u00e9parateur ; , ou tabulation).</li>
 </ul>
 <p>Les listes peuvent \u00eatre <b>sauvegard\u00e9es</b> et recharg\u00e9es pour d'autres tournois.</p>
 
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">3. Configurer les poules</h3>
-<p>D\u00e9finissez le nombre de poules et la taille de chaque poule. En mode 2, indiquez aussi le nombre de qualifi\u00e9s par poule pour les finales.</p>
+<p>D\u00e9finissez le nombre de poules et la taille de chaque poule. Avec \u00ab Poules puis finales \u00bb, indiquez aussi le nombre de qualifi\u00e9s par poule pour les finales.</p>
 <p>Avec plusieurs poules, deux r\u00e9glages \u00e0 faire ici :</p>
 <ul style="margin:4px 0 4px 20px">
 <li><b>Arbitres</b> : <i>Joueurs de la poule</i> (par d\u00e9faut) ne propose, pour un match de poule, que les joueurs libres de cette poule ; <i>Tous les joueurs</i> propose aussi ceux des autres poules.</li>
@@ -3295,16 +3304,16 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">4. R\u00e9partir les joueurs</h3>
 <p>Trois options de r\u00e9partition :</p>
 <ul style="margin:4px 0 4px 20px">
-<li><b>Par niveau</b> : en mode 1, poules homog\u00e8nes (les joueurs de m\u00eame niveau ensemble) ; en mode 2, r\u00e9partition en serpentin pour \u00e9quilibrer les poules.</li>
+<li><b>Par niveau</b> : avec \u00ab Poules par niveau \u00bb, poules homog\u00e8nes (les joueurs de m\u00eame niveau ensemble) ; avec \u00ab Poules puis finales \u00bb, r\u00e9partition en serpentin pour \u00e9quilibrer les poules.</li>
 <li><b>Al\u00e9atoire</b> : m\u00e9lange al\u00e9atoire.</li>
-<li><b>Manuel</b> : touchez un joueur puis la poule de destination.</li>
+<li><b>Manuel</b> : touchez un joueur, puis la poule de destination (une consigne reste affich\u00e9e en haut de l\u2019\u00e9cran). Sur ordinateur, vous pouvez aussi <b>glisser-d\u00e9poser</b> le joueur avec la souris vers sa nouvelle poule.</li>
 </ul>
 
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">5. G\u00e9rer les matchs</h3>
 <p>Les matchs sont g\u00e9n\u00e9r\u00e9s automatiquement (round-robin). Pour chaque match :</p>
 <ul style="margin:4px 0 4px 20px">
 <li>Saisissez les scores des deux joueurs.</li>
-<li>Attribuez un <b>arbitre</b> via le menu d\u00e9roulant (les joueurs occup\u00e9s sont automatiquement exclus ; avec plusieurs poules, seuls les joueurs de la poule sont propos\u00e9s si ce choix est actif).</li>
+<li>Attribuez un <b>arbitre</b> (un joueur libre qui arbitre le match, facultatif) via le menu d\u00e9roulant (les joueurs occup\u00e9s sont automatiquement exclus ; avec plusieurs poules, seuls les joueurs de la poule sont propos\u00e9s si ce choix est actif).</li>
 <li>Cochez <b>+1 pt arb.</b> si l'arbitrage \u00e9tait de qualit\u00e9 (bonus configurable).</li>
 <li>Cliquez sur <b>Valider</b> pour enregistrer le r\u00e9sultat.</li>
 </ul>
@@ -3314,7 +3323,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">6. Formats de match</h3>
 <ul style="margin:4px 0 4px 20px">
 <li><b>Match au score</b> (raquette/filet : tennis de table, badminton, volley...) : choisissez le nombre de <b>manches gagnantes</b> (1 = un seul set d\u00e9cisif, 2 = 2 manches gagnantes sur 3, le 3\u00e8me set n'appara\u00eet qu'en cas d'\u00e9galit\u00e9 1-1) et les <b>points par manche</b> (11/15/21/25). Pas de match nul : les scores \u00e9gaux sont refus\u00e9s.</li>
-<li><b>Match au temps</b> (sports collectifs au chronom\u00e8tre : foot, hand, rugby...) : choisissez le <b>nombre de p\u00e9riodes</b> (1 p\u00e9riode unique, 2 mi-temps, 3 tiers-temps, 4 quart-temps) et leur <b>dur\u00e9e</b>. Le score final peut \u00eatre \u00e9gal (match nul autoris\u00e9), sauf en phase de tableau \u00e0 \u00e9limination (mode 3) o\u00f9 une \u00e9galit\u00e9 n'est jamais permise.</li>
+<li><b>Match au temps</b> (sports collectifs au chronom\u00e8tre : foot, hand, rugby...) : choisissez le <b>nombre de p\u00e9riodes</b> (1 p\u00e9riode unique, 2 mi-temps, 3 tiers-temps, 4 quart-temps) et leur <b>dur\u00e9e</b>. Le score final peut \u00eatre \u00e9gal (match nul autoris\u00e9), sauf en \u00ab \u00c9limination directe \u00bb o\u00f9 une \u00e9galit\u00e9 n'est jamais permise.</li>
 </ul>
 
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">7. Classements et export</h3>
@@ -3328,6 +3337,11 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <p>Configurez les points de victoire/d\u00e9faite, le bonus arbitre, et le format par d\u00e9faut. Ces r\u00e9glages s'appliquent aux nouveaux tournois.</p>
 <p>Le bouton <b>"Supprimer toutes les donn\u00e9es"</b> r\u00e9initialise l'application \u00e0 son \u00e9tat d'origine : tous les param\u00e8tres personnalis\u00e9s (format, points, bonus) sont remis aux valeurs par d\u00e9faut et tous les tournois cr\u00e9\u00e9s sont supprim\u00e9s.</p>
 
+<h3 style="color:var(--pri-lt);margin:12px 0 6px">Sur ordinateur (PC, Mac)</h3>
+<ul style="margin:4px 0 4px 20px">
+<li><b>Tab</b> passe d\u2019un bouton \u00e0 l\u2019autre (cadre dor\u00e9), <b>Entr\u00e9e</b> ou <b>Espace</b> l\u2019active, <b>\u00c9chap</b> ferme une fen\u00eatre.</li>
+<li>Le zoom du navigateur (Ctrl ou Cmd et +) agrandit le texte ; sur grand \u00e9cran, les matchs et les poules s\u2019affichent sur deux colonnes.</li>
+</ul>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Dispens&eacute;s et absents (matchs en pause)</h3>
 <p>Un &eacute;l&egrave;ve qui ne peut pas jouer ne doit pas &ecirc;tre supprim&eacute; : il garde sa place dans la poule et tous ses matchs, rien n'est recalcul&eacute;.</p>
 <ul style="margin:4px 0 4px 20px">
@@ -3335,7 +3349,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <li><b>Absent</b> (bouton &#128101; Joueurs) : ses matchs non jou&eacute;s attendent la prochaine s&eacute;ance (carte grise &laquo; En pause &raquo;, absente de la file d'attente) ; il n'arbitre pas.</li>
 <li><b>R&eacute;tablir</b> : le joueur rejoue ses matchs, dans l'ordre d'origine.</li>
 <li><b>Classement provisoire</b> : les joueurs en pause restent dans le tableau, en couleur (orange = dispens&eacute;, gris = absent), avec les colonnes Moy (points par match) et J (jou&eacute;s / total). Un bouton permet de choisir le tri : <i>Points par match</i> (par d&eacute;faut tant que des matchs sont en pause) ou <i>Points totaux</i>.</li>
-<li><b>Fin des matchs jouables</b> : quand il ne reste que des matchs en pause, un encadr&eacute; propose de <b>Attendre la prochaine s&eacute;ance</b> (le classement reste provisoire) ou de <b>Cl&ocirc;turer sans eux</b> : leurs matchs (jou&eacute;s ou non) ne comptent plus pour personne, ils apparaissent &laquo; non class&eacute;s &raquo; en bas du tableau, et les finales du mode 2 deviennent possibles. <b>Rouvrir</b> annule la cl&ocirc;ture ; <b>Annuler</b> aussi. R&eacute;tablir un joueur le fait revenir dans le calcul.</li>
+<li><b>Fin des matchs jouables</b> : quand il ne reste que des matchs en pause, un encadr&eacute; propose de <b>Attendre la prochaine s&eacute;ance</b> (le classement reste provisoire) ou de <b>Cl&ocirc;turer sans eux</b> : leurs matchs (jou&eacute;s ou non) ne comptent plus pour personne, ils apparaissent &laquo; non class&eacute;s &raquo; en bas du tableau, et les finales de \u00ab Poules puis finales \u00bb deviennent possibles. <b>Rouvrir</b> annule la cl&ocirc;ture ; <b>Annuler</b> aussi. R&eacute;tablir un joueur le fait revenir dans le calcul.</li>
 <li>Les exports XLSX et l'impression indiquent les matchs en pause (colonne Statut, Jou&eacute;s / &Agrave; jouer, mention &laquo; provisoire &raquo;).</li>
 <li>Le r&eacute;glage <b>Arbitres</b> (joueurs de la poule ou tous) est aussi dans &#128101; Joueurs. Les dispens&eacute;s arbitrent toujours toutes les poules.</li>
 </ul>
@@ -3717,7 +3731,7 @@ showModal('&#127937; Fin des matchs jouables',
 '<button class="btn-secondary" style="width:100%;margin-bottom:6px" onclick="closeModal()">Attendre la prochaine s\u00e9ance</button>'+
 '<p style="font-size:.875em;color:var(--txt2);margin-bottom:14px">Le classement reste provisoire. Rien ne change, on reprend ces matchs plus tard (&#128101; Joueurs, R\u00e9tablir).</p>'+
 '<button class="btn-primary" style="width:100%;margin-bottom:6px" onclick="closeWithout()">Cl\u00f4turer sans eux</button>'+
-'<p style="font-size:.875em;color:var(--txt2)">Le classement est calcul\u00e9 sans ces joueurs : <b>leurs matchs (jou\u00e9s ou non) ne comptent pour personne</b>, ainsi chacun perd le m\u00eame nombre de matchs. Ils apparaissent &laquo; non class\u00e9s &raquo; en bas du tableau. Ensuite, les finales du mode 2 sont possibles. &laquo; Rouvrir &raquo; permet de revenir en arri\u00e8re.</p>'+
+'<p style="font-size:.875em;color:var(--txt2)">Le classement est calcul\u00e9 sans ces joueurs : <b>leurs matchs (jou\u00e9s ou non) ne comptent pour personne</b>, ainsi chacun perd le m\u00eame nombre de matchs. Ils apparaissent &laquo; non class\u00e9s &raquo; en bas du tableau. Ensuite, les finales de &laquo; Poules puis finales &raquo; sont possibles. &laquo; Rouvrir &raquo; permet de revenir en arri\u00e8re.</p>'+
 '<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button></div>');
 }
 function closeWithout(){
@@ -3810,7 +3824,7 @@ if(finalsExist||bracketStarted){
 html+='<p class="info-box" style="margin-top:14px">Ajout impossible : '+(finalsExist?'les finales sont déjà générées.':'le tableau est déjà commencé.')+' Vous pouvez encore retirer un joueur.</p>';
 }else{
 html+='<div class="section-title" style="font-size:.95em;margin:16px 0 6px">&#10133; Ajouter un joueur</div>'+
-'<div class="form-group"><input type="text" id="lp-name" placeholder="NOM Prénom" autocomplete="off"></div>'+
+'<div class="form-group"><input type="text" id="lp-name" placeholder="NOM ou PRÉNOM en MAJUSCULES" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" autocomplete="off"></div>'+
 '<div style="display:flex"><div class="form-group" style="flex:1;margin-right:8px"><label>Niveau</label><select id="lp-level">'+[0,1,2,3,4,5].map(l=>'<option value="'+l+'">'+(l?l:'Aucun')+'</option>').join('')+'</select></div>'+
 (T.pools.length?'<div class="form-group" style="flex:1"><label>Poule</label><select id="lp-pool">'+T.pools.map(p=>'<option value="'+p.id+'">'+escH(p.name)+'</option>').join('')+'</select></div>':'')+
 '</div><button class="btn-primary" onclick="addLatePlayer()">Ajouter</button>';
@@ -4200,7 +4214,7 @@ html+='<div class="live-set-label">Manche '+i+'</div><div class="live-sides">'+
 });
 }
 const cands=getRefereeCandidates(m);
-html+='<div class="live-actions"><div style="display:flex;align-items:center;margin-bottom:12px"><select id="live-ref" style="flex:1;margin-right:10px" onchange="liveSetRef(this.value)"><option value="">&#9999; Arbitre</option>'+
+html+='<div class="live-actions"><div style="display:flex;align-items:center;margin-bottom:12px"><select id="live-ref" style="flex:1;margin-right:10px" onchange="liveSetRef(this.value)"><option value="">&#9999; Choisir l&rsquo;arbitre</option>'+
 cands.map(p=>'<option value="'+p.id+'"'+(m.refereeId===p.id?' selected':'')+'>'+escH(p.name)+'</option>').join('')+'</select>'+
 '<label class="ref-bonus-label"><input type="checkbox" '+(draftValue('refbonus-'+m.id,m.refBonus)?'checked':'')+' onchange="liveSetBonus(this.checked)">+1 pt arb.</label></div>'+
 '<button class="btn-primary" onclick="liveAskValidate()">&#10003; Valider le score</button></div>';

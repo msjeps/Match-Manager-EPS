@@ -6,6 +6,15 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.7.3 - 2026-11-18 (APK versionCode 30, cache v47)
+
+Fin des corrections de l'audit ergonomie (suite de la 2.7.0).
+- **Arbitre** : une phrase sous chaque match explique son role (un joueur libre qui arbitre, facultatif, bonus « +1 pt arb. »), le menu propose « Choisir l'arbitre ».
+- **Noms en majuscules** : les champs de saisie (un par un, liste, ajout tardif) demandent « NOM ou PRENOM en MAJUSCULES », affichent la saisie en majuscules et declenchent les capitales sur le clavier tactile.
+- **Interrupteurs** (mode clair, son, departage, bonus arbitre) : `aria-checked` tenu a jour automatiquement (recopie de la classe `.on`), nom accessible pour les lecteurs d'ecran.
+- **Bouton « D » (dispense)** : espacement de 8 px de chaque cote, plus de confusion avec la croix de suppression.
+- **Aide integree relue** : explique le bouton « ? », le fil d'etapes, le glisser-deposer a la souris, la saisie en majuscules, le role de l'arbitre et la navigation au clavier sur ordinateur ; les derniers « mode 1/2/3 » remplaces par les noms affiches a l'ecran.
+
 ## 2.7.2 - 2026-11-17 (APK versionCode 29, cache v46)
 
 - **Noms de fichier avec l'heure** : l'export XLSX (`MatchManagerEPS_<Classe>_<jj-mm-aaaa>_<HHhMM>.xlsx`) et la copie « donnees illisibles » portent maintenant la date ET l'heure, comme le JSON de sauvegarde depuis la 2.5. Helper unique `fileStamp()`. Cause : avec la date seule, deux exports du meme jour avaient le meme nom et le dernier ecrasait le precedent. Test automatique ajoute (`noms de fichier : date ET heure`).
