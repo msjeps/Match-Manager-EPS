@@ -1,4 +1,4 @@
-# Fonctionnalités - Match Manager EPS (version 2.6)
+# Fonctionnalités - Match Manager EPS (version 2.7.4)
 
 Catalogue de ce que l'application fait aujourd'hui. Pour l'historique : [CHANGELOG.md](CHANGELOG.md).
 
@@ -24,7 +24,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 ## 3. Joueurs
 
 - Saisie un par un, par liste collée, ou import `.csv` / `.txt` (`NOM;Niveau`, séparateurs `;` `,` tabulation).
-- Noms toujours en majuscules, niveau de 0 à 5.
+- Noms toujours en majuscules (les champs affichent la saisie en majuscules et le placeholder demande « NOM ou PRÉNOM en MAJUSCULES »), niveau de 0 à 5 (« - » = inconnu, 1 = débutant, 5 = expert).
 - Listes sauvegardées et rechargées d'un tournoi à l'autre.
 - **Régénération des poules protégée** (v2.4.2) : « Valider et générer les matchs » et « Créer les poules » demandent confirmation (et prennent un instantané pour « Annuler ») si des matchs de poule sont joués ou en cours ; « Retour » de l'écran des matchs mène à l'accueil dès qu'un match est joué.
 - **Dispensé / absent / rétablir** (v2.5) : un joueur en pause garde sa place et ses matchs (rien n'est supprimé ni regénéré) ; ses matchs non joués attendent (carte grisée « En pause », hors file d'attente, ni lancement ni validation). *Dispensé* (bouton **D** à l'inscription ou « Joueurs ») : arbitre toutes les poules quel que soit le réglage des arbitres ; *absent* : n'arbitre pas. « Rétablir » le remet en jeu. Classement : joueurs en pause en couleur (orange dispensé, gris absent) à leur rang réel, colonnes Moy (points par match) et J (joués / total), bandeau « Classement provisoire » et bascule du tri (points par match par défaut tant qu'un match est en pause, sinon points totaux). Réglage des arbitres (poule / tous) aussi dans « Joueurs ». Modèle : `player.away = 'absent' | 'dispense'`.
@@ -82,9 +82,17 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Sons (Paramètres, désactivé par défaut) : ding à la validation d'un match, mélodie en fin de tournoi.
 - Avatars : pastille à l'initiale, couleur de la poule du joueur, dans les cartes de match. Fondu de 150 ms entre écrans.
 - **Paramètres** (libre) : mode clair / sombre, sons, accès à la configuration avancée, aide.
-- **Style** : charte des apps EPS (voir [DESIGN-SYSTEM-EPS.md](../DESIGN-SYSTEM-EPS.md)) : boutons en pilule en majuscules, liseré de 5 px et puce colorée sur les encadrés, stepper +/- de 44 px, police système. Palette bleu marine et or conservée, thème nativement sombre.
+- **Style** : charte des apps EPS (voir [DESIGN-SYSTEM-EPS.md](../DESIGN-SYSTEM-EPS.md)) : boutons en pilule (majuscules sauf les boutons principaux et secondaires, en minuscules depuis la 2.7.0), liseré de 5 px et puce colorée sur les encadrés, stepper +/- de 44 px, police système. Palette bleu marine et or conservée, thème nativement sombre.
 - **Configuration avancée** (mot de passe professeur) : format par défaut, points, départage, bonus arbitre, mot de passe personnalisé, suppression de toutes les données.
-- Aide intégrée à jour des fonctions ci-dessus.
+- Aide intégrée à jour des fonctions ci-dessus : bouton « ? » sur l'accueil, fil d'étapes, glisser-déposer, majuscules, rôle de l'arbitre, navigation au clavier.
+- **Ergonomie débutant** (v2.7.0 à v2.7.4) :
+  - noms affichés des modes : « Poules par niveau », « Poules puis finales », « Élimination directe » ; accueil vide avec les 3 étapes ;
+  - fil d'étapes en haut des écrans du tournoi (Joueurs, Poules, Répartition, Matchs, Finales, Classement) ;
+  - saisie : clavier numérique, contenu sélectionné au focus, champs de score de 48 px, champ fautif entouré en rouge avec message de 4,5 s, texte indicatif gris clair qui s'efface au toucher, curseur doré (bleu en mode clair) ;
+  - rôle de l'arbitre expliqué sous chaque match, menu « Choisir l'arbitre » ;
+  - répartition : consigne permanente, joueur sélectionné nommé, glisser-déposer à la souris ;
+  - PC / Mac : Tab, Entrée, Espace, Échap, cadre de focus, survol des boutons, fenêtres avec focus et Tab enfermé, deux colonnes au-dessus de 1000 px ;
+  - accessibilité : `role="button"`, interrupteurs `role="switch"` avec `aria-checked`, zoom par pincement autorisé, texte de 14 px minimum, police système.
 
 ## 9. Robustesse et sécurité
 
