@@ -6,6 +6,12 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.7.4 - 2026-11-18 (APK versionCode 31, cache v48)
+
+Retour iPad : dans le champ « NOM ou PRENOM en MAJUSCULES », le texte indicatif etait presque blanc et le curseur invisible au toucher.
+- Texte indicatif de tous les champs en **gris clair** (gris plus fonce en mode clair), et il **disparait quand on touche le champ**.
+- **Curseur** de saisie dore en mode sombre (bleu en mode clair), visible sur le fond bleu des champs.
+
 ## 2.7.3 - 2026-11-18 (APK versionCode 30, cache v47)
 
 Fin des corrections de l'audit ergonomie (suite de la 2.7.0).

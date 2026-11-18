@@ -167,8 +167,12 @@ body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
 .stat-item .val{font-size:1.4em;font-weight:700;color:var(--pri-lt)}
 .stat-item .lbl{font-size:.875em;color:var(--txt2)}
 #inp-pname,#inp-plist{text-transform:uppercase}
-#inp-pname::placeholder,#inp-plist::placeholder{color:#f4eac5;text-transform:none}
-body.light-mode #inp-pname::placeholder,body.light-mode #inp-plist::placeholder{color:var(--txt2)}
+/* Saisie lisible sur iPad : texte indicatif gris clair (qui s'efface au toucher du champ), curseur doré bien visible */
+input,textarea,select{caret-color:#F3C146}
+body.light-mode input,body.light-mode textarea,body.light-mode select{caret-color:#1565C0}
+input::placeholder,textarea::placeholder{color:#C3CCE0;opacity:1;text-transform:none}
+body.light-mode input::placeholder,body.light-mode textarea::placeholder{color:#6B7A99}
+input:focus::placeholder,textarea:focus::placeholder{color:transparent}
 .level-select{display:flex;gap:8px}
 .level-select button{width:44px;height:44px;border-radius:50%;border:2px solid var(--brd);background:var(--surf2);color:var(--txt);font-weight:700;font-size:.875em;cursor:pointer}
 .level-select button.active{background:var(--pri);color:#000;border-color:var(--pri)}
@@ -679,7 +683,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.7.3';
+const APP_VERSION='2.7.4';
 /* Accessibilite clavier (PC/Mac) et saisie : Entree/Espace activent un element role=button|switch, Echap ferme une modale, un champ numerique se selectionne au focus */
 document.addEventListener('keydown',function(e){
 const t=e.target;
