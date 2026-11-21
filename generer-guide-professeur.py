@@ -149,7 +149,7 @@ def contenu():
                "mise en veille ou de rotation)."))
 
     s.append(P('Pendant le tournoi', h2))
-    s.append(B("<b>Deux zones sur l'écran des matchs</b> : « MATCHS À LANCER » en haut (on lance les matchs), « RÉSULTATS DES MATCHS » en dessous (on saisit les scores quand ils sont finis)."))
+    s.append(B("<b>Deux zones sur l'écran des matchs</b> : « Matchs à lancer » en haut (on lance les matchs), « Résultats des matchs » en dessous (on saisit les scores quand ils sont finis)."))
     s.append(B("<b>File d'attente</b> : au-dessus des matchs, elle indique les tables libres, le prochain match "
                "possible (joueurs ni en jeu ni arbitres, dans l'ordre de la liste), la table et l'arbitre suggérés, et un "
                "bouton « Lancer ce match ». En poules, la table proposée est toujours une table de la poule du match, "
