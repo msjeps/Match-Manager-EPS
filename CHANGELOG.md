@@ -6,6 +6,16 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.7.7 - 2026-11-21 (APK versionCode 34 a reconstruire, cache v51)
+
+Passe de finition visuelle (unslop), sans changement de fonction.
+- Aplats a la place des degrades (barre du haut, chrono, en-tete de classement et de poule), ombres adoucies, plus de halo dore sur le bouton principal.
+- Boutons et titres en minuscules (plus de majuscules espacees), graisses plafonnees a 700, plus d'italique.
+- Transitions nommees (couleur, fond, bordure) au lieu de `all`.
+- Emoji decoratifs retires des libelles de boutons et de titres.
+
+---
+
 ## 2.7.6 - 2026-11-20 (APK versionCode 33, cache v50)
 
 Ecran des matchs (poules, finales, tableau) : les deux temps du travail n'etaient pas separes visuellement.

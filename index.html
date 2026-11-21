@@ -12,15 +12,15 @@
 <title>Match Manager EPS</title>
 <meta name="description" content="Match Manager EPS - Organiser les rencontres, les terrains, les arbitres et les classements sans jongler entre plusieurs feuilles.">
 <style>
-:root{--pri:#F3C146;--pri-lt:#F5D080;--pri-dk:#D4A020;--accent:#4DB0FA;--accent-txt:#4DB0FA;--ok:#4CAF50;--ok-txt:#4CAF50;--err:#E64D4C;--err-txt:#E64D4C;--info:#4DB0FA;--warn:#F3C146;--bg:#213364;--surf:#3e5db3;--surf2:#4A6BC5;--txt:#FFFFFF;--txt2:#D6E4FF;--brd:#5572C8;--ombre-douce:0 4px 15px rgba(0,0,0,.25);--ombre-forte:0 8px 25px rgba(0,0,0,.4);--sh:var(--ombre-douce);--rad:16px;--chrome1:#4A6BC5;--chrome2:#3e5db3}
-body.light-mode{--bg:#EEF2FA;--surf:#FFFFFF;--surf2:#F1F4FB;--txt:#1A2540;--txt2:#46567A;--brd:#D7DEEC;--ombre-douce:0 4px 15px rgba(30,50,90,.12);--ombre-forte:0 8px 25px rgba(30,50,90,.18);--pri-lt:#8A6400;--accent-txt:#1565C0;--ok-txt:#2E7D32;--err-txt:#C62828}
+:root{--pri:#F3C146;--pri-lt:#F5D080;--pri-dk:#D4A020;--accent:#4DB0FA;--accent-txt:#4DB0FA;--ok:#4CAF50;--ok-txt:#4CAF50;--err:#E64D4C;--err-txt:#E64D4C;--info:#4DB0FA;--warn:#F3C146;--bg:#213364;--surf:#3e5db3;--surf2:#4A6BC5;--txt:#FFFFFF;--txt2:#D6E4FF;--brd:#5572C8;--ombre-douce:0 1px 3px rgba(0,0,0,.25);--ombre-forte:0 4px 12px rgba(0,0,0,.35);--sh:var(--ombre-douce);--rad:16px;--chrome1:#4A6BC5;--chrome2:#3e5db3}
+body.light-mode{--bg:#EEF2FA;--surf:#FFFFFF;--surf2:#F1F4FB;--txt:#1A2540;--txt2:#46567A;--brd:#D7DEEC;--ombre-douce:0 1px 3px rgba(30,50,90,.12);--ombre-forte:0 4px 12px rgba(30,50,90,.18);--pri-lt:#8A6400;--accent-txt:#1565C0;--ok-txt:#2E7D32;--err-txt:#C62828}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;touch-action:manipulation;background:var(--bg);color:var(--txt);min-height:100vh;min-height:100dvh;overflow-x:hidden}
 button:focus-visible,[role=button]:focus-visible,[role=switch]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
 .screen{display:none;min-height:100vh;min-height:100dvh;padding-bottom:20px}
 .screen.active{display:block;animation:screenIn .15s ease-out}
 @keyframes screenIn{from{opacity:0}to{opacity:1}}
-.top-bar{background:linear-gradient(135deg,var(--chrome1),var(--chrome2));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.4);border-bottom:2px solid var(--pri)}
+.top-bar{background:var(--chrome1);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--pri)}
 .top-bar h1{font-size:1.1em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .top-bar .logo{font-size:1.3em;font-weight:700;flex:1;display:flex;align-items:center;gap:10px}
 .top-logo{width:40px;height:40px;border-radius:8px;flex-shrink:0}
@@ -37,15 +37,13 @@ button:focus-visible,[role=button]:focus-visible,[role=switch]:focus-visible,inp
 input[type=text],input[type=number],select,textarea{width:100%;padding:12px;border:2px solid var(--brd);border-radius:var(--rad);font-size:1em;background:var(--surf2);color:var(--txt);transition:border .2s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pri)}
 textarea{resize:vertical;min-height:80px}
-.btn-primary{background:var(--pri);color:#000;border:none;padding:14px 24px;border-radius:var(--rad);font-size:1em;font-weight:700;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(243,193,70,.3);transition:transform .1s}
+.btn-primary{background:var(--pri);color:#000;border:none;padding:14px 24px;border-radius:var(--rad);font-size:1em;font-weight:700;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s}
 .btn-primary:active{transform:scale(.97)}
-.btn-secondary{background:transparent;color:var(--pri-lt);border:2px solid var(--pri);padding:10px 18px;border-radius:var(--rad);font-size:.9em;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-secondary{background:transparent;color:var(--pri-lt);border:2px solid var(--pri);padding:10px 18px;border-radius:var(--rad);font-size:.9em;font-weight:600;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s}
 .btn-secondary:active{background:var(--pri);color:#000}
 .btn-success{background:var(--ok);color:#fff;border:none;padding:10px 18px;border-radius:var(--rad);font-size:.9em;font-weight:600;cursor:pointer}
 .btn-danger{background:var(--err);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:.875em;cursor:pointer}
-.btn-primary,.btn-secondary,.btn-success,.btn-danger,.match-validate{border-radius:25px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;min-height:44px;box-shadow:var(--ombre-douce);transition:transform .15s,background .2s}
-.btn-secondary{box-shadow:none}
-.btn-primary,.btn-secondary{text-transform:none;letter-spacing:0}
+.btn-primary,.btn-secondary,.btn-success,.btn-danger,.match-validate{border-radius:25px;font-weight:600;min-height:44px;transition:transform .15s,background .2s}
 .btn-success,.btn-danger,.match-validate{display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn-sm{padding:8px 16px;font-size:.875em}
 .btn-primary:active,.btn-secondary:active,.btn-success:active,.btn-danger:active,.match-validate:active,.btn-back:active,.family-btn:active,.mode-card:active,.lvl-btn:active,.level-select button:active,.pool-nav button:active{transform:scale(.95)}
@@ -70,23 +68,23 @@ body.light-mode .badge-green{color:#2E7D32}
 body.light-mode .badge-blue{color:#1565C0}
 body.light-mode .badge-red{color:#C62828}
 .mode-cards{display:grid;gap:12px}
-.mode-card{border:2px solid var(--brd);border-radius:var(--rad);padding:16px;cursor:pointer;transition:all .2s;background:var(--surf)}
+.mode-card{border:2px solid var(--brd);border-radius:var(--rad);padding:16px;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s;background:var(--surf)}
 .mode-card.selected{border-color:var(--pri);border-left-width:5px;background:rgba(243,193,70,.08)}
 .mode-card h3{color:var(--pri-lt);margin-bottom:4px}
 .mode-card p{font-weight:600;margin-bottom:4px}
 .mode-card small{color:var(--txt2)}
 .family-toggle{display:flex;gap:8px}
-.family-btn{flex:1;border:2px solid var(--brd);border-radius:var(--rad);padding:12px 8px;cursor:pointer;background:var(--surf);text-align:center;font-weight:600;font-size:.9em;transition:all .2s}
+.family-btn{flex:1;border:2px solid var(--brd);border-radius:var(--rad);padding:12px 8px;cursor:pointer;background:var(--surf);text-align:center;font-weight:600;font-size:.9em;transition:background-color .2s,border-color .2s,color .2s}
 .family-btn.selected{border-color:var(--pri);background:rgba(243,193,70,.08);color:var(--pri-lt)}
 .format-group{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .format-group .form-group{flex:1;min-width:120px}
 .player-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;margin-bottom:6px}
 .player-item .num{width:30px;height:30px;border-radius:50%;background:var(--pri);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.875em;flex-shrink:0}
-.player-item .name{flex:1;font-weight:600;letter-spacing:.02em}
+.player-item .name{flex:1;font-weight:600;}
 .player-item .level{font-size:.875em;color:var(--txt2)}
 .player-item .del{background:none;border:none;color:var(--err-txt);font-size:1.2em;cursor:pointer;min-width:44px;min-height:44px;padding:4px 8px}
 .pool-card{border-radius:var(--rad);overflow:hidden;margin-bottom:16px;box-shadow:var(--sh);background:var(--surf);border:1px solid var(--brd)}
-.pool-header{padding:12px 16px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45);font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.pool-header{padding:12px 16px;color:#fff;font-weight:700;display:flex;justify-content:space-between;align-items:center}
 .pool-body{padding:12px}
 .pool-player{padding:8px 12px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
 .pool-player:last-child{border-bottom:none}
@@ -105,7 +103,7 @@ body.light-mode .badge-red{color:#C62828}
 .match-status.done{color:var(--ok-txt)}
 .match-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .match-row .pname{flex:1;font-weight:500;font-size:.95em}
-.match-row input[type=number]{width:64px;height:48px;text-align:center;border:2px solid var(--brd);border-radius:8px;font-size:1.1em;font-weight:800;padding:0;color:var(--txt);background:var(--surf2)}
+.match-row input[type=number]{width:64px;height:48px;text-align:center;border:2px solid var(--brd);border-radius:8px;font-size:1.1em;font-weight:700;padding:0;color:var(--txt);background:var(--surf2)}
 .match-row input.winner{border-color:var(--ok);background:rgba(76,175,80,.1);color:#66BB6A}
 body.light-mode .match-row input.winner{color:#2E7D32}
 .match-row input.loser{border-color:var(--brd);background:var(--surf);color:var(--txt2)}
@@ -117,16 +115,16 @@ body.light-mode .match-row input.winner{color:#2E7D32}
 .match-validate:disabled{opacity:.4;cursor:not-allowed}
 .mtimer{display:flex;align-items:center;gap:10px;background:var(--surf2);border-radius:8px;padding:6px 10px;margin-top:8px}
 .mtimer-period{font-size:.875em;color:var(--txt2);font-weight:600}
-.mtimer-time{font-family:'Courier New',monospace;font-size:1.15em;font-weight:800;color:var(--pri-lt)}
-.mtimer-end{font-size:.875em;color:var(--txt2);font-style:italic}
+.mtimer-time{font-family:'Courier New',monospace;font-size:1.15em;font-weight:700;color:var(--pri-lt)}
+.mtimer-end{font-size:.875em;color:var(--txt2)}
 .mtimer .btn-secondary{padding:6px 12px;font-size:.875em}
 .progress-bar{height:8px;background:var(--brd);border-radius:4px;overflow:hidden;margin:12px 0}
 .progress-fill{height:100%;background:var(--ok);transition:width .3s;border-radius:4px}
 .tab-bar{display:flex;gap:0;background:var(--surf);border-radius:var(--rad);overflow:hidden;border:2px solid var(--brd);margin-bottom:16px}
-.tab-btn{flex:1;padding:10px 8px;border:none;background:none;font-weight:600;font-size:.875em;cursor:pointer;transition:all .2s;color:var(--txt2)}
+.tab-btn{flex:1;padding:10px 8px;border:none;background:none;font-weight:600;font-size:.875em;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s;color:var(--txt2)}
 .tab-btn.active{background:var(--pri);color:#000}
 .ranking-table{width:100%;border-collapse:collapse;font-size:.9em}
-.ranking-table th{background:linear-gradient(135deg,var(--pri-dk),var(--pri));color:#1A2540;padding:10px 8px;text-align:center;font-size:.875em}
+.ranking-table th{background:var(--pri);color:#1A2540;padding:10px 8px;text-align:center;font-size:.875em}
 .ranking-table td{padding:8px;text-align:center;border-bottom:1px solid var(--brd);color:var(--txt)}
 .ranking-table tr:nth-child(even){background:rgba(255,255,255,.03)}
 body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
@@ -135,7 +133,7 @@ body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
 .ranking-table tr.podium-2{background:rgba(200,210,230,.1)}
 .ranking-table tr.podium-3{background:rgba(205,127,50,.12)}
 .ranking-table .pname{text-align:left;font-weight:500}
-.timer-bar{background:linear-gradient(135deg,var(--chrome2),var(--chrome1));color:#fff;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:1.1em;border-bottom:2px solid var(--pri)}
+.timer-bar{background:var(--chrome1);color:#fff;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:1.1em;border-bottom:2px solid var(--pri)}
 .timer-bar .time{font-family:'Courier New',monospace;font-size:1.3em;color:var(--pri)}
 .timer-bar button{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:.9em;cursor:pointer}
 .pool-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px}
@@ -149,7 +147,7 @@ body.light-mode .ranking-table tr:nth-child(even){background:rgba(0,0,0,.03)}
 .bracket-round h3{color:var(--pri-lt);margin-bottom:10px;font-size:1em}
 .qr-container{text-align:center;padding:20px}
 .qr-container canvas{border:4px solid var(--txt);border-radius:8px;margin:16px auto;display:block}
-.import-zone{border:2px dashed var(--brd);border-radius:var(--rad);padding:30px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;color:var(--txt2)}
+.import-zone{border:2px dashed var(--brd);border-radius:var(--rad);padding:30px;text-align:center;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s;margin-bottom:16px;color:var(--txt2)}
 .import-zone:hover{border-color:var(--pri);background:rgba(243,193,70,.05)}
 .import-zone input{display:none}
 .chip{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.875em;font-weight:600;margin:2px}
@@ -189,7 +187,7 @@ input:focus::placeholder,textarea:focus::placeholder{color:transparent}
 .player-item:active{background:rgba(243,193,70,.08)}
 .level-editor{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:8px;margin:-2px 0 6px 0;animation:slideDown .2s ease}
 .level-editor-inner{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.lvl-btn{min-height:44px;padding:6px 14px;border:2px solid var(--brd);border-radius:8px;background:var(--surf);color:var(--txt);cursor:pointer;font-size:.875em;transition:all .15s}
+.lvl-btn{min-height:44px;padding:6px 14px;border:2px solid var(--brd);border-radius:8px;background:var(--surf);color:var(--txt);cursor:pointer;font-size:.875em;transition:background-color .15s,border-color .15s,color .15s}
 .lvl-btn.active{background:var(--pri);color:#000;border-color:var(--pri)}
 .trophy-display{color:var(--pri-lt);font-size:.9em}
 .no-level{color:var(--txt2);font-size:.875em;font-style:italic}
@@ -198,7 +196,7 @@ input:focus::placeholder,textarea:focus::placeholder{color:transparent}
 .pool-header.drop-target{box-shadow:inset 0 0 0 3px rgba(255,255,255,.6)}
 .set-scores{margin-bottom:8px}
 .set-header,.set-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
-.set-header{font-size:.875em;font-weight:700;color:var(--txt2);text-transform:uppercase}
+.set-header{font-size:.875em;font-weight:600;color:var(--txt2)}
 .pname-col{flex:1;font-weight:500;font-size:.95em}
 .set-col{width:54px;text-align:center;flex-shrink:0}
 .set-col input[type=number]{width:54px;height:48px;text-align:center;border:2px solid var(--brd);border-radius:8px;font-size:1em;font-weight:700;padding:0;color:var(--txt);background:var(--surf2)}
@@ -210,7 +208,7 @@ body.light-mode .set-col input.loser{color:#C62828}
 .ref-bonus-label input[type=checkbox]{width:18px;height:18px;accent-color:var(--pri)}
 .bv-slot{padding:3px 6px;border:1px solid var(--brd);font-size:.72em;background:var(--surf2);color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:24px;line-height:18px}
 .bv-w{background:rgba(76,175,80,.2);font-weight:700;color:#66BB6A}
-.bv-bye{background:rgba(255,255,255,.03);color:var(--txt2);font-style:italic}
+.bv-bye{background:rgba(255,255,255,.03);color:var(--txt2)}
 body.light-mode .bv-bye{background:rgba(0,0,0,.03)}
 .bv-champ{padding:6px 8px;border:2px solid var(--ok);border-radius:8px;background:rgba(76,175,80,.1);text-align:center;font-weight:700;font-size:.875em;color:#66BB6A}
 body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
@@ -221,8 +219,8 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 .queue-t.busy{background:rgba(243,193,70,.18);color:var(--pri-lt);border-color:var(--pri)}
 .queue-next{background:var(--surf2);border-radius:10px;padding:10px 12px}
 .queue-row{padding:3px 0}
-.zone-titre{font-size:1.7em;font-weight:800;text-transform:uppercase;letter-spacing:.5px;line-height:1.2;padding:14px 16px;border-radius:12px;margin:22px 0 12px;text-align:center}
-.zone-titre small{display:block;font-size:.5em;font-weight:500;text-transform:none;letter-spacing:0;margin-top:4px}
+.zone-titre{font-size:1.7em;font-weight:700;line-height:1.2;padding:14px 16px;border-radius:12px;margin:22px 0 12px;text-align:center}
+.zone-titre small{display:block;font-size:.5em;font-weight:500;margin-top:4px}
 .zone-res{background:#2E7D32;color:#fff;margin-top:28px;border-top:0}
 .queue-big .zone-lancer{background:var(--pri);color:#213364;margin:0 0 12px}
 .queue-big{padding:16px}
@@ -250,18 +248,18 @@ body.light-mode .badge-out{color:#C62828}
 .live-info{text-align:center;color:var(--txt2);font-size:.95em;margin-bottom:10px}
 .live-sides{display:flex;margin:0 -6px}
 .live-side{flex:1;margin:0 6px;background:var(--surf);border:2px solid var(--brd);border-radius:var(--rad);padding:12px 8px;text-align:center}
-.live-name{font-size:1.4em;font-weight:800;margin-bottom:6px;word-wrap:break-word}
-.live-score{font-size:5.5em;font-weight:900;line-height:1.1;color:var(--pri-lt)}
-.live-set-label{font-size:.9em;font-weight:700;color:var(--txt2);margin:10px 0 2px;text-transform:uppercase}
-.live-num{font-size:3em;font-weight:900;line-height:1.1;color:var(--pri-lt)}
-.live-btn{display:block;width:100%;height:76px;margin-top:8px;border-radius:var(--rad);border:3px solid var(--brd);background:var(--surf2);color:var(--txt);font-size:2.8em;font-weight:800;cursor:pointer}
+.live-name{font-size:1.4em;font-weight:700;margin-bottom:6px;word-wrap:break-word}
+.live-score{font-size:5.5em;font-weight:700;line-height:1.1;color:var(--pri-lt)}
+.live-set-label{font-size:.9em;font-weight:700;color:var(--txt2);margin:10px 0 2px}
+.live-num{font-size:3em;font-weight:700;line-height:1.1;color:var(--pri-lt)}
+.live-btn{display:block;width:100%;height:76px;margin-top:8px;border-radius:var(--rad);border:3px solid var(--brd);background:var(--surf2);color:var(--txt);font-size:2.8em;font-weight:700;cursor:pointer}
 .live-btn.plus{background:var(--ok);border-color:var(--ok);color:#fff}
 .live-btn:active{opacity:.7}
 .avatar{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-size:.875em;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
 .card.done{border-left-color:var(--ok)}
 .podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:12px 0 4px}
 .pstep{flex:1;max-width:200px;text-align:center}
-.pstep-name{font-weight:800;margin-bottom:6px;word-break:break-word}
+.pstep-name{font-weight:700;margin-bottom:6px;word-break:break-word}
 .pstep-block{border-radius:12px 12px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:10px;font-size:2em;color:#1A2540}
 .pstep-1 .pstep-block{height:120px;background:#F3C146}
 .pstep-2 .pstep-block{height:90px;background:#C9D3E6}
@@ -272,11 +270,11 @@ body.light-mode .badge-out{color:#C62828}
 .live-score.bump,.live-num.bump{animation:liveBump .18s ease-out}
 .live-timer{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;background:var(--surf2);border-radius:var(--rad);padding:10px;margin:12px 0}
 .live-timer>*{margin:4px 8px}
-.live-time{font-family:'Courier New',monospace;font-size:2.6em;font-weight:900;color:var(--pri-lt)}
+.live-time{font-family:'Courier New',monospace;font-size:2.6em;font-weight:700;color:var(--pri-lt)}
 .live-actions{margin-top:14px}
 .live-actions .btn-primary{height:64px;font-size:1.3em}
 .live-ok{text-align:center;padding:30px 10px}
-.live-ok .big{font-size:2em;font-weight:800;margin:14px 0}
+.live-ok .big{font-size:2em;font-weight:700;margin:14px 0}
 
 .inp-err{border-color:var(--err)!important;box-shadow:0 0 0 3px rgba(230,77,76,.35)!important}
 .steps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;font-size:.875em}
@@ -320,8 +318,8 @@ body.light-mode .badge-out{color:#C62828}
 <h2 style="margin-bottom:16px">Mes Tournois</h2>
 <div id="tournament-list"></div>
 <button class="btn-primary" onclick="showScreen('scr-create')" style="margin-top:16px">+ Nouveau tournoi</button>
-<button class="btn-secondary" onclick="showPalmares()" style="margin-top:10px;width:100%">&#127941; Palmar&egrave;s par classe</button>
-<button class="btn-secondary" onclick="showBackupModal()" style="margin-top:10px;width:100%">&#128190; Sauvegarde / transfert de tournoi</button>
+<button class="btn-secondary" onclick="showPalmares()" style="margin-top:10px;width:100%">Palmar&egrave;s par classe</button>
+<button class="btn-secondary" onclick="showBackupModal()" style="margin-top:10px;width:100%">Sauvegarde / transfert de tournoi</button>
 <div class="pied-page">
 <img src="logo-outils-eps.png" alt="Logo outils-eps.fr" class="pied-page-logo">
 <p>https://outils-eps.fr par Nathalie Prenois</p>
@@ -361,7 +359,7 @@ body.light-mode .badge-out{color:#C62828}
 <div class="form-group"><label>Format de match</label>
 <div class="family-toggle" id="inp-family-toggle">
 <div class="family-btn selected" data-family="score" role="button" tabindex="0" onclick="onFormatFamilyChange('inp','score')">&#127955; Match au score</div>
-<div class="family-btn" data-family="time" role="button" tabindex="0" onclick="onFormatFamilyChange('inp','time')">&#9201; Match au temps</div>
+<div class="family-btn" data-family="time" role="button" tabindex="0" onclick="onFormatFamilyChange('inp','time')">Match au temps</div>
 </div>
 <div class="format-group" id="inp-format-score">
 <div class="form-group"><label>Manches gagnantes <small style="font-weight:400">(1 = un seul set d&eacute;cisif ; 2 = le premier &agrave; gagner 2 sets)</small></label>
@@ -390,7 +388,7 @@ body.light-mode .badge-out{color:#C62828}
 </div>
 <div class="content">
 <div class="btn-group">
-<button class="btn-secondary btn-sm" onclick="showSaveListModal()">&#128190; Sauvegarder</button>
+<button class="btn-secondary btn-sm" onclick="showSaveListModal()">Sauvegarder</button>
 <button class="btn-secondary btn-sm" onclick="showLoadListModal()">&#128194; Charger liste</button>
 </div>
 <div class="tab-bar" style="margin-bottom:12px">
@@ -419,7 +417,7 @@ body.light-mode .badge-out{color:#C62828}
 </div>
 <div class="list-head"><h3 id="player-count">Joueurs inscrits (0)</h3><div class="legend" id="player-legend" style="display:none"><span>&#127942; = niveau (1 &agrave; 5)</span><span>Non class&eacute; = sans niveau</span><span><b class="legend-d">D</b> = dispens&eacute; (ne joue pas, peut arbitrer)</span></div></div>
 <div id="player-list"></div>
-<div id="player-clear" class="danger-zone" style="display:none"><button class="btn-danger btn-sm" onclick="clearAllPlayers()">&#128465; Supprimer tous les joueurs</button></div>
+<div id="player-clear" class="danger-zone" style="display:none"><button class="btn-danger btn-sm" onclick="clearAllPlayers()">Supprimer tous les joueurs</button></div>
 <div id="player-empty" class="empty-state"><div class="icon">&#128101;</div><p>Aucun joueur inscrit pour le moment</p></div>
 <button class="btn-primary" onclick="goToConfig()" style="margin-top:20px">Continuer &rarr;</button>
 </div>
@@ -453,7 +451,7 @@ body.light-mode .badge-out{color:#C62828}
 <div class="btn-group">
 <button class="btn-secondary btn-sm" onclick="distByLevel()">&#11088; Niveau</button>
 <button class="btn-secondary btn-sm" onclick="distRandom()">&#128256; M&eacute;langer</button>
-<button class="btn-secondary btn-sm" onclick="distManual()">&#9998; Manuel</button>
+<button class="btn-secondary btn-sm" onclick="distManual()">Manuel</button>
 </div>
 <div id="dist-help" class="info-box"></div>
 <div id="dist-pools"></div>
@@ -476,10 +474,10 @@ body.light-mode .badge-out{color:#C62828}
 <div id="matches-progress"></div>
 <div id="export-banner"></div>
 <div id="pool-queue"></div>
-<div class="zone-titre zone-res" role="heading" aria-level="2">&#9998; R&Eacute;SULTATS DES MATCHS<small>Saisissez ici le score quand le match est termin&eacute;</small></div>
+<div class="zone-titre zone-res" role="heading" aria-level="2">R&eacute;sultats des matchs<small>Saisissez ici le score quand le match est termin&eacute;</small></div>
 <div id="matches-list"></div>
 <div class="btn-group" style="margin-top:20px">
-<button class="btn-secondary" onclick="showScreen('scr-rankings')">&#128202; Classements</button>
+<button class="btn-secondary" onclick="showScreen('scr-rankings')">Classements</button>
 <button class="btn-primary" id="btn-next-phase" style="display:none" onclick="goNextPhase()"></button>
 </div>
 </div>
@@ -508,8 +506,8 @@ body.light-mode .badge-out{color:#C62828}
 <div class="card" style="margin-top:16px">
 <h3 style="margin-bottom:12px">QR Code des r&eacute;sultats</h3>
 <div class="qr-container" id="qr-container-rankings"></div>
-<button class="btn-secondary" onclick="downloadCSV()" style="width:100%;margin-top:12px">&#128196; T&eacute;l&eacute;charger XLSX</button>
-<button class="btn-secondary" onclick="showPrintDialog()" style="width:100%;margin-top:8px">&#128424; Imprimer / PDF (affichage)</button>
+<button class="btn-secondary" onclick="downloadCSV()" style="width:100%;margin-top:12px">T&eacute;l&eacute;charger XLSX</button>
+<button class="btn-secondary" onclick="showPrintDialog()" style="width:100%;margin-top:8px">Imprimer / PDF (affichage)</button>
 </div>
 </div>
 </section>
@@ -527,9 +525,9 @@ body.light-mode .badge-out{color:#C62828}
 <div id="queue-finals"></div>
 <div id="finals-tabs" class="tab-bar"></div>
 <div id="final-queue"></div>
-<div class="zone-titre zone-res" role="heading" aria-level="2">&#9998; R&Eacute;SULTATS DES MATCHS<small>Saisissez ici le score quand le match est termin&eacute;</small></div>
+<div class="zone-titre zone-res" role="heading" aria-level="2">R&eacute;sultats des matchs<small>Saisissez ici le score quand le match est termin&eacute;</small></div>
 <div id="finals-list"></div>
-<button class="btn-secondary" onclick="showFinalRankings()" style="margin-top:16px;width:100%">&#128202; Classement g&eacute;n&eacute;ral</button>
+<button class="btn-secondary" onclick="showFinalRankings()" style="margin-top:16px;width:100%">Classement g&eacute;n&eacute;ral</button>
 </div>
 </section>
 
@@ -544,11 +542,11 @@ body.light-mode .badge-out{color:#C62828}
 <div class="content">
 <div id="tools-bracket"></div>
 <div id="queue-bracket"></div>
-<div class="zone-titre zone-res" role="heading" aria-level="2">&#9998; R&Eacute;SULTATS DES MATCHS<small>Saisissez ici le score quand le match est termin&eacute;</small></div>
+<div class="zone-titre zone-res" role="heading" aria-level="2">R&eacute;sultats des matchs<small>Saisissez ici le score quand le match est termin&eacute;</small></div>
 <div id="bracket-tabs" class="tab-bar"></div>
 <div id="bracket-content"></div>
 <div style="display:flex;gap:8px;margin-top:16px">
-<button class="btn-secondary" onclick="showBracketRanking()" style="flex:1">&#128202; Classement complet</button>
+<button class="btn-secondary" onclick="showBracketRanking()" style="flex:1">Classement complet</button>
 <button class="btn-primary" onclick="showBracketVisual()" style="flex:1">&#128204; Tableau</button>
 </div>
 </div>
@@ -569,7 +567,7 @@ body.light-mode .badge-out{color:#C62828}
 <h3 style="margin-bottom:12px">QR Code des r&eacute;sultats</h3>
 <div class="qr-container" id="qr-container"></div>
 </div>
-<button class="btn-secondary" onclick="downloadCSV()" style="width:100%;margin-top:12px">&#128196; T&eacute;l&eacute;charger XLSX</button>
+<button class="btn-secondary" onclick="downloadCSV()" style="width:100%;margin-top:12px">T&eacute;l&eacute;charger XLSX</button>
 </div>
 </section>
 
@@ -596,10 +594,10 @@ body.light-mode .badge-out{color:#C62828}
 <div class="card">
 <h3>&#128274; Acc&egrave;s professeur</h3>
 <p style="font-size:.875em;color:var(--txt2);margin:8px 0">Configuration du format de match, du syst&egrave;me de points, du bonus arbitre et des donn&eacute;es.</p>
-<button class="btn-secondary" onclick="openAdminAccess()" style="width:100%">&#128273; Configuration avanc&eacute;e</button>
+<button class="btn-secondary" onclick="openAdminAccess()" style="width:100%">Configuration avanc&eacute;e</button>
 </div>
 <div class="card">
-<h3>&#10067; Aide</h3>
+<h3>Aide</h3>
 <p style="font-size:.875em;color:var(--txt2);margin:8px 0">Guide d'utilisation de l'application</p>
 <button class="btn-secondary" onclick="showHelp()" style="width:100%">Ouvrir l'aide</button>
 </div>
@@ -618,7 +616,7 @@ body.light-mode .badge-out{color:#C62828}
 <h3>Format de match par d&eacute;faut</h3>
 <div class="family-toggle" id="adm-family-toggle">
 <div class="family-btn selected" data-family="score" role="button" tabindex="0" onclick="onFormatFamilyChange('adm','score')">&#127955; Match au score</div>
-<div class="family-btn" data-family="time" role="button" tabindex="0" onclick="onFormatFamilyChange('adm','time')">&#9201; Match au temps</div>
+<div class="family-btn" data-family="time" role="button" tabindex="0" onclick="onFormatFamilyChange('adm','time')">Match au temps</div>
 </div>
 <div class="format-group" id="adm-format-score">
 <div class="form-group"><label>Manches gagnantes</label>
@@ -659,17 +657,17 @@ body.light-mode .badge-out{color:#C62828}
 <input type="number" inputmode="numeric" pattern="[0-9]*" id="adm-refbonuspts" value="1" min="0" max="5" onchange="saveSettings()"></div></div>
 </div>
 <div class="card">
-<h3>&#128273; Mot de passe personnalis&eacute; (optionnel)</h3>
+<h3>Mot de passe personnalis&eacute; (optionnel)</h3>
 <p style="font-size:.875em;color:var(--txt2);margin:8px 0">Cet acc&egrave;s est prot&eacute;g&eacute; par le mot de passe par d&eacute;faut (voir le guide professeur). Vous pouvez d&eacute;finir ici un mot de passe qui vous est propre - une fois personnalis&eacute;, le mot de passe par d&eacute;faut ne fonctionne plus directement (pour emp&ecirc;cher un &eacute;l&egrave;ve qui le conna&icirc;trait de contourner votre mot de passe). En cas d'oubli, 3 tentatives incorrectes sur l'&eacute;cran de connexion font appara&icirc;tre un bouton pour r&eacute;initialiser au mot de passe par d&eacute;faut.</p>
 <div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="adm-nouveau-mdp" placeholder="Laisser vide pour ne rien changer" autocomplete="off"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap">
-<button type="button" class="btn-secondary" onclick="definirMdpAdmin()">&#128190; Enregistrer ce mot de passe</button>
-<button type="button" class="btn-secondary" onclick="supprimerMdpAdmin()">&#128260; Revenir au mot de passe par d&eacute;faut</button>
+<button type="button" class="btn-secondary" onclick="definirMdpAdmin()">Enregistrer ce mot de passe</button>
+<button type="button" class="btn-secondary" onclick="supprimerMdpAdmin()">Revenir au mot de passe par d&eacute;faut</button>
 </div>
 <p id="adm-mdp-message" style="display:none;margin-top:8px;color:var(--ok-txt);font-size:.875em"></p>
 </div>
 <div class="card">
-<h3>&#128465; Donn&eacute;es</h3>
+<h3>Donn&eacute;es</h3>
 <button class="btn-danger" onclick="resetAll()" style="margin-top:8px">Supprimer toutes les donn&eacute;es</button>
 </div>
 </div>
@@ -695,7 +693,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.7.6';
+const APP_VERSION='2.7.7';
 /* Accessibilite clavier (PC/Mac) et saisie : Entree/Espace activent un element role=button|switch, Echap ferme une modale, un champ numerique se selectionne au focus */
 document.addEventListener('keydown',function(e){
 const t=e.target;
@@ -802,7 +800,7 @@ Object.keys(d.drafts).forEach(k=>{if(ids.has(k.slice(k.indexOf('-')+1)))state.dr
 function showLoadProblem(){
 showModal('&#9888;&#65039; Donn&eacute;es illisibles',
 '<p style="margin-bottom:10px">Les donn&eacute;es enregistr&eacute;es sur cette tablette n\'ont pas pu &ecirc;tre relues enti&egrave;rement. Une copie brute a &eacute;t&eacute; conserv&eacute;e : <strong>n\'utilisez pas &laquo; Supprimer toutes les donn&eacute;es &raquo;</strong> et pr&eacute;venez l\'enseignante.</p>'+
-'<div class="modal-actions"><button class="btn-secondary" onclick="downloadUnreadableBackup()">&#128190; Enregistrer la copie</button><button class="btn-primary" style="width:auto" onclick="closeModal()">Compris</button></div>');
+'<div class="modal-actions"><button class="btn-secondary" onclick="downloadUnreadableBackup()">Enregistrer la copie</button><button class="btn-primary" style="width:auto" onclick="closeModal()">Compris</button></div>');
 }
 function downloadUnreadableBackup(){
 let raw='';
@@ -933,7 +931,7 @@ function toast(msg,ms){const d=document.createElement('div');d.className='toast'
 /* ===== HOME ===== */
 function renderHome(){
 const el=document.getElementById('tournament-list');
-if(!state.tournaments.length){el.innerHTML='<div class="empty-state"><div class="icon"><img src="icon_192.png" alt="" class="empty-logo"></div><h3 style="color:var(--txt);margin-bottom:10px">Bienvenue !</h3><p style="margin-bottom:12px">Pour organiser un tournoi en 3 \u00e9tapes :</p><ol style="text-align:left;display:inline-block;line-height:1.8"><li>Touchez <b>+ Nouveau tournoi</b> ci-dessous</li><li>Ajoutez vos joueurs (un par un ou en liste)</li><li>Lancez les matchs et saisissez les scores</li></ol><p style="margin-top:12px"><button class="btn-secondary btn-sm" onclick="showHelp()">&#10067; Ouvrir l\'aide</button></p></div>';return;}
+if(!state.tournaments.length){el.innerHTML='<div class="empty-state"><div class="icon"><img src="icon_192.png" alt="" class="empty-logo"></div><h3 style="color:var(--txt);margin-bottom:10px">Bienvenue !</h3><p style="margin-bottom:12px">Pour organiser un tournoi en 3 \u00e9tapes :</p><ol style="text-align:left;display:inline-block;line-height:1.8"><li>Touchez <b>+ Nouveau tournoi</b> ci-dessous</li><li>Ajoutez vos joueurs (un par un ou en liste)</li><li>Lancez les matchs et saisissez les scores</li></ol><p style="margin-top:12px"><button class="btn-secondary btn-sm" onclick="showHelp()">Ouvrir l\'aide</button></p></div>';return;}
 el.innerHTML=state.tournaments.map(t=>{
 const modeNames={1:'Poules de niveau',2:'Poules + Finales',3:'Tableau \u00e9limination'};
 const phaseNames={players:'Inscription',pools:'Configuration',matches:'Matchs en cours',finals:'Finales',bracket:'Bracket',done:'Termin\u00e9'};
@@ -943,7 +941,7 @@ const total=t.matches.length,nbDone=t.matches.filter(m=>m.status==='done').lengt
 const pct=total?Math.round(100*nbDone/total):0;
 const prog=total?`<div style="display:flex;justify-content:space-between;font-size:.875em;color:var(--txt2);margin-top:10px"><span>${nbDone}/${total} matchs</span><span>${pct}%</span></div>
 <div class="progress-bar" style="margin:4px 0 0"><div class="progress-fill" style="width:${pct}%"></div></div>`:'';
-const go=fin?`<button class="btn-primary btn-sm" style="width:auto;margin-top:12px" onclick="event.stopPropagation();openResults('${t.id}')">&#127941; Voir le podium</button>`
+const go=fin?`<button class="btn-primary btn-sm" style="width:auto;margin-top:12px" onclick="event.stopPropagation();openResults('${t.id}')">Voir le podium</button>`
 :`<button class="btn-primary btn-sm" style="width:auto;margin-top:12px" onclick="event.stopPropagation();openTournament('${t.id}')">&#9654; Reprendre</button>`;
 return`<div class="card${fin?' done':''}" role="button" tabindex="0" style="cursor:pointer" onclick="openTournament('${t.id}')">
 <div style="display:flex;justify-content:space-between;align-items:start">
@@ -951,7 +949,7 @@ return`<div class="card${fin?' done':''}" role="button" tabindex="0" style="curs
 <p style="font-size:.875em;color:var(--txt2)">&#128197; ${escH(t.date)} - ${escH(t.classe||'')}</p>
 <p style="font-size:.875em">${t.players.length} joueurs</p>
 <span class="badge badge-orange">${modeNames[t.mode]}</span>
-${fin?'<span class="badge badge-green">&#127941; Termin&eacute;</span>':'<span class="badge badge-blue">'+(phaseNames[t.phase]||t.phase)+'</span>'}</div>
+${fin?'<span class="badge badge-green">Termin&eacute;</span>':'<span class="badge badge-blue">'+(phaseNames[t.phase]||t.phase)+'</span>'}</div>
 <button class="btn-danger btn-sm" onclick="event.stopPropagation();delTournament('${t.id}')">&#128465;</button>
 </div>${prog}${go}</div>`}).join('');
 }
@@ -1426,7 +1424,7 @@ el.innerHTML=T.pools.map((pool,pi)=>{
 const col=POOL_COLORS[pi%POOL_COLORS.length];
 const players=pool.playerIds.map(id=>T.players.find(p=>p.id===id)).filter(Boolean);
 return`<div class="pool-card" data-pool="${pool.id}">
-<div class="pool-header" style="background:linear-gradient(135deg,${col[0]},${col[1]});cursor:pointer" role="button" tabindex="0" onclick="moveToPool('${pool.id}')">
+<div class="pool-header" style="background:${col[0]};cursor:pointer" role="button" tabindex="0" onclick="moveToPool('${pool.id}')">
 <span>&#127937; ${escH(pool.name)}</span><span class="badge" style="background:rgba(255,255,255,.3);color:#fff">${players.length} joueurs</span>
 ${selectedPlayerForMove?'<span style="font-size:.875em;opacity:.8">&#128071; D\u00e9poser ici</span>':''}
 </div><div class="pool-body">${players.map((p,i)=>`<div class="pool-player${selectedPlayerForMove===p.id?' selected':''}" draggable="true" data-pid="${p.id}" role="button" tabindex="0" onclick="selectPlayerForMove('${p.id}',event)" style="cursor:pointer"><div class="seed">${i+1}</div><span>${escH(p.name)}</span>${p.level?'<span class="chip" style="background:rgba(77,176,250,.2);color:#4DB0FA">Niv.'+p.level+'</span>':''}</div>`).join('')}
@@ -1627,7 +1625,7 @@ const actionsHtml=waiting?(involvesExcluded(m)?'<div class="match-pause-note">\u
 <div class="match-actions">
 ${refSelectHtml}
 <label class="ref-bonus-label"><input type="checkbox" id="refbonus-${m.id}" ${(isDone?m.refBonus:draftValue('refbonus-'+m.id,m.refBonus))?'checked':''} ${dis}>+1 pt arb.</label>
-${isDone?(m.forfeit?'':'<button class="btn-secondary btn-sm" onclick="unlockMatch(\''+m.id+'\')">&#9998; Modifier</button>'):
+${isDone?(m.forfeit?'':'<button class="btn-secondary btn-sm" onclick="unlockMatch(\''+m.id+'\')">Modifier</button>'):
 '<button class="btn-secondary btn-sm" style="min-height:44px" title="Mode tablette \u00e9l\u00e8ve" onclick="openLive(\''+m.id+'\',event)">&#128241;</button><button class="match-validate" onclick="validateMatch(\''+m.id+'\')">&#10003; Valider</button>'}
 </div>`;
 if(!isBo3){
@@ -3195,7 +3193,7 @@ const html=`<div class="form-group"><label>Mot de passe</label><input type="pass
 <div id="admin-pwd-error" style="color:var(--err-txt);margin-top:8px;display:none">&#10060; Mot de passe incorrect</div>
 <div id="admin-pwd-reset" style="display:none;margin-top:15px;padding-top:15px;border-top:1px solid var(--brd)">
 <p style="font-size:.875em;color:var(--txt2);margin-bottom:8px">Mot de passe personnalisé oublié ?</p>
-<button type="button" class="btn-secondary" style="width:100%" onclick="resetAdminPasswordFromLogin()">&#128260; Réinitialiser au mot de passe par défaut</button>
+<button type="button" class="btn-secondary" style="width:100%" onclick="resetAdminPasswordFromLogin()">Réinitialiser au mot de passe par défaut</button>
 </div>
 <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" style="width:auto" onclick="verifyAdminPassword()">Valider</button></div>`;
 showModal('&#128274; Accès professeur',html);
@@ -3387,12 +3385,12 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <li><b>Ajouter un joueur</b> &agrave; une poule (avant les finales) : il rencontre tous les joueurs de la poule.</li>
 </ul>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">File d'attente et tables</h3>
-<p>L'&eacute;cran des matchs se lit de haut en bas : en haut <b>&#9654; MATCHS &Agrave; LANCER</b> (on lance les matchs), en dessous <b>&#9998; R&Eacute;SULTATS DES MATCHS</b> (on saisit les scores quand ils sont finis).</p>
-<p>Au-dessus des matchs, la carte <b>&#9201; File d'attente</b> montre les tables libres (vert) ou occup&eacute;es (jaune), puis propose le <b>prochain match libre</b> : celui dont aucun joueur n'est en jeu ni en train d'arbitrer. En poules et finales, elle suit l'ordre de la liste (poule affich&eacute;e d'abord) ; en tableau, elle donne la priorit&eacute; aux joueurs qui ont le moins jou&eacute;. Elle sugg&egrave;re aussi une table (celles de la poule du match, si vous les avez d&eacute;finies) et un arbitre (un joueur qui n'a plus de match &agrave; jouer, ou qui a le moins arbitr&eacute;), mais seulement si cela ne bloque aucun autre match : sans joueur libre, le match se lance sans arbitre (par exemple 4 joueurs : les 2 matchs se jouent en m&ecirc;me temps). <b>&#9654; Lancer ce match</b> met le match en cours et applique la table et l'arbitre propos&eacute;s.</p>
+<p>L'&eacute;cran des matchs se lit de haut en bas : en haut <b>&#9654; Matchs &agrave; lancer</b> (on lance les matchs), en dessous <b>R&eacute;sultats des matchs</b> (on saisit les scores quand ils sont finis).</p>
+<p>Au-dessus des matchs, la carte <b>File d'attente</b> montre les tables libres (vert) ou occup&eacute;es (jaune), puis propose le <b>prochain match libre</b> : celui dont aucun joueur n'est en jeu ni en train d'arbitrer. En poules et finales, elle suit l'ordre de la liste (poule affich&eacute;e d'abord) ; en tableau, elle donne la priorit&eacute; aux joueurs qui ont le moins jou&eacute;. Elle sugg&egrave;re aussi une table (celles de la poule du match, si vous les avez d&eacute;finies) et un arbitre (un joueur qui n'a plus de match &agrave; jouer, ou qui a le moins arbitr&eacute;), mais seulement si cela ne bloque aucun autre match : sans joueur libre, le match se lance sans arbitre (par exemple 4 joueurs : les 2 matchs se jouent en m&ecirc;me temps). <b>&#9654; Lancer ce match</b> met le match en cours et applique la table et l'arbitre propos&eacute;s.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Imprimer ou PDF</h3>
-<p>Le bouton <b>&#128424; Imprimer / PDF</b> (barre d'outils des matchs et &eacute;cran Classements) pr&eacute;pare une feuille A4 en noir et blanc : classements, tableau du tournoi, liste des matchs et scores. Choisissez une imprimante ou &laquo; Enregistrer au format PDF &raquo; pour l'afficher au gymnase.</p>
+<p>Le bouton <b>Imprimer / PDF</b> (barre d'outils des matchs et &eacute;cran Classements) pr&eacute;pare une feuille A4 en noir et blanc : classements, tableau du tournoi, liste des matchs et scores. Choisissez une imprimante ou &laquo; Enregistrer au format PDF &raquo; pour l'afficher au gymnase.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Palmar&egrave;s par classe</h3>
-<p>Sur l'&eacute;cran d'accueil, <b>&#127941; Palmar&egrave;s par classe</b> additionne les r&eacute;sultats de tous les tournois d'une m&ecirc;me classe (joueurs rapproch&eacute;s par nom) : tournois jou&eacute;s, victoires, d&eacute;faites, % de victoires, diff&eacute;rence de points, points de classement, premi&egrave;res places et podiums. Triez par points, % de victoires ou podiums, d&eacute;cochez un tournoi (copie, essai) pour l'exclure, puis imprimez ou enregistrez en PDF.</p>
+<p>Sur l'&eacute;cran d'accueil, <b>Palmar&egrave;s par classe</b> additionne les r&eacute;sultats de tous les tournois d'une m&ecirc;me classe (joueurs rapproch&eacute;s par nom) : tournois jou&eacute;s, victoires, d&eacute;faites, % de victoires, diff&eacute;rence de points, points de classement, premi&egrave;res places et podiums. Triez par points, % de victoires ou podiums, d&eacute;cochez un tournoi (copie, essai) pour l'exclure, puis imprimez ou enregistrez en PDF.</p>
 <p><b>&#127942; Fin de tournoi</b> : quand le dernier match est valid&eacute;, une fen&ecirc;tre affiche le <b>podium</b> (une seule fois par podium). Il reste visible en haut de l'&eacute;cran Classements et, sur l'accueil, le tournoi passe en vert avec le bouton &laquo; Voir le podium &raquo;. Les m&eacute;dailles &#129351;&#129352;&#129353; apparaissent dans les classements d&egrave;s qu'un match est jou&eacute;.</p>
 <p><b>&#128266; Sons</b> : dans les Param&egrave;tres, un petit son peut accompagner chaque r&eacute;sultat valid&eacute; (d&eacute;sactiv&eacute; par d&eacute;faut, r&eacute;glage propre &agrave; chaque tablette).</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Annuler</h3>
@@ -3400,7 +3398,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Mode tablette &eacute;l&egrave;ve</h3>
 <p>Le bouton <b>&#128241;</b> d'un match affiche un &eacute;cran avec de gros boutons + et &minus; pour saisir le score &agrave; la touche, puis une confirmation avant validation.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Sauvegarde et transfert</h3>
-<p>Sur l'&eacute;cran d'accueil, <b>&#128190; Sauvegarde / transfert</b> enregistre un tournoi dans un fichier, ou copie son texte pour le coller sur une autre tablette (messagerie, cl&eacute; USB...). L'import se fait depuis le m&ecirc;me &eacute;cran.</p>
+<p>Sur l'&eacute;cran d'accueil, <b>Sauvegarde / transfert</b> enregistre un tournoi dans un fichier, ou copie son texte pour le coller sur une autre tablette (messagerie, cl&eacute; USB...). L'import se fait depuis le m&ecirc;me &eacute;cran.</p>
 
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">9. Installation sur tablette (PWA)</h3>
 <p>L'application peut s'installer comme une application native :</p>
@@ -3718,7 +3716,7 @@ const e=lastUndo();
 el.innerHTML='<div class="tools-bar">'+
 (e?'<button class="btn-secondary btn-sm" onclick="confirmUndo()">&#8617; Annuler : '+escH(e.label.length>34?e.label.slice(0,33)+'…':e.label)+'</button>':'')+
 '<button class="btn-secondary btn-sm" onclick="showPlayersManager()">&#128101; Joueurs</button>'+
-'<button class="btn-secondary btn-sm" onclick="showPrintDialog()">&#128424; Imprimer / PDF</button></div>';
+'<button class="btn-secondary btn-sm" onclick="showPrintDialog()">Imprimer / PDF</button></div>';
 }
 
 /* ===== JOUEURS : absent / forfait / ajout tardif ===== */
@@ -4003,7 +4001,7 @@ if(typeof AndroidDownload!=='undefined')return '';
 const st=exportStatus();
 if(!st.dirty||(!st.n&&!st.never))return '';
 const when=st.at?new Date(st.at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
-return '<div class="info-box" style="margin-top:8px;border-left-color:#FF8F00">&#9888; <b>'+(st.n?st.n+' r\u00e9sultat(s) non export\u00e9(s)':'Rien n\'a encore \u00e9t\u00e9 export\u00e9')+'</b>'+(when?' depuis le dernier export ('+when+')':'')+'. Les donn\u00e9es de ce navigateur peuvent dispara\u00eetre \u00e0 la d\u00e9connexion de l\'ordinateur.<br><button class="btn-secondary btn-sm" style="margin-top:6px" onclick="exportCurrentBackup()">&#128190; Exporter la sauvegarde (JSON)</button></div>';
+return '<div class="info-box" style="margin-top:8px;border-left-color:#FF8F00">&#9888; <b>'+(st.n?st.n+' r\u00e9sultat(s) non export\u00e9(s)':'Rien n\'a encore \u00e9t\u00e9 export\u00e9')+'</b>'+(when?' depuis le dernier export ('+when+')':'')+'. Les donn\u00e9es de ce navigateur peuvent dispara\u00eetre \u00e0 la d\u00e9connexion de l\'ordinateur.<br><button class="btn-secondary btn-sm" style="margin-top:6px" onclick="exportCurrentBackup()">Exporter la sauvegarde (JSON)</button></div>';
 }
 function exportCurrentBackup(){
 const i=T?state.tournaments.indexOf(T):-1;
@@ -4020,11 +4018,11 @@ let html='<p style="font-size:.875em;color:var(--txt2);margin-bottom:10px">Pour 
 if(!state.tournaments.length)html+='<p class="info-box">Aucun tournoi &agrave; exporter.</p>';
 state.tournaments.forEach((t,i)=>{
 html+='<div class="card" style="margin-bottom:8px;padding:10px"><div style="font-weight:600;margin-bottom:6px">'+escH(t.name)+' <span style="color:var(--txt2);font-weight:400;font-size:.875em">'+escH(t.classe||'')+'</span></div>'+
-'<button class="btn-secondary btn-sm" onclick="exportBackup('+i+',\'file\')">&#128190; Fichier</button> '+
+'<button class="btn-secondary btn-sm" onclick="exportBackup('+i+',\'file\')">Fichier</button> '+
 '<button class="btn-secondary btn-sm" onclick="exportBackup('+i+',\'copy\')">&#128203; Copier</button></div>';
 });
 if(state.tournaments.length>1){
-html+='<button class="btn-secondary" style="width:100%;margin-bottom:6px" onclick="exportBackup(-1,\'file\')">&#128190; Tout exporter (fichier)</button>';
+html+='<button class="btn-secondary" style="width:100%;margin-bottom:6px" onclick="exportBackup(-1,\'file\')">Tout exporter (fichier)</button>';
 }
 html+='<div class="section-title" style="font-size:.95em;margin:16px 0 6px">&#128229; Importer</div>'+
 '<div ondragover="event.preventDefault();this.style.borderColor=\'var(--pri)\'" ondragleave="this.style.borderColor=\'\'" ondrop="dropBackup(event)" style="border:2px dashed var(--txt2);border-radius:12px;padding:16px;text-align:center;color:var(--txt2);margin-bottom:8px">Glissez ici le fichier .json t\u00e9l\u00e9charg\u00e9 depuis votre Drive</div>'+
@@ -4032,7 +4030,7 @@ html+='<div class="section-title" style="font-size:.95em;margin:16px 0 6px">&#12
 '<textarea id="bk-paste" placeholder="ou collez ici le texte copié" style="min-height:70px"></textarea>'+
 '<button class="btn-primary" style="margin-top:8px" onclick="importBackupText(document.getElementById(\'bk-paste\').value)">Importer le texte</button>'+
 '<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Fermer</button></div>';
-showModal('&#128190; Sauvegarde / transfert',html);
+showModal('Sauvegarde / transfert',html);
 }
 function dropBackup(ev){
 ev.preventDefault();
@@ -4417,7 +4415,7 @@ const q=computeQueue(phase);
 const playingNow=T.matches.filter(m=>m.status==='playing');
 if(!q.entries.length&&!playingNow.length){el.innerHTML='';return;}
 const big=phase==='pool'||phase==='final';
-let h='<div class="card queue-card'+(big?' queue-big':'')+'">'+(big?'<div class="zone-titre zone-lancer" role="heading" aria-level="2">&#9654; MATCHS &Agrave; LANCER<small>'+q.entries.length+' &agrave; jouer &middot; lancez-les ici, puis saisissez les scores plus bas</small></div>':'<div style="font-weight:700;margin-bottom:6px">&#9201; File d\'attente <span style="font-weight:400;color:var(--txt2);font-size:.875em">('+q.entries.length+' &agrave; jouer)</span></div>');
+let h='<div class="card queue-card'+(big?' queue-big':'')+'">'+(big?'<div class="zone-titre zone-lancer" role="heading" aria-level="2">&#9654; Matchs &agrave; lancer<small>'+q.entries.length+' &agrave; jouer &middot; lancez-les ici, puis saisissez les scores plus bas</small></div>':'<div style="font-weight:700;margin-bottom:6px">File d\'attente <span style="font-weight:400;color:var(--txt2);font-size:.875em">('+q.entries.length+' &agrave; jouer)</span></div>');
 h+='<div class="queue-tables">';
 for(let t=1;t<=q.nbTables;t++){
 const u=q.usedTables[t];
@@ -4460,7 +4458,7 @@ if(!pool){el.innerHTML='';return;}
 const q=computeQueue(phase);
 const es=q.entries.filter(e=>e.m.poolId===pool.id);
 if(!es.length){el.innerHTML='';return;}
-let h='<div class="card queue-card"><div style="font-weight:700;margin-bottom:6px">&#9201; File d\'attente '+(phase==='final'?'de la finale':'de la poule')+' <span style="font-weight:400;color:var(--txt2);font-size:.875em">('+es.length+' &agrave; jouer)</span></div><div style="font-size:.9em">';
+let h='<div class="card queue-card"><div style="font-weight:700;margin-bottom:6px">File d\'attente '+(phase==='final'?'de la finale':'de la poule')+' <span style="font-weight:400;color:var(--txt2);font-size:.875em">('+es.length+' &agrave; jouer)</span></div><div style="font-size:.9em">';
 es.forEach((e,i)=>{
 h+='<div class="queue-row"><span style="color:var(--txt2)">'+(i+1)+'.</span> '+escH(playerName(e.m.p1))+' / '+escH(playerName(e.m.p2))+
 (e.ready?' <span style="color:var(--ok-txt)">pr&ecirc;t</span>':' <span style="color:var(--txt2)">attend : '+escH(e.why.join(', '))+'</span>')+'</div>';
@@ -4555,7 +4553,7 @@ let html='<p style="font-size:.88em;color:var(--txt2);margin-bottom:8px">Pr&eacu
 row('pr-rank','&#127942; Classements',true)+
 (hasBracket?row('pr-draw','&#128204; Tableau (arbre du tournoi)',true):'')+
 row('pr-matches','&#128203; Liste des matchs et scores',!hasBracket)+
-'<button class="btn-primary" style="width:100%;margin-top:10px" onclick="doPrint()">&#128424; Imprimer / PDF</button>';
+'<button class="btn-primary" style="width:100%;margin-top:10px" onclick="doPrint()">Imprimer / PDF</button>';
 showModal('Imprimer ou PDF',html);
 }
 function printMatchTable(title,ms){
@@ -4778,8 +4776,8 @@ html+='<div style="overflow:auto;max-height:50vh;-webkit-overflow-scrolling:touc
 html+='<div style="margin-top:12px;font-weight:600">Tournois pris en compte</div>'+c.tournaments.map(t=>
 '<label style="display:flex;align-items:center;gap:10px;padding:8px 2px;font-size:.9em"><input type="checkbox" style="width:22px;height:22px" '+(t.excluded?'':'checked')+' onchange="togglePalmaresTournament(\''+t.id+'\')"><span>'+escH(t.name)+' <span style="color:var(--txt2)">'+escH(t.date||'')+' - '+(t.finished?'termin&eacute;':'en cours')+'</span></span></label>').join('');
 html+='<p style="font-size:.875em;color:var(--txt2);margin-top:8px">Les joueurs sont rapproch&eacute;s par nom. <b>Pts</b> : points de classement de chaque tournoi (leur bar&egrave;me) additionn&eacute;s. <b>Diff</b> : points marqu&eacute;s moins encaiss&eacute;s. <b>Podiums</b> : places 1 &agrave; 3 du classement g&eacute;n&eacute;ral d\'un tournoi termin&eacute;. Les matchs gagn&eacute;s ou perdus par forfait ne sont pas compt&eacute;s. D&eacute;cochez un tournoi pour l\'exclure (copie, essai) : valable jusqu\'&agrave; la fermeture de l\'application.</p>';
-html+='<button class="btn-secondary" style="width:100%;margin-top:8px" onclick="printPalmares()">&#128424; Imprimer / PDF</button>';
-showModal('&#127941; Palmar&egrave;s par classe',html);
+html+='<button class="btn-secondary" style="width:100%;margin-top:8px" onclick="printPalmares()">Imprimer / PDF</button>';
+showModal('Palmar&egrave;s par classe',html);
 }
 function togglePalmaresTournament(id){
 if(palmExcluded[id])delete palmExcluded[id];else palmExcluded[id]=true;
