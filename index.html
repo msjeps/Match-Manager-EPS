@@ -221,6 +221,10 @@ body.light-mode .bv-w,body.light-mode .bv-champ{color:#2E7D32}
 .queue-t.busy{background:rgba(243,193,70,.18);color:var(--pri-lt);border-color:var(--pri)}
 .queue-next{background:var(--surf2);border-radius:10px;padding:10px 12px}
 .queue-row{padding:3px 0}
+.zone-titre{font-size:1.7em;font-weight:800;text-transform:uppercase;letter-spacing:.5px;line-height:1.2;padding:14px 16px;border-radius:12px;margin:22px 0 12px;text-align:center}
+.zone-titre small{display:block;font-size:.5em;font-weight:500;text-transform:none;letter-spacing:0;margin-top:4px}
+.zone-res{background:#2E7D32;color:#fff;margin-top:28px;border-top:0}
+.queue-big .zone-lancer{background:var(--pri);color:#213364;margin:0 0 12px}
 .queue-big{padding:16px}
 .queue-big .queue-t{font-size:1em;padding:8px 14px;min-height:36px}
 .queue-big .queue-next{padding:16px 18px}
@@ -472,6 +476,7 @@ body.light-mode .badge-out{color:#C62828}
 <div id="matches-progress"></div>
 <div id="export-banner"></div>
 <div id="pool-queue"></div>
+<div class="zone-titre zone-res" role="heading" aria-level="2">&#9998; R&Eacute;SULTATS DES MATCHS<small>Saisissez ici le score quand le match est termin&eacute;</small></div>
 <div id="matches-list"></div>
 <div class="btn-group" style="margin-top:20px">
 <button class="btn-secondary" onclick="showScreen('scr-rankings')">&#128202; Classements</button>
@@ -522,6 +527,7 @@ body.light-mode .badge-out{color:#C62828}
 <div id="queue-finals"></div>
 <div id="finals-tabs" class="tab-bar"></div>
 <div id="final-queue"></div>
+<div class="zone-titre zone-res" role="heading" aria-level="2">&#9998; R&Eacute;SULTATS DES MATCHS<small>Saisissez ici le score quand le match est termin&eacute;</small></div>
 <div id="finals-list"></div>
 <button class="btn-secondary" onclick="showFinalRankings()" style="margin-top:16px;width:100%">&#128202; Classement g&eacute;n&eacute;ral</button>
 </div>
@@ -538,6 +544,7 @@ body.light-mode .badge-out{color:#C62828}
 <div class="content">
 <div id="tools-bracket"></div>
 <div id="queue-bracket"></div>
+<div class="zone-titre zone-res" role="heading" aria-level="2">&#9998; R&Eacute;SULTATS DES MATCHS<small>Saisissez ici le score quand le match est termin&eacute;</small></div>
 <div id="bracket-tabs" class="tab-bar"></div>
 <div id="bracket-content"></div>
 <div style="display:flex;gap:8px;margin-top:16px">
@@ -688,7 +695,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.7.5';
+const APP_VERSION='2.7.6';
 /* Accessibilite clavier (PC/Mac) et saisie : Entree/Espace activent un element role=button|switch, Echap ferme une modale, un champ numerique se selectionne au focus */
 document.addEventListener('keydown',function(e){
 const t=e.target;
@@ -3380,6 +3387,7 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <li><b>Ajouter un joueur</b> &agrave; une poule (avant les finales) : il rencontre tous les joueurs de la poule.</li>
 </ul>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">File d'attente et tables</h3>
+<p>L'&eacute;cran des matchs se lit de haut en bas : en haut <b>&#9654; MATCHS &Agrave; LANCER</b> (on lance les matchs), en dessous <b>&#9998; R&Eacute;SULTATS DES MATCHS</b> (on saisit les scores quand ils sont finis).</p>
 <p>Au-dessus des matchs, la carte <b>&#9201; File d'attente</b> montre les tables libres (vert) ou occup&eacute;es (jaune), puis propose le <b>prochain match libre</b> : celui dont aucun joueur n'est en jeu ni en train d'arbitrer. En poules et finales, elle suit l'ordre de la liste (poule affich&eacute;e d'abord) ; en tableau, elle donne la priorit&eacute; aux joueurs qui ont le moins jou&eacute;. Elle sugg&egrave;re aussi une table (celles de la poule du match, si vous les avez d&eacute;finies) et un arbitre (un joueur qui n'a plus de match &agrave; jouer, ou qui a le moins arbitr&eacute;), mais seulement si cela ne bloque aucun autre match : sans joueur libre, le match se lance sans arbitre (par exemple 4 joueurs : les 2 matchs se jouent en m&ecirc;me temps). <b>&#9654; Lancer ce match</b> met le match en cours et applique la table et l'arbitre propos&eacute;s.</p>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">Imprimer ou PDF</h3>
 <p>Le bouton <b>&#128424; Imprimer / PDF</b> (barre d'outils des matchs et &eacute;cran Classements) pr&eacute;pare une feuille A4 en noir et blanc : classements, tableau du tournoi, liste des matchs et scores. Choisissez une imprimante ou &laquo; Enregistrer au format PDF &raquo; pour l'afficher au gymnase.</p>
@@ -4409,7 +4417,7 @@ const q=computeQueue(phase);
 const playingNow=T.matches.filter(m=>m.status==='playing');
 if(!q.entries.length&&!playingNow.length){el.innerHTML='';return;}
 const big=phase==='pool'||phase==='final';
-let h='<div class="card queue-card'+(big?' queue-big':'')+'"><div style="font-weight:700;margin-bottom:6px'+(big?';font-size:1.15em':'')+'">'+(big?'&#9654; Matchs &agrave; lancer':'&#9201; File d\'attente')+' <span style="font-weight:400;color:var(--txt2);font-size:.875em">('+q.entries.length+' &agrave; jouer)</span></div>';
+let h='<div class="card queue-card'+(big?' queue-big':'')+'">'+(big?'<div class="zone-titre zone-lancer" role="heading" aria-level="2">&#9654; MATCHS &Agrave; LANCER<small>'+q.entries.length+' &agrave; jouer &middot; lancez-les ici, puis saisissez les scores plus bas</small></div>':'<div style="font-weight:700;margin-bottom:6px">&#9201; File d\'attente <span style="font-weight:400;color:var(--txt2);font-size:.875em">('+q.entries.length+' &agrave; jouer)</span></div>');
 h+='<div class="queue-tables">';
 for(let t=1;t<=q.nbTables;t++){
 const u=q.usedTables[t];

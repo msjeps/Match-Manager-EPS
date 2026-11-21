@@ -50,6 +50,7 @@ Création : nom, classe, nombre de tables ou terrains, format de match, durée d
 - Saisie des scores avec **brouillons conservés** (un choix d'arbitre ou un changement de carte n'efface rien).
 - **Liste d'une poule** : matchs en cours en haut, à jouer ensuite, terminés en bas (`sortedPoolMatches`, `reorderPoolCards`).
 - Arbitres : liste filtrée (ni les joueurs du match, ni ceux en cours de jeu, ni les arbitres déjà affectés, ni les joueurs retirés), bonus arbitre réglable.
+- **Deux zones** (v2.7.6) : « MATCHS À LANCER » (bandeau or, en haut) puis « RÉSULTATS DES MATCHS » (bandeau vert, au-dessus des cartes de saisie), sur poules, finales et tableau.
 - **File d'attente** : carte au-dessus des matchs (poules, finales, tableau) avec tables libres / occupées, prochain match libre (joueurs ni en jeu ni arbitres ; poules et finales : ordre de la liste, poule affichée d'abord ; tableau : priorité à ceux qui ont le moins joué), table et arbitre suggérés, « Lancer ce match ».
 - **Mode tablette élève** (📱) : un match en grand, boutons + et -, confirmation, match suivant. Le score en tête passe en vert, léger rebond à chaque point.
 - **Annuler** (↩) : retour à l'état exact d'avant la dernière action, 8 niveaux par tournoi.

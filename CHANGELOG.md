@@ -6,6 +6,13 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2.7.6 - 2026-11-20 (APK versionCode 33, cache v50)
+
+Ecran des matchs (poules, finales, tableau) : les deux temps du travail n'etaient pas separes visuellement.
+- **MATCHS A LANCER** : gros titre en majuscules (bandeau or) en haut de la carte de lancement, avec « N a jouer ».
+- **RESULTATS DES MATCHS** : nouveau gros titre (bandeau vert fonce, contraste suffisant) au-dessus des cartes de saisie des scores, pour comprendre qu'on lance en haut puis qu'on saisit en dessous.
+- Aide et guide professeur : phrase expliquant les deux zones.
+
 ## 2.7.5 - 2026-11-18 (APK versionCode 32, cache v49)
 
 Retour iPad : en validant un nom au clavier (coche bleue), le champ se vidait et la personne croyait le nom perdu. Il etait bien ajoute a la liste, sans aucun signe visible.
