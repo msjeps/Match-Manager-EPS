@@ -6,6 +6,12 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2026-11-22 - titre pour les moteurs de recherche (PWA seulement, version affichee 2.7.7 inchangee, cache v52)
+
+- Balise `<title>` : « Match Manager EPS : poules, tableau et classement final » (l'ancien titre « Match Manager EPS » etait trop court pour Bing). Description inchangee. Aucun changement de fonction, pas de nouvelle APK : le titre n'est pas visible dans le WebView.
+
+---
+
 ## 2.7.7 - 2026-11-21 (APK versionCode 34 a reconstruire, cache v51)
 
 Passe de finition visuelle (unslop), sans changement de fonction.
