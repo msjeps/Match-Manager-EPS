@@ -6,6 +6,16 @@ Repères techniques par version : `versionCode` Android (APK) et `CACHE_NAME` du
 
 ---
 
+## 2026-11-24 - 2.8.0 : renommer, tables en cours de tournoi, recalcul des matchs des retardataires (versionCode 35, cache v53, pas encore publiee)
+
+- **Renommer** : bouton « Renommer » sur chaque ligne de la fenetre « Joueurs » (nom mal saisi). Mise en majuscules, doublon refuse, nom d'arbitre et tetes de serie mis a jour, annulable. `applyRename()`.
+- **Tables** : bouton « Tables » dans la barre d'outils des matchs de poule. Touches T1..Tn par poule ; « Toutes les tables pour tous » supprime la reservation. Les matchs a venir sont reattribues, les matchs en cours ou termines ne bougent pas. Annulable. `applyPoolTablesChange()`.
+- Origine : seance 6B du 2026-11-24 (poule 1 finie, tables 1 a 3 libres mais reservees a la poule 3).
+- **Recalcul des matchs** : un joueur ajoute en retard, ou retabli apres « absent » / « dispense », voit ses matchs manquants crees (une rencontre contre chacun, jamais de doublon) et joues en priorite. Les matchs non lances de la poule sont reordonnes par vagues (un match par table) : le retardataire joue dans chaque vague, les autres tables vont aux joueurs restes le plus longtemps sans jouer. `completePoolMatches()`, `rebalancePool()`, `resyncPoolsFor()`. Annulable.
+- **Arbitres** : propose en premier, parmi les joueurs libres, celui qui est reste le plus longtemps sans role (jouer ou arbitrer), puis celui qui a le moins arbitre. Chaque lancement est numerote (`m.seq`).
+
+---
+
 ## 2026-11-22 - titre pour les moteurs de recherche (PWA seulement, version affichee 2.7.7 inchangee, cache v52)
 
 - Balise `<title>` : « Match Manager EPS : poules, tableau et classement final » (l'ancien titre « Match Manager EPS » etait trop court pour Bing). Description inchangee. Aucun changement de fonction, pas de nouvelle APK : le titre n'est pas visible dans le WebView.

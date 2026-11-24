@@ -693,7 +693,7 @@ let timerSeconds=0;
 let selectedPlayerForMove=null;
 
 const LS_KEY='teneps_data';
-const APP_VERSION='2.7.7';
+const APP_VERSION='2.8.0';
 /* Accessibilite clavier (PC/Mac) et saisie : Entree/Espace activent un element role=button|switch, Echap ferme une modale, un champ numerique se selectionne au focus */
 document.addEventListener('keydown',function(e){
 const t=e.target;
@@ -1592,7 +1592,7 @@ function toggleMatchPlaying(mid,ev){
 if(ev.target.closest('input,select,button,label'))return;
 const m=T.matches.find(x=>x.id===mid);if(!m||m.status==='done')return;
 if(isWaitingMatch(m)){toast('Match en pause : '+waitingWho(m));return;}
-m.status=m.status==='playing'?'pending':'playing';save();
+m.status=m.status==='playing'?'pending':'playing';if(m.status==='playing')stampLaunch(m);save();
 refreshAfterChange(m);
 }
 
@@ -3382,7 +3382,9 @@ c.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-inde
 <p>Pendant le tournoi, le bouton <b>&#128101; Joueurs</b> (en haut de la liste des matchs) permet de :</p>
 <ul style="margin:4px 0 4px 20px">
 <li><b>Retirer un joueur</b> : <i>Absent</i> (retir&eacute; de la poule, tous ses matchs sont annul&eacute;s) ou <i>Forfait</i> (ses matchs jou&eacute;s restent compt&eacute;s, les autres sont annul&eacute;s, il est class&eacute; en bas de poule). En tableau &agrave; &eacute;limination, l'adversaire est qualifi&eacute;.</li>
-<li><b>Ajouter un joueur</b> &agrave; une poule (avant les finales) : il rencontre tous les joueurs de la poule.</li>
+<li><b>Ajouter un joueur</b> &agrave; une poule (avant les finales) : il rencontre tous les joueurs de la poule, et ses matchs sont jou&eacute;s en priorit&eacute; pour rattraper les autres. M&ecirc;me chose pour un joueur r&eacute;tabli apr&egrave;s &laquo; absent &raquo; ou &laquo; dispens&eacute; &raquo; : ses matchs manquants sont recr&eacute;&eacute;s.</li>
+<li><b>Renommer</b> : corrige un nom mal saisi, m&ecirc;me tournoi lanc&eacute;.</li>
+<li><b>Tables</b> (bouton de la barre d'outils des matchs de poule) : change les tables de chaque poule en cours de tournoi, ou les ouvre &agrave; toutes. Les matchs d&eacute;j&agrave; lanc&eacute;s ne bougent pas.</li>
 </ul>
 <h3 style="color:var(--pri-lt);margin:12px 0 6px">File d'attente et tables</h3>
 <p>L'&eacute;cran des matchs se lit de haut en bas : en haut <b>&#9654; Matchs &agrave; lancer</b> (on lance les matchs), en dessous <b>R&eacute;sultats des matchs</b> (on saisit les scores quand ils sont finis).</p>
@@ -3716,6 +3718,7 @@ const e=lastUndo();
 el.innerHTML='<div class="tools-bar">'+
 (e?'<button class="btn-secondary btn-sm" onclick="confirmUndo()">&#8617; Annuler : '+escH(e.label.length>34?e.label.slice(0,33)+'…':e.label)+'</button>':'')+
 '<button class="btn-secondary btn-sm" onclick="showPlayersManager()">&#128101; Joueurs</button>'+
+(canEditPoolTables()?'<button class="btn-secondary btn-sm" onclick="showTablesManager()">Tables</button>':'')+
 '<button class="btn-secondary btn-sm" onclick="showPrintDialog()">Imprimer / PDF</button></div>';
 }
 
@@ -3789,6 +3792,7 @@ if(kind&&p.away===kind)return;
 const mine=T.matches.filter(m=>m.p1===pid||m.p2===pid);
 pushUndo((kind==='dispense'?'Dispens\u00e9 : ':kind==='absent'?'Absent : ':'R\u00e9tabli : ')+p.name,mine.map(m=>m.id));
 if(kind)p.away=kind;else{delete p.away;if(T.excluded){T.excluded=T.excluded.filter(id=>id!==pid);if(!T.excluded.length)delete T.excluded;}}
+if(!kind&&T.mode!==3&&T.phase==='matches'&&!T.matches.some(m=>m.phase==='final'))resyncPoolsFor([pid]);
 if(kind){
 mine.forEach(m=>{if(m.status==='playing'){m.status='pending';m.table=null;detachMatchTimerTick(m.id);}});
 if(kind==='absent')T.matches.forEach(m=>{if(m.refereeId===pid&&m.status!=='done'){m.refereeId='';m.referee='';}});
@@ -3818,6 +3822,7 @@ function showPlayersManager(){
 if(!T)return;
 const canAway=T.mode!==3&&!T.matches.some(m=>m.phase==='final');
 const row=p=>'<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:4px"><span style="flex:1;font-weight:600;min-width:120px">'+pnameHtml(p)+'</span>'+
+'<button class="btn-secondary btn-sm" aria-label="Renommer '+escH(p.name)+'" onclick="renamePlayer(\''+p.id+'\')">Renommer</button>'+
 (p.out?'':(p.away?'<button class="btn-success btn-sm" onclick="setAway(\''+p.id+'\',null)">R\u00e9tablir</button>'+(p.away==='absent'?'<button class="btn-secondary btn-sm" onclick="setAway(\''+p.id+'\',\'dispense\')">Dispens\u00e9</button>':'<button class="btn-secondary btn-sm" onclick="setAway(\''+p.id+'\',\'absent\')">Absent</button>'):
 (canAway?'<button class="btn-secondary btn-sm" onclick="setAway(\''+p.id+'\',\'absent\')">Absent</button><button class="btn-secondary btn-sm" onclick="setAway(\''+p.id+'\',\'dispense\')">Dispens\u00e9</button>':''))+
 '<button class="btn-danger btn-sm" onclick="askWithdraw(\''+p.id+'\')">Retirer</button>')+'</div>';
@@ -3857,6 +3862,171 @@ else html+='<p style="font-size:.875em;color:var(--txt2);margin-top:6px">Le joue
 }
 showModal('&#128101; Joueurs du tournoi',html);
 }
+/* ===== RECALCUL DES MATCHS D'UNE POULE (joueur ajouté en retard, rétabli, non encore inscrit) ===== */
+function stampLaunch(m){T.seq=(T.seq||0)+1;m.seq=T.seq;}
+// Crée les matchs manquants de la poule (toutes les paires de joueurs non retirés, une seule fois chacune).
+// Renvoie le nombre de matchs créés.
+function completePoolMatches(pool){
+const ids=pool.playerIds.filter(id=>!isOut(id));
+const has=new Set();
+T.matches.forEach(m=>{if(m.poolId===pool.id&&m.phase==='pool'){has.add(m.p1+'|'+m.p2);has.add(m.p2+'|'+m.p1);}});
+const pm=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool');
+let round=pm.reduce((a,m)=>Math.max(a,m.round||0),0)+1;
+let num=pm.reduce((a,m)=>Math.max(a,m.matchNum||0),0);
+let n=0;
+for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
+if(has.has(ids[i]+'|'+ids[j]))continue;
+T.matches.push({id:uid(),poolId:pool.id,phase:'pool',p1:ids[i],p2:ids[j],score1:null,score2:null,referee:'',table:null,status:'pending',round,matchNum:++num});
+n++;
+}
+return n;
+}
+// Réordonne les matchs non lancés d'une poule par « vagues » (un match par table en même temps) :
+// les joueurs de `priorityIds` (retardataires) jouent dans chaque vague jusqu'à avoir rattrapé les autres ;
+// les autres tables vont aux joueurs restés le plus longtemps sans jouer et ayant le plus de matchs à jouer.
+function rebalancePool(pool,priorityIds){
+const pri=new Set(priorityIds||[]);
+const pend=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool'&&m.status==='pending');
+if(pend.length<2)return;
+const others=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool'&&m.status!=='pending');
+const base=others.reduce((a,m)=>Math.max(a,m.matchNum||0),0);
+const rem={};
+pend.forEach(m=>{rem[m.p1]=(rem[m.p1]||0)+1;rem[m.p2]=(rem[m.p2]||0)+1;});
+const last={};
+others.forEach(m=>{if(m.status==='playing'){last[m.p1]=0;last[m.p2]=0;}});
+const pi=T.pools.indexOf(pool);
+const ts=(T.poolTables&&T.poolTables[pi])||[];
+const nTab=Math.max(1,ts.length||+(T.settings.tables)||10);
+const active=pool.playerIds.filter(id=>!isOut(id)&&!isAway(id)).length;
+const cap=Math.max(1,Math.min(nTab,Math.floor(active/2)));
+const left=pend.slice();
+const order=[];
+for(let wave=1;left.length;wave++){
+const used=new Set();
+for(let k=0;k<cap&&left.length;k++){
+let best=-1,bs=-Infinity;
+left.forEach((m,i)=>{
+if(used.has(m.p1)||used.has(m.p2))return;
+const w1=wave-(last[m.p1]===undefined?-1:last[m.p1]),w2=wave-(last[m.p2]===undefined?-1:last[m.p2]);
+const sc=(pri.has(m.p1)||pri.has(m.p2)?1000:0)+3*(w1+w2)+(rem[m.p1]+rem[m.p2])-(isAway(m.p1)||isAway(m.p2)?5000:0);
+if(sc>bs){bs=sc;best=i;}
+});
+if(best<0)break;
+const m=left.splice(best,1)[0];
+used.add(m.p1);used.add(m.p2);
+last[m.p1]=wave;last[m.p2]=wave;
+rem[m.p1]--;rem[m.p2]--;
+order.push(m);
+}
+}
+order.forEach((m,i)=>{m.matchNum=base+i+1;});
+}
+// Complète puis réordonne les poules touchant ces joueurs ; renvoie le nombre de matchs créés
+function resyncPoolsFor(pids){
+let created=0;
+T.pools.forEach(pool=>{
+const mine=(pids||[]).filter(id=>pool.playerIds.includes(id));
+if(!mine.length)return;
+created+=completePoolMatches(pool);
+rebalancePool(pool,mine);
+});
+recyclePendingTables();
+return created;
+}
+
+/* ===== RENOMMER UN JOUEUR (tournoi lancé) ===== */
+// Logique pure : renvoie un message d'erreur, ou '' si le renommage est fait. Le nom est repris tel quel
+// dans les matchs (champ texte `referee`), le tableau (têtes de série) ; les identifiants ne changent pas.
+function applyRename(pid,raw){
+const p=T.players.find(x=>x.id===pid);if(!p)return 'Joueur introuvable';
+const name=String(raw||'').replace(/\s+/g,' ').trim().toUpperCase().slice(0,40);
+if(!name)return 'Entrez un nom';
+if(name===p.name)return '';
+if(T.players.some(x=>x.id!==pid&&x.name===name))return 'Ce nom existe d\u00e9j\u00e0 dans le tournoi';
+pushUndo('Renomm\u00e9 : '+p.name,[]);
+const old=p.name;
+p.name=name;
+T.matches.forEach(m=>{
+if(m.refereeId===pid||(!m.refereeId&&m.referee&&m.referee.trim().toLowerCase()===old.toLowerCase()))m.referee=name;
+});
+if(T.bracket&&Array.isArray(T.bracket.seedInfo))T.bracket.seedInfo.forEach(si=>{if(si&&si.id===pid)si.name=name;});
+save();
+return '';
+}
+function renamePlayer(pid){
+const p=T.players.find(x=>x.id===pid);if(!p)return;
+askText('Renommer un joueur','Nouveau nom (en MAJUSCULES) :',p.name,v=>{
+const err=applyRename(pid,v);
+if(err){badField(['ask-text'],err);return false;}
+setTimeout(()=>{gotoPhaseScreen();showPlayersManager();toast('Nom corrig\u00e9 \u2713');},0);
+return true;
+});
+}
+
+/* ===== TABLES PAR POULE (tournoi lancé) ===== */
+// La file d'attente (computeQueue) ne propose à une poule que ses tables ; une poule sans table réservée
+// peut utiliser toutes les tables libres du tournoi.
+function canEditPoolTables(){
+return !!(T&&T.mode!==3&&T.phase==='matches'&&T.pools.length&&T.matches.some(m=>m.phase==='pool'&&m.status!=='done'));
+}
+let tblDraft=[];
+// Logique pure : tables = [[n°...] par poule]. Les matchs en cours ou terminés ne bougent pas.
+function applyPoolTablesChange(tables){
+const nb=Math.max(1,+(T.settings.tables)||10);
+for(const arr of tables)for(const n of arr)if(!(n>=1&&n<=nb))return 'Les tables vont de 1 \u00e0 '+nb;
+pushUndo('Tables des poules',[]);
+T.poolTables=tables.map(a=>a.slice().sort((x,y)=>x-y));
+recyclePendingTables();
+save();
+return '';
+}
+// Réattribue les tables des matchs de poule non lancés selon T.poolTables (ordre des numéros de match)
+function recyclePendingTables(){
+T.pools.forEach((pool,pi)=>{
+const ts=(T.poolTables&&T.poolTables[pi])||[];
+T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool'&&m.status==='pending')
+.sort((a,b)=>(a.matchNum||0)-(b.matchNum||0))
+.forEach((m,i)=>{m.table=ts.length?ts[i%ts.length]:null;});
+});
+}
+function showTablesManager(){
+if(!T)return;
+const nb=Math.max(1,+(T.settings.tables)||10);
+const inUse={};
+T.matches.forEach(m=>{if(m.status==='playing'&&m.table)inUse[m.table]=1;});
+tblDraft=T.pools.map((_,pi)=>((T.poolTables&&T.poolTables[pi])||[]).slice());
+let html='<p class="info-box" style="margin-bottom:10px">Touchez les tables que chaque poule peut utiliser. Une poule <b>sans aucune table</b> coch\u00e9e peut jouer sur n\'importe quelle table libre. Les matchs d\u00e9j\u00e0 lanc\u00e9s ne changent pas de table.</p>';
+T.pools.forEach((pool,pi)=>{
+html+='<div class="section-title" style="font-size:.95em;margin:10px 0 6px">'+escH(pool.name)+'</div><div style="display:flex;flex-wrap:wrap;gap:6px">';
+for(let t=1;t<=nb;t++){
+const on=tblDraft[pi].includes(t);
+html+='<button type="button" class="family-btn'+(on?' selected':'')+'" style="min-width:52px;min-height:44px;flex:0 0 auto" aria-pressed="'+on+'" title="'+(inUse[t]?'Table occup\u00e9e en ce moment':'')+'" onclick="toggleDraftTable('+pi+','+t+',this)">T'+t+(inUse[t]?'*':'')+'</button>';
+}
+html+='</div>';
+});
+html+='<p style="font-size:.875em;color:var(--txt2);margin-top:8px">* table occup\u00e9e par un match en cours.</p>'+
+'<div class="modal-actions"><button class="btn-secondary" onclick="clearDraftTables()">Toutes les tables pour tous</button><button class="btn-primary" style="width:auto;min-height:44px" onclick="saveTablesManager()">Valider</button></div>';
+showModal('Tables des poules',html);
+}
+function toggleDraftTable(pi,t,el){
+const a=tblDraft[pi];if(!a)return;
+const i=a.indexOf(t);
+if(i>=0)a.splice(i,1);else a.push(t);
+if(el){el.classList.toggle('selected',i<0);el.setAttribute('aria-pressed',i<0?'true':'false');}
+}
+function clearDraftTables(){
+tblDraft=T.pools.map(()=>[]);
+saveTablesManager();
+}
+function saveTablesManager(){
+const err=applyPoolTablesChange(tblDraft);
+if(err){toast(err,4500);return;}
+closeModal();
+const a=document.querySelector('.screen.active');
+if(a&&a.id==='scr-matches')renderMatches();
+toast('Tables mises \u00e0 jour');
+}
+
 function askWithdraw(pid){
 const p=T.players.find(x=>x.id===pid);if(!p)return;
 const finalsExist=T.matches.some(m=>m.phase==='final');
@@ -3921,14 +4091,8 @@ if(!pool)return;
 pushUndo('Joueur ajouté : '+name,[]);
 const np={id:uid(),name,level};
 T.players.push(np);
-const pm=T.matches.filter(m=>m.poolId===pool.id&&m.phase==='pool');
-const round=pm.reduce((a,m)=>Math.max(a,m.round||0),0)+1;
-let num=pm.reduce((a,m)=>Math.max(a,m.matchNum||0),0);
-pool.playerIds.filter(id=>!isOut(id)).forEach(oid=>{
-T.matches.push({id:uid(),poolId:pool.id,phase:'pool',p1:oid,p2:np.id,score1:null,score2:null,referee:'',table:null,status:'pending',round,matchNum:++num});
-});
 pool.playerIds.push(np.id);
-assignPoolTablesToMatches();
+resyncPoolsFor([np.id]);
 }
 curBracketTab=0;
 save();closeModal();
@@ -4132,7 +4296,7 @@ if(isWaitingMatch(m)){toast('Match en pause : '+waitingWho(m));return;}
 const a=document.querySelector('.screen.active');
 if(a&&a.id!=='scr-live')liveReturn=a.id;
 liveMid=mid;
-if(m.status==='pending'){m.status='playing';save();}
+if(m.status==='pending'){m.status='playing';stampLaunch(m);save();}
 showScreen('scr-live');
 }
 function closeLive(){
@@ -4318,6 +4482,24 @@ closeModal();
 if(cb)cb(v);
 }
 
+// Saisie d'un texte (nom) : onOk reçoit la chaîne saisie et renvoie true pour fermer la fenêtre
+// (sinon elle reste ouverte, le rappel ayant signalé l'erreur avec badField)
+let askTextCb=null;
+function askText(title,label,value,onOk){
+modalCb=null;
+askTextCb=onOk;
+showModal(escH(title),'<label for="ask-text" style="display:block;margin-bottom:8px">'+escH(label)+'</label>'+
+'<input type="text" id="ask-text" maxlength="40" autocapitalize="characters" spellcheck="false" autocomplete="off" style="text-transform:uppercase" value="'+escH(value==null?'':value)+'" onkeydown="if(event.key===\'Enter\')askTextOk()">'+
+'<div class="modal-actions"><button class="btn-secondary" onclick="askTextCb=null;closeModal()">Annuler</button><button class="btn-primary" style="width:auto;min-height:44px" onclick="askTextOk()">Valider</button></div>');
+setTimeout(()=>{const i=document.getElementById('ask-text');if(i){i.focus();i.select();}},50);
+}
+function askTextOk(){
+const i=document.getElementById('ask-text');
+const v=i?i.value:'';
+const cb=askTextCb;if(!cb)return;
+if(cb(v)!==false){askTextCb=null;closeModal();}
+}
+
 
 /* ===== FILE D'ATTENTE : prochain match libre, tables libres, arbitre suggéré ===== */
 // Un joueur est « occupé » s'il joue ou arbitre un match en cours. Un match est « prêt » si ses
@@ -4338,8 +4520,9 @@ function computeQueue(phase){
 const nbTables=Math.max(1,+(T.settings.tables)||10);
 const busy={};            // id joueur -> 'joue' | 'arbitre'
 const usedTables={};
-const played={},refd={};
+const played={},refd={},lastRole={};
 T.matches.forEach(m=>{
+if(m.seq){[m.p1,m.p2,m.refereeId].forEach(id=>{if(id&&m.seq>(lastRole[id]||0))lastRole[id]=m.seq;});}
 if(m.status==='done'){played[m.p1]=(played[m.p1]||0)+1;played[m.p2]=(played[m.p2]||0)+1;}
 if(m.refereeId)refd[m.refereeId]=(refd[m.refereeId]||0)+1;
 if(m.status==='playing'){
@@ -4403,6 +4586,7 @@ const cands=getRefereeCandidates(e.m).filter(p=>!takenRef[p.id]&&!reserved.has(p
 cands.sort((a,b)=>
 ((stillToPlay.has(a.id)?1:0)-(stillToPlay.has(b.id)?1:0))
 ||((poolObj&&poolObj.playerIds.includes(a.id)?0:1)-(poolObj&&poolObj.playerIds.includes(b.id)?0:1))
+||((lastRole[a.id]||0)-(lastRole[b.id]||0))
 ||((refd[a.id]||0)-(refd[b.id]||0))||a.name.localeCompare(b.name));
 if(cands.length){e.ref=cands[0].id;takenRef[e.ref]=1;}
 });
@@ -4538,6 +4722,7 @@ const q=computeQueue(m.phase);
 const e=q.entries.find(x=>x.m.id===mid);
 if(!e||!e.ready||e.table===null)return toast('Aucune table libre');
 m.status='playing';
+stampLaunch(m);
 m.table=e.table;
 if(!m.refereeId&&e.ref){m.refereeId=e.ref;m.referee=playerName(e.ref);}
 save();

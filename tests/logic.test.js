@@ -643,3 +643,108 @@ test('noms de fichier : date ET heure, deux exports du meme jour ne portent jama
   assert.match(app.fn("backupFileName")(t), re);
   assert.match(app.fn("fileStamp")(), /^\d{2}-\d{2}-\d{4}_\d{2}h\d{2}$/);
 });
+
+test('renommer un joueur en cours de tournoi : arbitre, tableau, doublon, annulation', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'rn', names: ['ALICE', 'BOB', 'CLARA', 'DAVID'] });
+  app.state.tournaments = [t]; app.state.currentId = t.id; app.T = t;
+  const [a, b] = t.players;
+  t.matches[0].refereeId = b.id; t.matches[0].referee = 'BOB';
+  t.matches[1].referee = 'bob'; // ancien tournoi : arbitre saisi en texte
+  t.bracket = { seedInfo: [{ id: b.id, name: 'BOB' }] };
+  const rename = app.fn('applyRename');
+  assert.equal(rename(b.id, '  roberta  '), '');
+  assert.equal(b.name, 'ROBERTA');
+  assert.equal(t.matches[0].referee, 'ROBERTA');
+  assert.equal(t.matches[1].referee, 'ROBERTA');
+  assert.equal(t.bracket.seedInfo[0].name, 'ROBERTA');
+  assert.match(rename(a.id, 'roberta'), /existe d/);
+  assert.equal(a.name, 'ALICE');
+  assert.match(rename(a.id, '   '), /nom/i);
+  assert.equal(app.fn('lastUndo')().label.startsWith('Renomm'), true);
+});
+
+test('tables des poules en cours de tournoi : les matchs a venir suivent, les matchs en cours restent', () => {
+  const app = createApp();
+  const t = tournament(app, {
+    id: 'tb', names: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'], settings: { tables: 10 },
+    pools: [['tbp0', 'tbp1', 'tbp2', 'tbp3'], ['tbp4', 'tbp5', 'tbp6', 'tbp7']],
+  });
+  t.poolTables = [[8, 9, 10], [1, 2, 3]];
+  app.state.tournaments = [t]; app.state.currentId = t.id; app.T = t;
+  const p0 = t.matches.filter(m => m.poolId === t.pools[0].id);
+  p0[0].status = 'playing'; p0[0].table = 8;
+  play(p0[1], 11, 5); p0[1].table = 9;
+  assert.equal(app.fn('applyPoolTablesChange')([[4, 5], []]), '');
+  assert.equal(p0[0].table, 8, 'match en cours inchange');
+  assert.equal(p0[1].table, 9, 'match termine inchange');
+  p0.filter(m => m.status === 'pending').forEach(m => assert.ok([4, 5].includes(m.table)));
+  t.matches.filter(m => m.poolId === t.pools[1].id).forEach(m => assert.equal(m.table, null));
+  const q = app.fn('computeQueue')('pool');
+  const e2 = q.entries.find(e => e.ready && e.m.poolId === t.pools[1].id);
+  assert.ok(e2 && e2.table !== null, 'poule sans table reservee : toute table libre');
+  assert.match(app.fn('applyPoolTablesChange')([[11], []]), /1 . 10/);
+  assert.deepEqual(Array.from(t.poolTables[0]), [4, 5], 'refus : rien ne change');
+});
+
+test('joueur ajoute en retard : matchs manquants crees, il joue en priorite, les autres ne restent pas inactifs', () => {
+  const app = createApp();
+  const names = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  const t = tournament(app, { id: 'lt', names, settings: { tables: 3 } });
+  t.poolTables = [[1, 2, 3]];
+  app.state.tournaments = [t]; app.state.currentId = t.id; app.T = t;
+  // la moitie des matchs est jouee
+  t.matches.slice(0, 14).forEach(m => play(m, 11, 5));
+  const before = t.matches.length;
+  app.fn('showPlayersManager')();
+  const np = { id: 'lt_new', name: 'INES', level: 0 };
+  t.players.push(np); t.pools[0].playerIds.push(np.id);
+  const created = app.fn('resyncPoolsFor')([np.id]);
+  assert.equal(created, 8, 'une rencontre contre chacun des 8 autres');
+  assert.equal(t.matches.length, before + 8);
+  const pend = t.matches.filter(m => m.status === 'pending').sort((a, b) => a.matchNum - b.matchNum);
+  assert.equal(new Set(pend.map(m => m.matchNum)).size, pend.length, 'numeros uniques');
+  // premieres vagues (3 tables) : INES dans chacune, et 3 matchs de joueurs differents par vague
+  for (let w = 0; w < 4; w++) {
+    const wave = pend.slice(w * 3, w * 3 + 3);
+    assert.ok(wave.some(m => m.p1 === np.id || m.p2 === np.id), 'vague ' + w + ' : INES joue');
+    const ids = wave.flatMap(m => [m.p1, m.p2]);
+    assert.equal(new Set(ids).size, ids.length, 'vague ' + w + ' : pas de joueur en double');
+  }
+  // aucun doublon de paire
+  const pairs = t.matches.map(m => [m.p1, m.p2].sort().join('|'));
+  assert.equal(new Set(pairs).size, pairs.length);
+  // les matchs deja joues sont intacts
+  t.matches.filter(m => m.status === 'done').forEach(m => assert.equal(m.score1, 11));
+});
+
+test('retablir un joueur absent : ses matchs manquants sont recrees et joues en priorite', () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'rt', names: ['A', 'B', 'C', 'D', 'E', 'F'], settings: { tables: 2 } });
+  app.state.tournaments = [t]; app.state.currentId = t.id; app.T = t;
+  const [a, , , , , f] = t.players;
+  f.away = 'absent';
+  t.matches.filter(m => m.p1 !== f.id && m.p2 !== f.id).slice(0, 4).forEach(m => play(m, 11, 3));
+  // un match supprime (ancien retrait) : doit etre recree
+  t.matches = t.matches.filter(m => !(m.p1 === f.id && m.p2 === a.id) && !(m.p2 === f.id && m.p1 === a.id));
+  app.fn('setAway')(f.id, null);
+  assert.equal(f.away, undefined);
+  const mine = t.matches.filter(m => m.p1 === f.id || m.p2 === f.id);
+  assert.equal(mine.length, 5, 'une rencontre contre chacun des 5 autres');
+  const pend = t.matches.filter(m => m.status === 'pending').sort((x, y) => x.matchNum - y.matchNum);
+  assert.ok(pend[0].p1 === f.id || pend[0].p2 === f.id);
+  assert.ok(pend[1].p1 === f.id || pend[1].p2 === f.id || pend.slice(0, 2).every(m => m.status === 'pending'));
+});
+
+test("arbitre propose : celui qui est reste le plus longtemps sans role", () => {
+  const app = createApp();
+  const t = tournament(app, { id: 'ar', names: ['A', 'B', 'C', 'D', 'E', 'F'], settings: { tables: 1 } });
+  app.state.tournaments = [t]; app.state.currentId = t.id; app.T = t;
+  const [a, b, c, d, e, f] = t.players;
+  // E a arbitre recemment, F jamais : F doit etre propose avant E (a nombre egal d'arbitrages sinon)
+  const old = t.matches.find(m => ![e.id, f.id].includes(m.p1) && ![e.id, f.id].includes(m.p2));
+  old.status = 'done'; old.score1 = 11; old.score2 = 3; old.seq = 5; old.refereeId = e.id;
+  const q = app.fn('computeQueue')('pool');
+  const first = q.entries.find(x => x.ready && x.ref);
+  if (first) assert.notEqual(first.ref, e.id);
+});

@@ -158,11 +158,11 @@ def contenu():
                "le joueur en tête s'affiche en vert, confirmation avant validation, puis match suivant. Utile pour "
                "laisser les élèves saisir le score."))
     s.append(B("<b>Dispensés et absents (matchs en pause)</b> : un élève qui ne peut pas jouer garde sa place dans la "
-               "poule et tous ses matchs, rien n'est recalculé. <b>Dispensé</b> : bouton D à l'inscription ou bouton "
+               "poule et tous ses matchs. <b>Dispensé</b> : bouton D à l'inscription ou bouton "
                "« Dispensé » dans « Joueurs » ; il ne joue pas et arbitre toutes les poules. <b>Absent</b> (bouton "
                "« Joueurs ») : ses matchs non joués attendent la prochaine séance, il n'arbitre pas. Les matchs en "
-               "pause sont grisés et absents de la file d'attente. « Rétablir » remet le joueur en jeu dans l'ordre "
-               "d'origine. Le classement provisoire garde ces joueurs à leur rang, en couleur (orange dispensé, gris "
+               "pause sont grisés et absents de la file d'attente. « Rétablir » remet le joueur en jeu : ses matchs manquants sont recréés et joués en priorité pour "
+               "rattraper les autres. Le classement provisoire garde ces joueurs à leur rang, en couleur (orange dispensé, gris "
                "absent), avec les colonnes Moy (points par match) et J (joués / total) ; un bouton choisit le tri "
                "« Points par match » (par défaut tant que des matchs sont en pause) ou « Points totaux »."))
     s.append(B("<b>Fin des matchs jouables</b> : quand il ne reste que des matchs en pause, un encadré propose « Attendre "
@@ -172,7 +172,8 @@ def contenu():
                "arrière. Les exports XLSX et l'impression indiquent le statut et la mention « provisoire »."))
     s.append(B("<b>Forfait ou retrait définitif</b> (bouton « Joueurs », « Retirer ») : un forfait reste classé en "
                "dernier, ses matchs joués sont conservés et, en tableau, l'adversaire est qualifié. Un joueur peut "
-               "aussi être ajouté en retard. Le réglage des arbitres (poule ou tous) est aussi dans « Joueurs »."))
+               "aussi être ajouté en retard : il rencontre tous les joueurs de la poule, en priorité. « Renommer » corrige un nom mal saisi. "
+               "Le bouton « Tables » (matchs de poule) change les tables de chaque poule en cours de tournoi. Le réglage des arbitres (poule ou tous) est aussi dans « Joueurs »."))
     s.append(B("<b>Sauvegarde sur un ordinateur</b> : si la session efface les données du navigateur à la "
                "déconnexion, exportez le fichier JSON (écran d'accueil, « Sauvegarde / transfert », ou bandeau "
                "orange) avant de vous déconnecter et déposez-le dans votre Drive. À la séance suivante, téléchargez-le "
